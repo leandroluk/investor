@@ -1,0 +1,16 @@
+packages:
+  - apps/*
+  - libs/*
+  - tools/*
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - '@tailwindcss/oxide'
+  - core-js
+  - core-js-pure
+  - esbuild
+  - fsevents
+  - lefthook
+  - sharp
+  - unrs-resolver

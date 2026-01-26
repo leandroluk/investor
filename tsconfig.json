@@ -1,0 +1,16 @@
+{
+  "extends": "@libs/config-typescript/base.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": [
+    "libs/**/*",
+    "apps/**/*",
+    "tools/**/*",
+    "*.config,*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@libs/config-typescript",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "25.0.10",
+    "next": "16.1.4",
+    "typescript": "5.9.3"
+  }
+}

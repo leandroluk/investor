@@ -1,0 +1,13 @@
+{
+  "name": "@libs/config-vitest",
+  "private": true,
+  "version": "1.0.0",
+  "devDependencies": {
+    "@libs/config-typescript": "workspace:*",
+    "@types/node": "^25.0.10",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "vite-tsconfig-paths": "^6.0.5",
+    "vitest": "^4.0.18"
+  }
+}

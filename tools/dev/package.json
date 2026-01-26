@@ -1,0 +1,22 @@
+{
+  "name": "@tools/dev",
+  "version": "1.0.0",
+  "private": true,
+  "bin": {
+    "dev-gen-deps-graph": "./bin/gen-deps-graph.js",
+    "dev-watch": "./bin/watch.js",
+    "dev-k3d-build": "./bin/k3d-build.js"
+  },
+  "dependencies": {
+    "chokidar": "^5.0.0",
+    "concurrently": "^9.2.1",
+    "fast-glob": "^3.3.3",
+    "tsc-alias": "^1.8.16",
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@libs/config-eslint": "workspace:^",
+    "@types/node": "25.0.10",
+    "pako": "^2.1.0"
+  }
+}

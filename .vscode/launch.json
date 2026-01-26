@@ -1,0 +1,84 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // apps/api
+    {
+      "name": "api",
+      "request": "launch",
+      "type": "node",
+      "cwd": "${workspaceFolder}/apps/api",
+      "runtimeExecutable": "pnpm",
+      "console": "integratedTerminal",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "api",
+        "order": 1
+      },
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    // apps/web (server-side)
+    {
+      "name": "web:server",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/apps/web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "web",
+        "order": 2
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_OPTIONS": "--inspect"
+      }
+    },
+    // apps/web (client-side, React)
+    {
+      "name": "web:chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1.nip.io:3000",
+      "webRoot": "${workspaceFolder}/apps/web",
+      "presentation": {
+        "hidden": false,
+        "group": "web",
+        "order": 3
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**",
+        "${workspaceFolder}/.next/**",
+        "**/next/dist/**",
+        "**/next/**",
+        "**/*.min.js"
+      ]
+    },
+  ],
+  "compounds": [
+    {
+      "name": "web",
+      "configurations": [
+        "web:server",
+        "web:chrome"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "web",
+        "order": 101
+      }
+    }
+  ]
+}
