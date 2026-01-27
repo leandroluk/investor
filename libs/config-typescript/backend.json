@@ -7,7 +7,6 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "moduleResolution": "node",
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
     "removeComments": true,
