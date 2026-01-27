@@ -1,4 +1,4 @@
-
+// libs/config-eslint/vitest.eslint.config.mjs
 /** @type {import('eslint').Linter.Config} */
 const vitestConfig = {
   name: 'vitest',

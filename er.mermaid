@@ -1,0 +1,114 @@
+erDiagram
+  user {
+    uuidv7             id                 "PK"
+    timestamp[3]       created_at          ""
+    timestamp[3]       updated_at          ""
+    null[timestamp[3]] deleted_at          ""
+    varchar[255]       email              "UK"
+    varchar[255]       password_hash       ""
+    varchar[100]       name                ""
+    null[char[42]]     wallet_address     "UK"
+    varchar[20]        status              ""
+    boolean            two_factor_enabled  ""
+    null[varchar[32]]  two_factor_secret   ""
+    null[timestamp]    blocked_until       ""
+  }
+
+  user_device {
+    uuidv7             id             "PK"
+    varchar[20]        platform        ""
+    varchar[255]       push_token      ""
+    null[varchar[100]] device_model    ""
+    null[varchar[20]]  app_version     ""
+    boolean            is_active       ""
+    timestamp[3]       last_active_at  ""
+    timestamp[3]       created_at      ""
+    uuidv7             user_id        "FK"
+  }
+
+  login {
+    uuidv7             id         "PK"
+    timestamp[3]       timestamp   ""
+    timestamp[3]       created_at  ""
+    inet               ip          ""
+    null[varchar[100]] location    ""
+    null[varchar[100]] device      ""
+    boolean            success     ""
+    uuidv7             user_id    "FK"
+  }
+
+  notification {
+    uuidv7       id         "PK"
+    varchar[100] title       ""
+    text         body        ""
+    varchar[50]  type        ""
+    boolean      is_read     ""
+    timestamp[3] created_at  ""
+    uuidv7       user_id    "FK"
+  }
+
+  system_config {
+    varchar[100]       key         "PK"
+    text               value        ""
+    null[varchar[255]] description  ""
+    timestamp[3]       updated_at   ""
+  }
+
+  asset {
+    varchar[20]    id               "PK"
+    varchar[10]    symbol            ""
+    varchar[20]    network           ""
+    null[char[42]] contract_address  ""
+    smallint       decimals          ""
+    boolean        is_active         ""
+    timestamp[3]   created_at        ""
+    timestamp[3]   updated_at        ""
+  }
+
+  strategy {
+    varchar[50]     id                     "PK"
+    timestamp[3]    created_at              ""
+    timestamp[3]    updated_at              ""
+    null[timestamp] deleted_at              ""
+    text            description             ""
+    decimal[5,2]    expected_apy_range_low  ""
+    decimal[5,2]    expected_apy_range_high ""
+  }
+
+  investment {
+    uuidv7             id                    "PK"
+    varchar[50]        strategy_id           "FK"
+    varchar[20]        asset_id              "FK"
+    decimal[18,2]      amount_usd             ""
+    decimal[24,18]     amount_token           ""
+    varchar[20]        status                 ""
+    decimal[18,2]      current_value          ""
+    decimal[18,2]      total_earning          ""       
+    null[char[66]]     transaction_hash       ""
+    null[char[66]]     withdraw_tx_hash       ""
+    varchar[50]        frozen_strategy_name   ""
+    decimal[5,2]       frozen_apy_range_low   ""
+    decimal[5,2]       frozen_apy_range_high  ""
+    timestamp[3]       created_at             ""
+    timestamp[3]       updated_at             ""
+    null[timestamp[3]] deleted_at             ""
+    null[timestamp[3]] withdrawn_at           ""
+    uuidv7             user_id               "FK"
+  }
+
+  investment_earning {
+    uuidv7        id            "PK"
+    timestamp[3]  recorded_at    ""
+    timestamp[3]  created_at     ""
+    decimal[18,6] amount         ""
+    decimal[5,2]  apy_at_time    ""
+    uuidv7        investment_id "FK"
+  }
+
+  user       ||--o{ user_device        : has
+  user       ||--o{ login              : logs
+  user       ||--o{ notification       : receives
+  user       ||--o{ investment         : owns
+  strategy   ||--o{ investment         : defines
+  asset      ||--o{ investment         : denominates
+  investment ||--o{ investment_earning : generates

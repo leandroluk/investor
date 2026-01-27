@@ -1,12 +1,13 @@
+// libs/config-eslint/backend.eslint.config.mjs
 import globals from 'globals';
 import baseConfig from './base.eslint.config.mjs';
 import vitestConfig from './vitest.eslint.config.mjs';
 
 /** @type {import('eslint').Linter.Config[]} */
-const nestConfig = [
+const backendConfig = [
   {
     ...baseConfig,
-    name: 'nest',
+    name: 'backend',
     languageOptions: {
       ...baseConfig.languageOptions,
       globals: {
@@ -18,4 +19,4 @@ const nestConfig = [
   vitestConfig,
 ];
 
-export default nestConfig
+export default backendConfig

@@ -1,3 +1,4 @@
+// libs/config-vitest/backend.config.mjs
 /// <reference types="vitest" />
 import {defineConfig, mergeConfig} from 'vitest/config';
 import baseConfig from './base.config.mjs';

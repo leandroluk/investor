@@ -1,3 +1,4 @@
+// libs/config-eslint/base.eslint.config.mjs
 import js from '@eslint/js';
 import eslintPluginN from 'eslint-plugin-n';
 import eslintPluginPrettier from 'eslint-plugin-prettier';

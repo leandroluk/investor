@@ -7,13 +7,13 @@
   "editor.formatOnSaveMode": "file",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.codeActionsOnSave": [
-    "source.organizeImports",
-    "source.removeUnusedImports",
-    "source.fixAll.eslint",
-    "source.sortImports",
-    "source.organizeLinkDefinitions",
-  ],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.removeUnusedImports": "always",
+    "source.fixAll.eslint": "always",
+    "source.sortImports": "always",
+    "source.organizeLinkDefinitions": "always",
+  },
   "editor.rulers": [
     80,
     100,

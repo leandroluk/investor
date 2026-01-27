@@ -1,3 +1,4 @@
+// libs/config-eslint/library.eslint.config.mjs
 import globals from 'globals'
 import path from 'path'
 import baseConfig from './base.eslint.config.mjs'

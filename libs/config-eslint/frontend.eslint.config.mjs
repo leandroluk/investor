@@ -1,3 +1,4 @@
+// libs/config-eslint/frontend.eslint.config.mjs
 import * as nextPlugin from '@next/eslint-plugin-next';
 import globals from "globals";
 import path from "path";
@@ -7,7 +8,7 @@ import baseConfig from "./base.eslint.config.mjs";
 const nextConfig = [
   {
     ...baseConfig,
-    name: "next",
+    name: "frontend",
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       ...baseConfig.languageOptions,

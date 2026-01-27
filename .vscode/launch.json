@@ -21,6 +21,26 @@
         "<node_internals>/**"
       ]
     },
+    // apps/doc
+    {
+      "name": "doc",
+      "request": "launch",
+      "type": "node",
+      "cwd": "${workspaceFolder}/apps/doc",
+      "runtimeExecutable": "pnpm",
+      "console": "integratedTerminal",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "doc",
+        "order": 1
+      },
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
     // apps/web (server-side)
     {
       "name": "web:server",
