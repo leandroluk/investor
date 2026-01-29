@@ -1,0 +1,53 @@
+---
+title: "System Healthcheck"
+description: "Verifies the health of the system and its connections."
+---
+
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+- The system checks all registered `ConnectableContract` implementations.
+- Returns `up` and uptime if all connections are healthy.
+- Throws `UnhealthyError` (503 Service Unavailable) if any critical connection fails.
+
+## Request
+- **Method**: `GET`
+- **Path**: `/support/health`
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Database
+    participant Cache
+
+    Client->>API: GET /support/health
+    API->>Database: Ping
+    Database-->>API: Pong
+    API->>Cache: Ping
+    Cache-->>API: Error
+    API-->>Client: 503 Unhealthy
+```
+</MermaidZoom>
+
+## Success Case
+- **Status**: `200 OK`
+- **Body**:
+```json
+{
+  "uptime": "1d 2h 30m"
+}
+```
+
+## Error Case
+- **Status**: `503 Service Unavailable`
+- **Body**:
+```json
+{
+  "code": "UNHEALTHY",
+  "message": "Unhealthy"
+}
+```

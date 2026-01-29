@@ -5,60 +5,64 @@ legend:
 
 ---
 
-- api
-  - system
-    - ⛔ healthcheck
-    - ⛔ get configuration (maintenance_mode, min_version) # Faltou este para o App checar antes de abrir
+- iam (Identity & Access Management)
+  - application/command
+    - ⛔ [auth] register user using email and password
+    - ⛔ [auth] activate user using email and code
+    - ⛔ [auth] login using email and password
+    - ⛔ [auth] authorize 2fa code
+    - ⛔ [sso] login using internal sso code
+    - ⛔ [profile] update user profile
+    - ⛔ [device] register device (push token)
+    - ⛔ [device] revoke device (remote logout)
+
+  - application/query
+    - ⛔ [auth] check if email is available
+    - ⛔ [sso] get sso redirect url
+    - ⛔ [profile] get user profile
+    - ⛔ [device] list active devices
+
+  - application/saga
+    - ⛔ [onboarding] coordination between registration, welcome email and initial notification
+
+- catalog (Market Data & Public Info)
+  - application/query
+    - ⛔ [assets] list supported assets
+    - ⛔ [strategies] list investment strategies
+    - ⛔ [simulation] simulate yield
+
+- portfolio (User Assets & Performance)
+  - application/command
+    - ⛔ [investment] create investment intent
+    - ⛔ [investment] confirm investment
+    - ⛔ [investment] cancel investment
   
-  - auth (Identity & Access)
-    - ⛔ check if email is available
-    - ⛔ register user using email and password
-    - ⛔ activate user using email and code
-    - ⛔ resend activation code for email
-    - ⛔ send reset password for email
-    - ⛔ reset password using email, new password and code
-    - ⛔ login using email and password
-    - ⛔ refresh authorization token
-    - ⛔ authorize 2fa code (Login challenge)
-    - ⛔ register device (Save push token)
+  - application/query
+    - ⛔ [summary] get portfolio summary
+    - ⛔ [investment] list investments
+    - ⛔ [earning] list earnings history
 
-  - sso (OAuth2 / OIDC)
-    - ⛔ redirect to sso provider passing callback url as state
-    - ⛔ callback from sso provider callbacking to initial url with internal code
-    - ⛔ login using internal code
+  - application/saga
+    - ⛔ [investment-flow] coordinates strategy snapshot, wallet signature and balance update
 
-  - me (User Profile & Security)
-    - ⛔ get user
-    - ⛔ update user profile (name, avatar)
-    - ⛔ revoke device (Remote logout)
-    - ⛔ logoff
-    - ⛔ link web3 wallet (Sign-in with Ethereum)
-    - ⛔ unlink web3 wallet
-    - ⛔ setup 2fa (Generate Secret/QR Code) # CRÍTICO: Faltou a etapa de configuração
-    - ⛔ enable 2fa (Verify first code to activate) # CRÍTICO: Ativação efetiva
+- treasury (Financial Operations)
+  - application/command
+    - ⛔ [withdrawal] create withdrawal request
+    - ⛔ [withdrawal] process withdrawal payout
+    - ⛔ [withdrawal] confirm withdrawal (2FA check)
 
-  - assets (Public Data)
-    - ⛔ list supported assets (ETH, USDC addresses)
-    - ⛔ list investment strategies (Conservative, Aggressive)
-    - ⛔ simulate yield (Strategy + Amount projection)
+  - application/query
+    - ⛔ [withdrawal] list withdrawals
 
-  - my (User Resources)
-    - ⛔ get portfolio summary (Total balance + Earnings)
-    
-    - investments
-      - ⛔ list investments
-      - ⛔ create investment intent (Returns pending ID & Strategy Snapshot)
-      - ⛔ confirm investment (Send tx_hash after wallet signature)
-      - ⛔ cancel investment (Only if pending)
-      
-    - earnings
-      - ⛔ list earnings history (Daily payouts)
-    
-    - withdrawals
-      - ⛔ list withdrawals
-      - ⛔ create withdrawal request
-      - ⛔ confirm withdrawal (2FA check before processing)
-    
-    - notifications
-      - ⛔ list notifications (Inbox)
-      - ⛔ mark notification as read
+  - application/saga
+    - ⛔ [withdrawal-flow] coordinates 2fa verification, balance locking and blockchain execution
+
+- support (System & Communication)
+  - application/command
+    - ⛔ [notification] send push notification
+    - ⛔ [notification] mark as read
+  
+  - application/query
+    - ⛔ [system] healthcheck
+    - ⛔ [system] get configuration
+    - ⛔ [notification] list inbox notifications

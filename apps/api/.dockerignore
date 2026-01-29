@@ -1,0 +1,17 @@
+.git
+node_modules
+dist
+pnpm-store
+.pnpm-store
+.turbo
+.next
+.cache
+coverage
+*.log
+.DS_Store
+**/node_modules
+**/dist
+**/.turbo
+**/.next
+**/.cache
+**/coverage

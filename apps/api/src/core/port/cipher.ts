@@ -1,0 +1,4 @@
+export abstract class Cipher {
+  abstract encrypt<TType = any>(plain: TType, iv?: string): Promise<string>;
+  abstract decrypt<TType = any>(cipher: string): Promise<TType>;
+}

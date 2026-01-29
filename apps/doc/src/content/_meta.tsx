@@ -1,8 +1,7 @@
 import {type MetaRecord} from 'nextra';
 
 const meta: MetaRecord = {
-  index: 'Home',
-  system: 'System',
+  api: 'API',
 };
 
 export default meta;
