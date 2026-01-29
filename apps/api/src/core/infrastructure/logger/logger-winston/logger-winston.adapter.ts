@@ -1,37 +1,66 @@
 import {Logger} from '#/core/port/logger';
 import {Injectable} from '@nestjs/common';
 import {Logger as WinstonLogger, createLogger, format, transports} from 'winston';
+import LokiTransport from 'winston-loki';
 import {LoggerWinstonConfig} from './logger-winston.config';
 
 @Injectable()
 export class LoggerWinstonAdapter implements Logger {
-  private readonly instance: WinstonLogger;
+  private readonly winston: WinstonLogger;
+  private readonly noJsonFormat = format.combine(
+    format.colorize(),
+    format.printf(({timestamp, level, message, ...meta}) => {
+      const cleanMeta = Object.fromEntries(Object.entries(meta).filter(([_, value]) => value !== undefined));
+      const metaString = Object.keys(cleanMeta).length ? JSON.stringify(cleanMeta) : '';
+      return `${timestamp as string} ${level}: ${message as string} ${metaString}`;
+    })
+  );
 
   constructor(private readonly config: LoggerWinstonConfig) {
-    this.instance = createLogger({
+    const loggerTransports: any[] = [new transports.Console()];
+
+    if (this.config.lokiUrl) {
+      loggerTransports.push(
+        new LokiTransport({
+          host: this.config.lokiUrl,
+          labels: {app: 'investor-api'},
+          json: true,
+          format: format.json(),
+          replaceTimestamp: true,
+          onConnectionError: (err: Error): void => console.error('Loki Error', err),
+        })
+      );
+    }
+
+    this.winston = createLogger({
       level: this.config.level,
       format: format.combine(
         format.timestamp(),
         format.errors({stack: true}),
-        this.config.isJson ? format.json() : format.combine(format.colorize(), format.simple())
+        this.config.isJson ? format.json() : this.noJsonFormat
       ),
-      transports: [new transports.Console()],
+      transports: loggerTransports,
     });
   }
 
   debug(message: string, meta?: Record<string, any>): void {
-    this.instance.debug(message, meta);
+    this.winston.debug(message, meta);
   }
 
   info(message: string, meta?: Record<string, any>): void {
-    this.instance.info(message, meta);
+    this.winston.info(message, meta);
   }
 
   warn(message: string, meta?: Record<string, any>): void {
-    this.instance.warn(message, meta);
+    this.winston.warn(message, meta);
   }
 
   error(message: string, error: Error, meta?: Record<string, any>): void {
-    this.instance.error(message, {extra: meta, error});
+    this.winston.error(message, {
+      ...meta,
+      error,
+      stack: error.stack,
+      labels: {correlationId: meta?.messageId || 'internal-process'},
+    });
   }
 }

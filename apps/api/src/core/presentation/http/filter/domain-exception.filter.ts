@@ -10,29 +10,24 @@ export class DomainExceptionFilter implements ExceptionFilter {
 
   public catch(exception: DomainError | ZodError, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-
+    const reply = ctx.getResponse<FastifyReply>();
     const request = ctx.getRequest<FastifyRequest>();
-    const response = ctx.getResponse<FastifyReply>();
 
-    const errorName: string = exception.constructor.name;
-    const status: number = DOMAIN_ERROR_HTTP_MAP[errorName] ?? HttpStatus.BAD_REQUEST;
+    const errorName = exception.constructor.name;
+    const status = DOMAIN_ERROR_HTTP_MAP[errorName] ?? HttpStatus.BAD_REQUEST;
 
     if (status >= 500) {
-      this.logger.error(`[${errorName}] ${request.method} ${request.url}`, exception);
+      this.logger.error(`[${errorName}] ${request.method} ${request.url}`, exception.stack);
     }
 
-    const payload: any = {messageId: (request.raw as any).message};
-    if (exception instanceof ZodError) {
-      payload.code = 'VALIDATION_ERROR';
-      payload.message = 'Payload validation failed';
-      payload.details = z.treeifyError(exception);
-      payload.occurredAt = new Date().toISOString();
-    } else {
-      payload.code = exception.code;
-      payload.message = exception.message;
-      payload.occurredAt = exception.occurredAt.toISOString();
-    }
+    const payload = {
+      messageId: request.id,
+      code: exception instanceof ZodError ? 'VALIDATION_ERROR' : exception.code,
+      message: exception.message,
+      occurredAt: new Date().toISOString(),
+      ...(exception instanceof ZodError && {details: z.treeifyError(exception)}),
+    };
 
-    void response.status(status).send(payload);
+    reply.code(status).send(payload);
   }
 }

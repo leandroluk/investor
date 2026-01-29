@@ -9,5 +9,6 @@ onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - lefthook
+  - protobufjs
   - sharp
   - unrs-resolver

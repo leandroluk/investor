@@ -34,10 +34,15 @@ export class HealthQueryHandler implements IQueryHandler<HealthQuery, HealthQuer
 
     const results = await Promise.allSettled(services.map(service => service.ping()));
 
-    const hasFailure = results.some(result => result.status === 'rejected');
+    const failureMessage = results.reduce((acc, result) => {
+      if (result.status === 'rejected') {
+        return acc + `, ${result.reason.message}`;
+      }
+      return acc;
+    }, '');
 
-    if (hasFailure) {
-      throw new UnhealthyError();
+    if (failureMessage) {
+      throw new UnhealthyError(failureMessage);
     }
 
     return {

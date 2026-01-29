@@ -138,34 +138,110 @@ services:
       retries: 5
       start_period: 10s
   
-  investor-loki:
-    image: "grafana/loki:2.9.4"
-    hostname: "loki"
-    container_name: "investor-loki"
+  investor-glitchtip-create-database:
+    image: "postgres:15-alpine"
+    container_name: "investor-glitchtip-create-database"
     networks: [ "investor" ]
-    ports: [ "${DOCKER_GRAFANA_LOKI_PORT:?DOCKER_GRAFANA_LOKI_PORT is required}:3100" ]
-    command: -config.file=/etc/loki/local-config.yaml
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  investor-grafana:
-    image: "grafana/grafana:latest"
-    hostname: "grafana"
-    container_name: "investor-grafana"
-    networks: [ "investor" ]
-    volumes: [ "./deploy/grafana/provisioning:/etc/grafana/provisioning" ]
     depends_on:
-      investor-loki:
+      investor-postgres:
         condition: "service_healthy"
-    ports: [ "${DOCKER_GRAFANA_PORT:?DOCKER_GRAFANA_PORT is required}:3000" ]
+    command: >
+      sh -c "
+        export PGPASSWORD=${DOCKER_POSTGRES_PASSWORD};
+        until pg_isready -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME} -d ${DOCKER_POSTGRES_DATABASE}; do sleep 2; done;
+        psql -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME} -d ${DOCKER_POSTGRES_DATABASE} -tc \"SELECT 1 FROM pg_database WHERE datname = '${DOCKER_GLITCHTIP_DATABASE}'\" | grep -q 1 || 
+        createdb -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME} ${DOCKER_GLITCHTIP_DATABASE}"
+            
+  investor-glitchtip:
+    image: "glitchtip/glitchtip:latest"
+    hostname: "glitchtip"
+    container_name: "investor-glitchtip"
+    networks: [ "investor" ]
+    depends_on:
+      investor-postgres:
+        condition: "service_healthy"
+      investor-glitchtip-create-database:
+        condition: "service_completed_successfully"
+    ports: [ "${DOCKER_GLITCHTIP_PORT:?DOCKER_GLITCHTIP_PORT is required}:8000" ]
+    volumes: [ "./.env:/code/.env" ]
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      DATABASE_URL: "postgres://${DOCKER_POSTGRES_USERNAME}:${DOCKER_POSTGRES_PASSWORD}@investor-postgres:5432/${DOCKER_GLITCHTIP_DATABASE}"
+      REDIS_URL: "redis://investor-dragonfly:6379/1"
+      SECRET_KEY: "${DOCKER_GLITCHTIP_SECRET_KEY}"
+      PORT: "8000"
+      GLITCHTIP_DOMAIN: "http://localhost:${DOCKER_GLITCHTIP_PORT}"
+      DJANGO_SUPERUSER_EMAIL: "${DOCKER_GLITCHTIP_EMAIL}"
+      DJANGO_SUPERUSER_PASSWORD: "${DOCKER_GLITCHTIP_PASSWORD}"
+      EXT_PORT: "${DOCKER_GLITCHTIP_PORT}"
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        ./manage.py migrate
+        ./manage.py createsuperuser --no-input || true
+        python manage.py shell <<'PYTHON_EOF'
+        import os
+        from django.apps import apps
+        
+        Organization = apps.get_model('organizations_ext', 'Organization')
+        Project = apps.get_model('projects', 'Project')
+        Team = apps.get_model('teams', 'Team')
+        ProjectKey = apps.get_model('projects', 'ProjectKey')
+        User = apps.get_model('users', 'User')
+
+        user = User.objects.filter(is_superuser=True).first()
+        if user:
+            org, _ = Organization.objects.get_or_create(
+                slug='default-org', 
+                defaults={'name': 'Default Org'}
+            )
+            if not org.users.filter(id=user.id).exists():
+                org.add_user(user, role='owner')
+            
+            team, _ = Team.objects.get_or_create(
+                slug='default-team', 
+                organization=org
+            )
+            
+            project, created = Project.objects.get_or_create(
+                slug='default-project',
+                organization=org
+            )
+            
+            team.projects.add(project)
+            
+            key = ProjectKey.objects.filter(project=project).first()
+            if not key:
+                key = ProjectKey.objects.create(project=project)
+            
+            public_key = key.public_key.hex
+            project_id = project.id
+            ext_port = os.getenv('EXT_PORT', '8000')
+            new_dsn = f"http://{public_key}@localhost:{ext_port}/{project_id}"
+            
+            env_path = '.env'
+            if os.path.exists(env_path):
+                with open(env_path, 'r') as f:
+                    lines = f.readlines()
+                
+                updated = False
+                for i, line in enumerate(lines):
+                    if line.strip().startswith('API_SENTRY_URL'):
+                        parts = line.split('=', 1)
+                        if len(parts) == 2:
+                            var_part = parts[0]
+                            lines[i] = f'{var_part}={new_dsn}\n'
+                            updated = True
+                            break
+                
+                if not updated:
+                    if lines and not lines[-1].endswith('\n'):
+                        lines[-1] += '\n'
+                    lines.append(f'API_SENTRY_URL={new_dsn}\n')
+                
+                with open(env_path, 'w') as f:
+                    f.writelines(lines)
+
+                print(f"--- [OK] API_SENTRY_URL atualizado: {new_dsn} ---")
+        PYTHON_EOF
+        exec /code/bin/run-all-in-one.sh

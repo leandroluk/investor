@@ -52,7 +52,7 @@ To maintain high testability and flexibility, the system communicates through **
 * **Framework**: [NestJS](https://nestjs.com/) with Fastify.
 * **Architecture**: CQRS & Event-Driven (Kafka).
 * **Validation**: [Zod](https://zod.dev/) for strict schema safety.
-* **Observability**: [Sentry](https://sentry.io/) (via GlitchTip) for full-stack error tracking and performance profiling.
+* **Observability**: [Loki](https://grafana.com/loki) for full-stack error tracking and performance profiling.
 
 ### Infrastructure & DevOps (IaC)
 The entire environment is automated through **Infrastructure as Code (IaC)**:

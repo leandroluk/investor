@@ -11,12 +11,13 @@ export class CipherStdAdapter implements Cipher {
   private readonly algorithm = 'aes-256-gcm';
   private readonly plainEncoding = 'utf8';
   private readonly cipherEncoding = 'base64url';
+  private readonly key = this.config.key.padEnd(32, '_');
 
   constructor(private readonly config: CipherStdConfig) {}
 
   async encrypt<T = any>(plain: T, iv = crypto.randomBytes(12).toString(this.cipherEncoding)): Promise<string> {
     const plainText = JSON.stringify(plain);
-    const cipher = crypto.createCipheriv(this.algorithm, this.config.key, iv);
+    const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
     let encrypted = cipher.update(plainText, this.plainEncoding, this.cipherEncoding);
     encrypted += cipher.final(this.cipherEncoding);
     const tag = cipher.getAuthTag().toString(this.cipherEncoding);
@@ -25,7 +26,7 @@ export class CipherStdAdapter implements Cipher {
 
   async decrypt<T = any>(cipherText: string): Promise<T> {
     const [iv, encrypted, tag] = cipherText.split('.');
-    const decipher = crypto.createDecipheriv(this.algorithm, this.config.key, iv as string);
+    const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv as string);
     decipher.setAuthTag(Buffer.from(tag as string, this.cipherEncoding));
     let plainText = decipher.update(encrypted as string, this.cipherEncoding, this.plainEncoding);
     plainText += decipher.final(this.plainEncoding);

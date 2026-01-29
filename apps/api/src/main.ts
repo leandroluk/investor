@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/node';
-
 import dotenvx from '@dotenvx/dotenvx';
 import {NestFactory} from '@nestjs/core';
 import {EventEmitter2} from '@nestjs/event-emitter';
@@ -8,15 +6,10 @@ import helmet from 'helmet';
 import uuid from 'uuid';
 import {AppLogger} from './app.logger';
 import {AppModule} from './app.module';
+import {setupFastifyDrivingAdapter} from './core/presentation/http/fastify.setup';
 import {DomainExceptionFilter} from './core/presentation/http/filter/domain-exception.filter';
 
 dotenvx.config({path: ['.env', '../.env', '../../.env'], ignore: ['MISSING_ENV_FILE'], quiet: true});
-
-Sentry.init({
-  dsn: process.env.API_SENTRY_URL,
-  integrations: [Sentry.httpIntegration(), Sentry.nativeNodeFetchIntegration()],
-  environment: process.env.NODE_ENV,
-});
 
 const port = process.env.API_PORT || process.env.PORT || 3000;
 const prefix = process.env.API_PREFIX || '/';
@@ -35,18 +28,12 @@ async function bootstrap(): Promise<void> {
   });
   const logger = await app.resolve(AppLogger);
 
-  app.useGlobalFilters(new DomainExceptionFilter());
   app.setGlobalPrefix(prefix);
   app.useLogger(logger);
+  app.useGlobalFilters(new DomainExceptionFilter());
   app.use(helmet({contentSecurityPolicy: false}));
-  app
-    .getHttpAdapter()
-    .getInstance()
-    .addHook('onSend', (request, reply) => reply.header('x-request-id', request.id))
-    .addHook('onRequest', (request, _reply, done) => {
-      (request as any).startTime = new Date();
-      done();
-    });
+
+  setupFastifyDrivingAdapter(app);
 
   (globalThis as any).eventEmitter = app.get(EventEmitter2);
 

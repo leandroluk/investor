@@ -4,7 +4,7 @@ import {z} from 'zod';
 @Injectable()
 export class CipherStdConfig {
   static readonly schema = z.object({
-    key: z.string().length(32).default(''.padStart(32, 'a')),
+    key: z.string().max(32).default(''.padStart(32, 'a')),
   });
 
   constructor() {

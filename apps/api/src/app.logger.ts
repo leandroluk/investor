@@ -1,36 +1,38 @@
 import {Logger} from '#/core/port/logger';
 import {Injectable, type LoggerService} from '@nestjs/common';
-import * as Sentry from '@sentry/node';
 
 @Injectable()
 export class AppLogger implements LoggerService {
   private readonly ignoredContexts = ['RoutesResolver', 'RouterExplorer', 'NestApplication', 'InstanceLoader'];
+
   constructor(private readonly logger: Logger) {}
 
   log(message: string, ...optionalParams: any[]): void {
-    if (!this.ignoredContexts.includes(optionalParams[optionalParams.length - 1])) {
-      this.logger.info(message, ...optionalParams);
+    const context = optionalParams[optionalParams.length - 1];
+    if (!this.ignoredContexts.includes(context)) {
+      this.logger.info(message, {context});
     }
   }
 
   error(message: string, ...optionalParams: any[]): void {
-    const [firstParam, ...params] = optionalParams;
-    const context = params.pop();
-    const error = firstParam instanceof Error ? firstParam : new Error(message);
+    const error = optionalParams.find(p => p instanceof Error) || new Error(message);
+    const context = optionalParams[optionalParams.length - 1];
 
-    Sentry.captureException(error, {extra: {params}, tags: {context}});
-    this.logger.error(message, error, ...optionalParams);
+    const metadata = optionalParams.filter(p => !(p instanceof Error) && p !== context);
+    this.logger.error(message, error, {context, params: metadata, log_type: 'exception'});
   }
 
   warn(message: string, ...optionalParams: any[]): void {
-    this.logger.warn(message, ...optionalParams);
+    const context = optionalParams[optionalParams.length - 1];
+    this.logger.warn(message, {context, params: optionalParams.slice(0, -1)});
   }
 
   debug(message: string, ...optionalParams: any[]): void {
-    this.logger.debug(message, ...optionalParams);
+    const context = optionalParams[optionalParams.length - 1];
+    this.logger.debug(message, {context, params: optionalParams.slice(0, -1)});
   }
 
   verbose(message: string, ...optionalParams: any[]): void {
-    this.logger.debug(message, ...optionalParams);
+    this.debug(message, ...optionalParams);
   }
 }
