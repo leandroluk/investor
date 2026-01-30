@@ -1,16 +1,11 @@
 import {Cache} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {CacheRedisAdapter} from './redis.adapter';
 import {CacheRedisConfig} from './redis.config';
 import {CacheRedisLifecycle} from './redis.lifecycle';
 
-@Module({
-  providers: [
-    CacheRedisAdapter,
-    CacheRedisConfig,
-    CacheRedisLifecycle,
-    {provide: Cache, useExisting: CacheRedisAdapter},
-  ],
+@EnhancedModule({
+  providers: [CacheRedisAdapter, CacheRedisConfig, CacheRedisLifecycle],
   exports: [Cache],
 })
 export class CacheRedisModule {}

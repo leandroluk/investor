@@ -1,12 +1,12 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Cache} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import Redis from 'ioredis';
 import {CacheRedisConfig} from './redis.config';
 import {CacheRedisError} from './redis.error';
 
 @Throws(CacheRedisError)
-@Injectable()
+@InjectableExisting(Cache)
 export class CacheRedisAdapter implements Cache {
   private readonly redis: Redis;
 

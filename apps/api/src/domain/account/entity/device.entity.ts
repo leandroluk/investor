@@ -1,9 +1,9 @@
-import {type CreatableEntity, type IndexableEntity, type UpdatableEntity} from '#/domain/_shared/entity';
+import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
 import {ApiProperty} from '@nestjs/swagger';
 import {DeviceTypeEnum} from '../enum';
 import {type PushTokenValueObject} from '../value-object';
 
-export class DeviceEntity implements IndexableEntity, CreatableEntity, UpdatableEntity {
+export class DeviceEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the registered device (UUIDv7)',

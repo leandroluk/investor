@@ -1,12 +1,9 @@
 import {Logger} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {LoggerFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    LoggerFakeAdapter, //
-    {provide: Logger, useExisting: LoggerFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [LoggerFakeAdapter],
   exports: [Logger],
 })
 export class LoggerFakeModule {}

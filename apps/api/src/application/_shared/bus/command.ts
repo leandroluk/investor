@@ -11,6 +11,6 @@ export abstract class Command<TType extends object, TUnion = TType & z.infer<typ
   readonly occurredAt!: Date;
 
   constructor(payload: TUnion = {} as TUnion, schema = z.object()) {
-    Object.assign(this, command.extend(schema).parse(payload));
+    Object.assign(this, command.extend(schema.shape).parse(payload));
   }
 }

@@ -1,26 +1,16 @@
 import {DynamicModule, Module} from '@nestjs/common';
+import {makeDynamicEnvModule} from '../_shared/factory';
 import {CoinbaseAxiosModule} from './axios';
 import {CoinbaseFakeModule} from './fake';
 
 @Module({})
 export class CoinbaseModule {
   static forRoot(): DynamicModule {
-    const provider = process.env.API_CIPHER_PROVIDER || 'axios';
-
-    const selectedModule = {
-      axios: CoinbaseAxiosModule,
-      fake: CoinbaseFakeModule,
-    }[provider];
-
-    if (!selectedModule) {
-      throw new TypeError(`Invalid Coinbase Provider: ${provider}`);
-    }
-
-    return {
+    return makeDynamicEnvModule(CoinbaseModule, {
+      envVar: 'API_COINBASE_PROVIDER',
+      envSelectedProvider: 'axios',
+      envProviderMap: {axios: CoinbaseAxiosModule, fake: CoinbaseFakeModule},
       global: true,
-      module: CoinbaseModule,
-      imports: [selectedModule],
-      exports: [selectedModule],
-    };
+    });
   }
 }

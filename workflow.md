@@ -70,15 +70,15 @@ O agente deve apresentar o conteúdo do arquivo `.mdx` proposto ao usuário para
 
 ## 4. Implementação na API
 
-Após a aprovação da documentação pelo usuário, o agente deve implementar o caso de uso em @[apps/api] seguindo a Clean Architecture.
+Após a aprovação da documentação pelo usuário, o agente deve implementar o caso de uso em @[apps/api] seguindo a arquitetura DDD Layered.
 
 ### Arquivos e Estrutura
 
 os diretórios deverão ser perguntados ao usuário
 
 1.  **Use Case (Application Layer)**:
-    *   Diretório: `apps/api/src/<countext/application/<command|query|saga>/*.ts`
-    *   **Handler** (`<use_case>.ts`): Implementar a lógica de negócio, injetando repositórios e devolvendo erros de domínio ou sucesso. A assinatura deve ser conforme os arquivos em @[core/application]
+    *   Diretório: `apps/api/src/application/<context>/<command|query|saga>/*.ts`
+    *   **Handler** (`<use_case>.ts`): Implementar a lógica de negócio, injetando repositórios e devolvendo erros de domínio ou sucesso. A assinatura deve ser conforme os arquivos em @[apps/api/src/application]
     *   **Validação**: Utilizar a biblioteca *zod* para validar o struct de entrada. Para facilitar mantenha o schema dentro de uma propriedade interna da classe e execute no new da classe como nesse exemplo
         ```ts
         export class HealthQuery extends Query {}
@@ -101,28 +101,32 @@ os diretórios deverão ser perguntados ao usuário
             providers,
             exports: providers
         })
-        2.  **Registro da Rota (Presentation Layer)**:
-    *   Arquivo: `apps/api/presentation/http/controller/<context>/<context>.controller.ts` implementando swagger e prevendo os tipos.
+2.  **Registro da Rota (Presentation Layer)**:
+    *   Arquivo: `apps/api/src/presentation/http/<context>/<context>.controller.ts` implementando swagger e prevendo os tipos.
     *   Associar o método HTTP e URL ao do caso de uso criado.
-    *   fazer a implementação extendendo o @[apps/api/src/core/presentation/http/controller/base.controller.ts] usando resolução via (command/query)Bus
+    *   fazer a implementação com injeção direta do (Command|Query)Bus do NestJS, sem extender classe base.
         ```ts
-        import {BaseController} from '#/_core/presentation/http/controllers/base.controller';
-        import {GetMessageMetadata} from '#/_core/presentation/http/decorator/get-message-metadata.decorator';
-        import {ExampleCommand} from '#/context/example/application/command/example.command';
+        import {Envelope} from '#/application/_shared/bus';
+        import {ExampleCommand} from '#/application/example/command';
         import {Controller, Post, Req} from '@nestjs/common';
+        import {CommandBus} from '@nestjs/cqrs';
         import {ApiTags} from '@nestjs/swagger';
-        import {ExampleRequest} from '../dto/example.request'
-        import {MessageMetadata} from '#/_core/domain/message-metadata'
+        import {ApiDomainResponse, GetEnvelope} from '../_shared/decorator';
+        import {ExampleRequest} from './request';
+        import {ExampleResponse} from './response';
 
         @ApiTags('example')
         @Controller('example')
-        export class ExampleController extends BaseController {
+        export class ExampleController {
+          constructor(private readonly commandBus: CommandBus) {}
+          
           @Post('example')
+          @ApiDomainResponse(SomeError)
           async postExample(
             @Req() {params: {id}, body: changes}: ExampleRequest,
-            @GetMessageMetadata() metadata: MessageMetadata
-          ): Promise<void> {
-            return this.commandBus.execute(new ExampleCommand({...metadata, id, changes}));
+            @GetEnvelope() envelope: Envelope
+          ): Promise<ExampleResponse> {
+            return await this.commandBus.execute(new ExampleCommand({...envelope, id, changes}));
           }
         }
         ```    
@@ -131,8 +135,8 @@ os diretórios deverão ser perguntados ao usuário
 
         ```ts
         import { ApiProperty } from '@nestjs/swagger';
-        import { ApiEntityProperty } from '#/_core/presentation/http/decorator/api-entity-property.decorator';
-        import { UserEntity } from '#/iam/domain/entity/user.entity';
+        import { ApiEntityProperty } from '../../_shared/decorator';
+        import { UserEntity } from '#/domain/account/entity';
 
         export class RegisterUserParams {
           @ApiEntityProperty(UserEntity, 'id')
@@ -170,7 +174,7 @@ os diretórios deverão ser perguntados ao usuário
 4.  **Usuário**: "Sim."
 5.  **Agente**: "Implementando `<context>/application/<query|command>/<use-case (incluindo query, handler e result)>.ts`. Analise se ficou como esperado"
 6.  **Usuário**: "Sim."
-7.  **Agente**: "Implementando `<context>/presentation/http/<context>.controller.ts`." com os modelos de request no `<context>/presentation/http/dto/<usecase>.request.ts`. Analise se ficou ok
+7.  **Agente**: "Implementando `<context>/presentation/http/<context>.controller.ts`." com os modelos de request no `apps/api/src/presentation/http/<context>/request/` (usando index.ts). Analise se ficou ok
 8.  **Usuário**: "Sim."
 
 

@@ -1,12 +1,9 @@
 import {Mailer} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {MailerFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    MailerFakeAdapter, //
-    {provide: Mailer, useExisting: MailerFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [MailerFakeAdapter],
   exports: [Mailer],
 })
 export class MailerFakeModule {}

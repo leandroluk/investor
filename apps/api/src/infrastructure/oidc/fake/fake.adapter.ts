@@ -1,10 +1,10 @@
 import {Oidc} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios from 'axios';
 import {Readable} from 'stream';
 import {OidcFakeConfig} from './fake.config';
 
-@Injectable()
+@InjectableExisting(Oidc)
 export class OidcFakeAdapter extends Oidc {
   constructor(private readonly config: OidcFakeConfig) {
     super();

@@ -1,8 +1,11 @@
 import {Cipher} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Cipher)
 export class CipherFakeAdapter extends Cipher {
+  async hash(_plainText: string): Promise<string> {
+    return 'text';
+  }
   async encrypt<TType = any>(_plain: TType, _iv?: string): Promise<string> {
     return 'text';
   }

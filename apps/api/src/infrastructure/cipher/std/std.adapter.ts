@@ -1,12 +1,12 @@
 import {Throws} from '#/application/_shared/decorator';
 import {Cipher} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import crypto from 'node:crypto';
 import {CipherStdConfig} from './std.config';
 import {CipherStdError} from './std.error';
 
 @Throws(CipherStdError)
-@Injectable()
+@InjectableExisting(Cipher)
 export class CipherStdAdapter implements Cipher {
   private readonly algorithm = 'aes-256-gcm';
   private readonly plainEncoding = 'utf8';
@@ -14,6 +14,10 @@ export class CipherStdAdapter implements Cipher {
   private readonly key = this.config.key.padEnd(32, '_');
 
   constructor(private readonly config: CipherStdConfig) {}
+
+  async hash(plainText: string): Promise<string> {
+    return crypto.createHash('sha256').update(plainText).digest(this.cipherEncoding);
+  }
 
   async encrypt<T = any>(plain: T, iv = crypto.randomBytes(12).toString(this.cipherEncoding)): Promise<string> {
     const plainText = JSON.stringify(plain);

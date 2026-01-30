@@ -1,14 +1,10 @@
 import {Oidc} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {OidcAxiosResolver} from './axios.adapter';
 import {OidcAxiosConfig} from './axios.config';
 
-@Module({
-  providers: [
-    OidcAxiosConfig, //
-    OidcAxiosResolver,
-    {provide: Oidc, useExisting: OidcAxiosResolver},
-  ],
+@EnhancedModule({
+  providers: [OidcAxiosResolver, OidcAxiosConfig],
   exports: [Oidc],
 })
 export class OidcAxiosModule {}

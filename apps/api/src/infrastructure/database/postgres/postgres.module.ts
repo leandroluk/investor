@@ -1,16 +1,27 @@
 import {Database} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {AccountUnitOfWork} from '#/domain/account/account.unit-of-work';
+import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repository';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
+import {DatabasePostgresAccountUnitOfWork} from './account/account.unit-of-work';
+import {
+  DatabasePostgresDeviceRepository,
+  DatabasePostgresLoginRepository,
+  DatabasePostgresUserRepository,
+} from './account/repository';
 import {DatabasePostgresAdapter} from './postgres.adapter';
 import {DatabasePostgresConfig} from './postgres.config';
 import {DatabasePostgresLifecycle} from './postgres.lifecycle';
 
-@Module({
+@EnhancedModule({
   providers: [
-    DatabasePostgresAdapter, //
+    DatabasePostgresAdapter,
     DatabasePostgresConfig,
     DatabasePostgresLifecycle,
-    {provide: Database, useExisting: DatabasePostgresAdapter},
+    DatabasePostgresDeviceRepository,
+    DatabasePostgresLoginRepository,
+    DatabasePostgresUserRepository,
+    DatabasePostgresAccountUnitOfWork,
   ],
-  exports: [Database],
+  exports: [Database, DeviceRepository, LoginRepository, UserRepository, AccountUnitOfWork],
 })
 export class DatabasePostgresModule {}

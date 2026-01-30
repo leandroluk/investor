@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-login" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "login" (
+        "id"         UUID           NOT NULL,
+        "user_id"    UUID           NOT NULL,
+        "ip"         INET           NOT NULL,
+        "success"    BOOLEAN        NOT NULL,
+        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        ---
+        PRIMARY KEY ("id"),
+        FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "login";
+    ]]></sql></rollback>
+  </changeSet>
+
+  <changeSet id="tag" author="leandroluk@gmail.com">
+    <tagDatabase tag="003" />
+  </changeSet>
+</databaseChangeLog>

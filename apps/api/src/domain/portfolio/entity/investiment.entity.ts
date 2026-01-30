@@ -1,105 +1,56 @@
-import {
-  type CreatableEntity,
-  type DeletableEntity,
-  type IndexableEntity,
-  type UpdatableEntity,
-} from '#/domain/_shared/entity';
-import {type AmountValueObject} from '#/domain/_shared/value-object';
+import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
 import {ApiProperty} from '@nestjs/swagger';
 import {InvestmentStatusEnum} from '../enum';
-import {ApySnapshotValueObject} from '../value-object';
 
-export class InvestmentEntity implements IndexableEntity, CreatableEntity, UpdatableEntity, DeletableEntity {
+export class InvestmentEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
   @ApiProperty({
-    example: '018f3b5e-beef-7000-8000-000000000000',
-    description: 'Unique identifier for the investment record (UUIDv7)',
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the investment (UUIDv7)',
     format: 'uuid',
   })
   id!: string;
 
   @ApiProperty({
+    example: 'stable-yield-v1',
+    description: 'The strategy chosen for this investment',
+  })
+  strategyId!: string;
+
+  @ApiProperty({
+    example: 'usdc-polygon',
+    description: 'The asset used for the investment',
+  })
+  assetId!: string;
+
+  @ApiProperty({
     example: '018f3b5e-1234-7000-8000-000000000000',
-    description: 'The owner of this investment',
+    description: 'The owner of the investment',
     format: 'uuid',
   })
   userId!: string;
 
   @ApiProperty({
-    example: '018f3b5e-5678-7000-8000-000000000000',
-    description: 'The strategy identifier chosen for this investment',
-    format: 'uuid',
+    example: 1000.0,
+    description: 'Amount invested in USD equivalent at the time of creation',
   })
-  strategyId!: string;
+  amountUsd!: number;
 
   @ApiProperty({
-    example: '10.500234',
-    description: 'Initial invested amount in native tokens',
-    type: String,
-  })
-  amountToken!: AmountValueObject;
-
-  @ApiProperty({
-    example: '1000.00',
-    description: 'Initial invested amount in USD',
-    type: String,
-  })
-  amountUsd!: AmountValueObject;
-
-  @ApiProperty({
-    example: '0.005234',
-    description: 'Total accumulated yield in tokens',
-    type: String,
-  })
-  yieldToken!: AmountValueObject;
-
-  @ApiProperty({
-    example: '15.50',
-    description: 'Total accumulated yield in USD',
-    type: String,
-  })
-  yieldUsd!: AmountValueObject;
-
-  @ApiProperty({
-    example: 'ACTIVE',
-    description: 'Current status of the investment',
+    example: 'active',
+    description: 'Current status of the investment lifecycle',
     enum: Object.values(InvestmentStatusEnum),
   })
   status!: InvestmentStatusEnum;
 
   @ApiProperty({
-    description: 'Snapshot of the strategy APY at the moment of investment',
-    example: {low: 5.5, high: 12.2},
-    type: 'object',
-    properties: {
-      low: {type: 'number', example: 5.5},
-      high: {type: 'number', example: 12.2},
-    },
-  })
-  snapshot!: ApySnapshotValueObject;
-
-  @ApiProperty({
-    example: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e2b1b2c3d4e5f6g7h8i9j0k1l',
-    description: 'Blockchain transaction hash for verification',
-    nullable: true,
-  })
-  txHash!: string | null;
-
-  @ApiProperty({
     example: new Date(),
-    description: 'Timestamp when the investment was initiated',
+    description: 'Timestamp of the investment intent creation',
   })
   createdAt!: Date;
 
   @ApiProperty({
     example: new Date(),
-    description: 'Timestamp of the last update to investment state',
+    description: 'Timestamp of the last status update (e.g., confirmation)',
   })
   updatedAt!: Date;
-
-  @ApiProperty({
-    example: null,
-    description: 'Timestamp of soft deletion or archive',
-    nullable: true,
-  })
-  deletedAt!: Date | null;
 }

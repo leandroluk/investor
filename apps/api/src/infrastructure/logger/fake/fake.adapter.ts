@@ -1,7 +1,7 @@
 import {Logger} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Logger)
 export class LoggerFakeAdapter extends Logger {
   debug(): void {}
   info(): void {}

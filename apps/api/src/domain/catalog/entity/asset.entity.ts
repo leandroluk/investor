@@ -1,51 +1,34 @@
-import {type CreatableEntity, type IndexableEntity, type UpdatableEntity} from '#/domain/_shared/entity';
-import {type AddressValueObject} from '#/domain/_shared/value-object';
+import {type TCreatableEntity, type TIndexableEntity} from '#/domain/_shared/type';
 import {ApiProperty} from '@nestjs/swagger';
-import {type SymbolValueObject} from '../value-object';
 
-export class AssetEntity implements IndexableEntity, CreatableEntity, UpdatableEntity {
+export class AssetEntity implements TIndexableEntity, TCreatableEntity {
   @ApiProperty({
-    example: '018f3b5e-1234-7000-8000-000000000000',
-    description: 'Unique identifier for the asset (UUIDv7)',
-    format: 'uuid',
+    example: 'usdc-polygon',
+    description: 'Unique identifier for the asset (slug)',
   })
   id!: string;
 
   @ApiProperty({
-    example: 'USDT',
-    description: 'The ticker symbol of the asset',
-    type: String,
+    example: 'USDC',
+    description: 'Ticker symbol of the asset',
   })
-  symbol!: SymbolValueObject;
+  symbol!: string;
 
   @ApiProperty({
-    example: 'Tether USD',
-    description: 'The full legal or common name of the asset',
+    example: 'polygon',
+    description: 'Blockchain network where the asset resides',
   })
-  name!: string;
+  network!: string;
 
   @ApiProperty({
-    example: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    description: 'The smart contract address on the blockchain',
-    type: String,
+    example: true,
+    description: 'Whether the asset is currently enabled for investments',
   })
-  contractAddress!: AddressValueObject;
-
-  @ApiProperty({
-    example: 1,
-    description: 'The EIP-155 chain ID (e.g., 1 for Ethereum Mainnet, 137 for Polygon)',
-  })
-  chainId!: number;
+  isActive!: boolean;
 
   @ApiProperty({
     example: new Date(),
-    description: 'Timestamp of asset creation in the system',
+    description: 'Timestamp when the asset was supported',
   })
   createdAt!: Date;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the last update to asset metadata',
-  })
-  updatedAt!: Date;
 }

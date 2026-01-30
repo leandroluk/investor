@@ -1,7 +1,7 @@
 import {Coinbase} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Coinbase)
 export class CoinbaseFakeAdapter extends Coinbase {
   async getPrice(base: string, quote: string): Promise<Coinbase.Quote> {
     return {

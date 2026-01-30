@@ -1,7 +1,7 @@
 import {Cache} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Cache)
 export class CacheFakeAdapter extends Cache {
   private readonly storage = new Map<string, {value: string; expiresAt: number | null}>();
 

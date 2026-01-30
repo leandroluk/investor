@@ -1,26 +1,16 @@
 import {DynamicModule, Module} from '@nestjs/common';
+import {makeDynamicEnvModule} from '../_shared/factory';
 import {BrokerFakeModule} from './fake';
 import {BrokerKafkaModule} from './kafka';
 
 @Module({})
 export class BrokerModule {
   static forRoot(): DynamicModule {
-    const provider = process.env.API_BROKER_PROVIDER || 'kafka';
-
-    const selectedModule = {
-      kafka: BrokerKafkaModule,
-      fake: BrokerFakeModule,
-    }[provider];
-
-    if (!selectedModule) {
-      throw new TypeError(`Invalid Broker Provider: ${provider}`);
-    }
-
-    return {
+    return makeDynamicEnvModule(BrokerModule, {
+      envVar: 'API_BROKER_PROVIDER',
+      envSelectedProvider: 'kafka',
+      envProviderMap: {kafka: BrokerKafkaModule, fake: BrokerFakeModule},
       global: true,
-      module: BrokerModule,
-      imports: [selectedModule],
-      exports: [selectedModule],
-    };
+    });
   }
 }

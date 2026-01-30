@@ -1,14 +1,10 @@
 import {Coinbase} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {CoinbaseAxiosAdapter} from './axios.adapter';
 import {CoinbaseAxiosConfig} from './axios.config';
 
-@Module({
-  providers: [
-    CoinbaseAxiosConfig, //
-    CoinbaseAxiosAdapter,
-    {provide: Coinbase, useExisting: CoinbaseAxiosAdapter},
-  ],
+@EnhancedModule({
+  providers: [CoinbaseAxiosAdapter, CoinbaseAxiosConfig],
   exports: [Coinbase],
 })
 export class CoinbaseAxiosModule {}

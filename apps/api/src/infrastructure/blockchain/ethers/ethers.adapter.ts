@@ -1,12 +1,12 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Blockchain} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {FetchRequest, Interface, JsonRpcProvider, isAddress} from 'ethers';
 import {BlockchainEthersConfig} from './ethers.config';
 import {BlockchainEthersError} from './ethers.error';
 
 @Throws(BlockchainEthersError)
-@Injectable()
+@InjectableExisting(Blockchain)
 export class BlockchainEthersAdapter implements Blockchain {
   private provider: JsonRpcProvider;
 

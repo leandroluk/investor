@@ -1,14 +1,10 @@
 import {Logger} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {LoggerWinstonAdapter} from './winston.adapter';
 import {LoggerWinstonConfig} from './winston.config';
 
-@Module({
-  providers: [
-    LoggerWinstonConfig, //
-    LoggerWinstonAdapter,
-    {provide: Logger, useExisting: LoggerWinstonAdapter},
-  ],
+@EnhancedModule({
+  providers: [LoggerWinstonAdapter, LoggerWinstonConfig],
   exports: [Logger],
 })
 export class LoggerWinstonModule {}

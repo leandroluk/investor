@@ -1,6 +1,5 @@
 'use client';
-
-import {GithubControlButton} from '@/components/atoms/GithubControlButton';
+import {GithubControlButton} from '#/components/atoms/GithubControlButton';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {

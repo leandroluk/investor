@@ -1,13 +1,13 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Broker} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Kafka, logLevel, type Consumer, type Producer} from 'kafkajs';
 import {BrokerKafkaConfig} from './kafka.config';
 import {BrokerKafkaError} from './kafka.error';
 
 @Throws(BrokerKafkaError)
-@Injectable()
+@InjectableExisting(Broker)
 export class BrokerKafkaAdapter implements Broker {
   private readonly kafka: Kafka;
   private readonly producer: Producer;

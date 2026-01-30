@@ -1,12 +1,9 @@
 import {Cipher} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {CipherFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    CipherFakeAdapter, //
-    {provide: Cipher, useExisting: CipherFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [CipherFakeAdapter],
   exports: [Cipher],
 })
 export class CipherFakeModule {}

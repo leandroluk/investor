@@ -1,10 +1,10 @@
 import {Oidc} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios from 'axios';
 import {Readable} from 'node:stream';
 import {OidcAxiosConfig} from './axios.config';
 
-@Injectable()
+@InjectableExisting(Oidc)
 export class OidcAxiosResolver extends Oidc {
   private readonly googleAdapter!: OidcAxiosGoogleAdapter;
   private readonly microsoftAdapter!: OidcAxiosMicrosoftAdapter;

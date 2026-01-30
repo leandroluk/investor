@@ -1,7 +1,7 @@
 import {Broker} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Broker)
 export class BrokerFakeAdapter extends Broker {
   async ping(): Promise<void> {
     return;

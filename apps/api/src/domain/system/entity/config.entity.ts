@@ -1,7 +1,7 @@
-import {type CreatableEntity, type IndexableEntity, type UpdatableEntity} from '#/domain/_shared/entity';
+import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class ConfigEntity implements IndexableEntity, CreatableEntity, UpdatableEntity {
+export class ConfigEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
   @ApiProperty({
     example: '018f3b5e-aaaa-7000-8000-000000000000',
     description: 'Unique identifier for the configuration entry (UUIDv7)',

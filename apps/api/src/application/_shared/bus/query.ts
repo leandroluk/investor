@@ -8,6 +8,6 @@ export abstract class Query<TType = object, TUnion = TType & z.infer<typeof quer
   readonly messageId!: string;
 
   constructor(payload: TUnion = {} as TUnion, schema = z.object({})) {
-    Object.assign(this, query.extend(schema).parse(payload));
+    Object.assign(this, query.extend(schema.shape).parse(payload));
   }
 }

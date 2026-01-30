@@ -1,12 +1,9 @@
 import {Blockchain} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {BlockchainFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    BlockchainFakeAdapter, //
-    {provide: Blockchain, useExisting: BlockchainFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [BlockchainFakeAdapter],
   exports: [Blockchain],
 })
 export class BlockchainFakeModule {}

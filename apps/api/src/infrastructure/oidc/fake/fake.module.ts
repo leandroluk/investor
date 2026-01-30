@@ -1,14 +1,10 @@
 import {Oidc} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {OidcFakeAdapter} from './fake.adapter';
 import {OidcFakeConfig} from './fake.config';
 
-@Module({
-  providers: [
-    OidcFakeAdapter, //
-    OidcFakeConfig,
-    {provide: Oidc, useExisting: OidcFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [OidcFakeAdapter, OidcFakeConfig],
   exports: [Oidc],
 })
 export class OidcFakeModule {}

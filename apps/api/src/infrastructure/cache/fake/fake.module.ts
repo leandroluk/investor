@@ -1,12 +1,9 @@
 import {Cache} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {CacheFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    CacheFakeAdapter, //
-    {provide: Cache, useExisting: CacheFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [CacheFakeAdapter],
   exports: [Cache],
 })
 export class CacheFakeModule {}

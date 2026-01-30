@@ -1,13 +1,13 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Mailer} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import {MailerSmtpConfig} from './smtp.config';
 import {MailerSmtpError} from './smtp.error';
 
 @Throws(MailerSmtpError)
-@Injectable()
+@InjectableExisting(Mailer)
 export class MailerSmtpAdapter implements Mailer {
   private readonly transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 

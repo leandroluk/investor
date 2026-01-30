@@ -1,16 +1,18 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Database} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
-import {Pool, PoolClient} from 'pg';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
+import {Pool, PoolClient, types} from 'pg';
 import {DatabasePostgresConfig} from './postgres.config';
 import {DatabasePostgresError} from './postgres.error';
 
 @Throws(DatabasePostgresError)
-@Injectable()
+@InjectableExisting(Database)
 export class DatabasePostgresAdapter implements Database {
   private readonly pool: Pool;
 
   constructor(private readonly config: DatabasePostgresConfig) {
+    types.setTypeParser(20, val => parseInt(val, 10));
+
     this.pool = new Pool({
       connectionString: this.config.url,
       max: this.config.maxConnections,

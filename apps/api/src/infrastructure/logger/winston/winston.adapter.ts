@@ -1,10 +1,10 @@
 import {Logger} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Logger as WinstonLogger, createLogger, format, transports} from 'winston';
 import LokiTransport from 'winston-loki';
 import {LoggerWinstonConfig} from './winston.config';
 
-@Injectable()
+@InjectableExisting(Logger)
 export class LoggerWinstonAdapter implements Logger {
   private readonly winston: WinstonLogger;
   private readonly noJsonFormat = format.combine(

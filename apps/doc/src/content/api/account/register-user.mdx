@@ -1,0 +1,79 @@
+---
+title: Register User
+description: Register a new user using email and password
+---
+
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- The email must be unique in the system.
+- The password must meet complexity requirements (e.g., minimum length, special characters).
+- The user is created with status `PENDING`.
+- An activation email is sent to the user.
+
+## Request
+
+`POST /account/register`
+
+### Body
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| name | string | User's full name |
+| email | string | User's email address |
+| password | string | User's password (plain text) |
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant API
+    participant DB as Database
+    participant Mailer
+
+    User->>API: POST /account/register
+    API->>DB: Check if email exists
+    
+    alt Email already exists
+        DB-->>API: User found
+        API-->>User: 409 Conflict
+    end
+
+    API->>API: Hash password
+    API->>DB: Create user (PENDING)
+    API->>Mailer: Send activation email
+    API-->>User: 201 Created
+```
+</MermaidZoom>
+
+## Success Case
+
+`201 Created`
+
+## Error Case
+
+### Email Conflict
+
+`409 Conflict`
+
+```json
+{
+  "code": "EMAIL_CONFLICT",
+  "message": "The email is already in use."
+}
+```
+
+### Validation Error
+
+`400 Bad Request`
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Invalid password format."
+}
+```

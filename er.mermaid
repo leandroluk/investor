@@ -1,86 +1,118 @@
-erDiagram
+ erDiagram
     %% MODULE: account
-    user {
-        uuidv7 id PK
-        varchar email UK "cite: 2"
-        varchar password_hash
-        varchar name
-        char wallet_address UK
-        varchar status "cite: 3"
-        boolean two_factor_enabled
-        uuidv7 user_id FK "cite: 5"
-    }
     device {
-        uuidv7 id PK
-        varchar platform "cite: 4"
-        varchar push_token
-        boolean is_active
-        uuidv7 user_id FK "cite: 5"
+        uuidv7    id         PK
+        uuidv7    user_id    FK
+        varchar   platform   ""
+        varchar   push_token ""
+        boolean   is_active  ""
+        timestamp created_at ""
     }
     login {
-        uuidv7 id PK
-        inet ip "cite: 6"
-        boolean success
-        uuidv7 user_id FK
+        uuidv7    id         PK
+        uuidv7    user_id    FK
+        inet      ip         ""
+        boolean   success    ""
+        timestamp created_at ""
+    }
+    user {
+        uuidv7    id                 PK
+        varchar   email              UK
+        char      wallet_address     UK
+        text      password_hash      ""
+        varchar   name               ""
+        timestamp wallet_verified_at ""
+        varchar   status             ""
+        boolean   two_factor_enabled ""
+        timestamp created_at         ""
+    }
+
+    %% MODULE: audit
+    ledger {
+        uuidv7    id           PK
+        uuidv7    user_id      FK
+        varchar   type         "" 
+        decimal   amount_usd   ""
+        uuidv7    reference_id ""
+        timestamp created_at   ""
     }
 
     %% MODULE: catalog
     asset {
-        varchar id PK "cite: 9"
-        varchar symbol
-        varchar network "cite: 9"
-        boolean is_active
+        varchar   id         PK
+        varchar   symbol     ""
+        varchar   network    ""
+        boolean   is_active  ""
+        timestamp created_at ""
     }
     strategy {
-        varchar id PK "cite: 10"
-        text description "cite: 11"
-        decimal expected_apy_range_low
+        varchar   id                      PK
+        text      description             ""
+        decimal   expected_apy_range_low  ""
+        decimal   expected_apy_range_high ""
+        timestamp created_at              ""
     }
 
     %% MODULE: portfolio
-    investment {
-        uuidv7 id PK
-        varchar strategy_id FK "cite: 12"
-        varchar asset_id FK
-        decimal amount_usd
-        varchar status "cite: 13"
-        uuidv7 user_id FK "cite: 17"
-    }
     earning {
-        uuidv7 id PK
-        decimal amount "cite: 16"
-        uuidv7 investment_id FK
+        uuidv7    id            PK
+        uuidv7    investment_id FK
+        decimal   amount        ""
+        timestamp created_at    ""
+    }
+    investment {
+        uuidv7    id          PK
+        varchar   strategy_id FK
+        varchar   asset_id    FK
+        uuidv7    user_id     FK
+        decimal   amount_usd  ""
+        varchar   status      ""
+        timestamp created_at  ""
     }
 
-    %% MODULE: treasury
-    withdrawal {
-        uuidv7 id PK
-        decimal amount_usd
-        varchar status "Ex: PENDING, COMPLETED, FAILED"
-        char transaction_hash
-        timestamp created_at
-        uuidv7 user_id FK
+    %% MODULE: signal
+    notice {
+        uuidv7    id         PK
+        uuidv7    user_id    FK
+        varchar   title      ""
+        boolean   is_read    ""
+        timestamp created_at ""
     }
 
-    %% MODULE: communication
-    notification {
-        uuidv7 id PK
-        varchar title "cite: 7"
-        boolean is_read
-        uuidv7 user_id FK
+    %% MODULE: support
+    ticket {
+        uuidv7    id         PK
+        uuidv7    user_id    FK
+        varchar   subject    ""
+        text      message    ""
+        varchar   status     ""
+        timestamp created_at ""
     }
 
     %% MODULE: system
     config {
-        varchar key PK "cite: 8"
-        text value "cite: 8"
+        varchar   key          PK
+        text      value        ""
+        timestamp updated_at   ""
     }
 
-    user ||--o{ device : "has"
-    user ||--o{ login : "logs"
-    user ||--o{ notification : "receives"
-    user ||--o{ investment : "owns" "cite: 17"
-    user ||--o{ withdrawal : "requests"
-    strategy ||--o{ investment : "defines"
-    asset ||--o{ investment : "denominates"
-    investment ||--o{ earning : "generates"
+    %% MODULE: treasury
+    withdrawal {
+        uuidv7    id               PK
+        uuidv7    user_id          FK
+        decimal   amount_usd       ""
+        varchar   status           ""
+        char      transaction_hash ""
+        timestamp created_at       ""
+    }
+
+    user       ||--o{ device     : "has"
+    user       ||--o{ login      : "logs"
+    user       ||--o{ notice     : "receives"
+    investment }o--|| user       : "owns"
+    withdrawal }o--|| user       : "requests"
+    ticket     }o--|| user       : "opens"
+    ledger     }o--|| user       : "records"
+    strategy   ||--o{ investment : "defines"
+    asset      ||--o{ investment : "denominates"
+    investment ||--o{ earning    : "generates"

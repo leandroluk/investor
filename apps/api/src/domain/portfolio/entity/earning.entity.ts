@@ -1,8 +1,8 @@
-import {type CreatableEntity, type IndexableEntity} from '#/domain/_shared/entity';
+import {type TCreatableEntity, type TIndexableEntity} from '#/domain/_shared/type';
 import {type AmountValueObject} from '#/domain/_shared/value-object';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class EarningEntity implements IndexableEntity, CreatableEntity {
+export class EarningEntity implements TIndexableEntity, TCreatableEntity {
   @ApiProperty({
     example: '018f3b5e-ccdd-7000-8000-000000000000',
     description: 'Unique identifier for the earning record (UUIDv7)',

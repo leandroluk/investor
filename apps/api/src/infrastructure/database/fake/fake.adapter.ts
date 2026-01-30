@@ -1,7 +1,7 @@
 import {Database} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Database)
 export class DatabaseFakeAdapter extends Database {
   async ping(): Promise<void> {
     return;

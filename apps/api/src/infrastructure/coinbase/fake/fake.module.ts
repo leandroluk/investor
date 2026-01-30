@@ -1,12 +1,9 @@
 import {Coinbase} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {CoinbaseFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    CoinbaseFakeAdapter, //
-    {provide: Coinbase, useExisting: CoinbaseFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [CoinbaseFakeAdapter],
   exports: [Coinbase],
 })
 export class CoinbaseFakeModule {}

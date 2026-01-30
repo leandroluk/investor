@@ -1,12 +1,9 @@
 import {Database} from '#/domain/_shared/port';
-import {Module} from '@nestjs/common';
+import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {DatabaseFakeAdapter} from './fake.adapter';
 
-@Module({
-  providers: [
-    DatabaseFakeAdapter, //
-    {provide: Database, useExisting: DatabaseFakeAdapter},
-  ],
+@EnhancedModule({
+  providers: [DatabaseFakeAdapter],
   exports: [Database],
 })
 export class DatabaseFakeModule {}

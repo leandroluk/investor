@@ -1,7 +1,7 @@
 import {Blockchain} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@Injectable()
+@InjectableExisting(Blockchain)
 export class BlockchainFakeAdapter extends Blockchain {
   async ping(): Promise<void> {
     return;

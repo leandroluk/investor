@@ -5,6 +5,7 @@ import {CacheModule} from './cache/cache.module';
 import {CipherModule} from './cipher/cipher.module';
 import {CoinbaseModule} from './coinbase/coinbase.module';
 import {DatabaseModule} from './database/database.module';
+import {HasherModule} from './hasher/hasher.module';
 import {LoggerModule} from './logger/logger.module';
 import {MailerModule} from './mailer/mailer.module';
 import {OidcModule} from './oidc/oidc.module';
@@ -17,6 +18,7 @@ const modules = [
   CipherModule.forRoot(),
   CoinbaseModule.forRoot(),
   DatabaseModule.forRoot(),
+  HasherModule.forRoot(),
   LoggerModule.forRoot(),
   MailerModule.forRoot(),
   OidcModule.forRoot(),

@@ -1,26 +1,16 @@
 import {DynamicModule, Module} from '@nestjs/common';
+import {makeDynamicEnvModule} from '../_shared/factory';
 import {CacheFakeModule} from './fake';
 import {CacheRedisModule} from './redis';
 
 @Module({})
 export class CacheModule {
   static forRoot(): DynamicModule {
-    const provider = process.env.API_CACHE_PROVIDER || 'redis';
-
-    const selectedModule = {
-      redis: CacheRedisModule,
-      fake: CacheFakeModule,
-    }[provider];
-
-    if (!selectedModule) {
-      throw new TypeError(`Invalid Cache Provider: ${provider}`);
-    }
-
-    return {
+    return makeDynamicEnvModule(CacheModule, {
+      envVar: 'API_CACHE_PROVIDER',
+      envSelectedProvider: 'redis',
+      envProviderMap: {redis: CacheRedisModule, fake: CacheFakeModule},
       global: true,
-      module: CacheModule,
-      imports: [selectedModule],
-      exports: [selectedModule],
-    };
+    });
   }
 }

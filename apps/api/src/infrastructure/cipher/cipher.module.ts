@@ -1,26 +1,16 @@
 import {DynamicModule, Module} from '@nestjs/common';
+import {makeDynamicEnvModule} from '../_shared/factory';
 import {CipherFakeModule} from './fake';
 import {CipherStdModule} from './std';
 
 @Module({})
 export class CipherModule {
   static forRoot(): DynamicModule {
-    const provider = process.env.API_CIPHER_PROVIDER || 'std';
-
-    const selectedModule = {
-      std: CipherStdModule,
-      fake: CipherFakeModule,
-    }[provider];
-
-    if (!selectedModule) {
-      throw new TypeError(`Invalid Cipher Provider: ${provider}`);
-    }
-
-    return {
+    return makeDynamicEnvModule(CipherModule, {
+      envVar: 'API_CIPHER_PROVIDER',
+      envSelectedProvider: 'std',
+      envProviderMap: {std: CipherStdModule, fake: CipherFakeModule},
       global: true,
-      module: CipherModule,
-      imports: [selectedModule],
-      exports: [selectedModule],
-    };
+    });
   }
 }

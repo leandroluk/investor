@@ -1,10 +1,9 @@
-import {Controller, Get} from '@nestjs/common';
-import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
-
 import {Envelope} from '#/application/_shared/bus';
-import {HealthQuery, HealthQueryResult} from '#/application/support/query/health.query';
+import {HealthQuery, HealthQueryResult} from '#/application/system/query';
 import {UnhealthyError} from '#/domain/system/error/unhealty.error';
+import {Controller, Get} from '@nestjs/common';
 import {QueryBus} from '@nestjs/cqrs';
+import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {ApiDomainResponse, GetEnvelope} from '../_shared/decorator';
 
 @ApiTags('system')

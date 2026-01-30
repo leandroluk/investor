@@ -4,6 +4,7 @@ export * from './cache';
 export * from './cipher';
 export * from './coinbase';
 export * from './database';
+export * from './hasher';
 export * from './logger';
 export * from './mailer';
 export * from './oidc';

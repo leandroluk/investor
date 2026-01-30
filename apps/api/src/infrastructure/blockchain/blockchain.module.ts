@@ -1,26 +1,16 @@
 import {DynamicModule, Module} from '@nestjs/common';
+import {makeDynamicEnvModule} from '../_shared/factory';
 import {BlockchainEthersModule} from './ethers';
 import {BlockchainFakeModule} from './fake';
 
 @Module({})
 export class BlockchainModule {
   static forRoot(): DynamicModule {
-    const provider = process.env.API_BLOCKCHAIN_PROVIDER || 'ethers';
-
-    const selectedModule = {
-      ethers: BlockchainEthersModule,
-      fake: BlockchainFakeModule,
-    }[provider];
-
-    if (!selectedModule) {
-      throw new TypeError(`Invalid Blockchain Provider: ${provider}`);
-    }
-
-    return {
+    return makeDynamicEnvModule(BlockchainModule, {
+      envVar: 'API_BLOCKCHAIN_PROVIDER',
+      envSelectedProvider: 'ethers',
+      envProviderMap: {ethers: BlockchainEthersModule, fake: BlockchainFakeModule},
       global: true,
-      module: BlockchainModule,
-      imports: [selectedModule],
-      exports: [selectedModule],
-    };
+    });
   }
 }

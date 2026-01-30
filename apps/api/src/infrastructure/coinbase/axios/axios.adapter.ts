@@ -1,12 +1,12 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
 import {Coinbase} from '#/domain/_shared/port';
-import {Injectable} from '@nestjs/common';
+import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios, {AxiosInstance} from 'axios';
 import {CoinbaseAxiosConfig} from './axios.config';
 import {CoinbaseAxiosError} from './axios.error';
 
 @Throws(CoinbaseAxiosError)
-@Injectable()
+@InjectableExisting(Coinbase)
 export class CoinbaseAxiosAdapter implements Coinbase {
   private readonly http: AxiosInstance;
 

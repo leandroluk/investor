@@ -1,78 +1,69 @@
-import {
-  type CreatableEntity,
-  type DeletableEntity,
-  type IndexableEntity,
-  type UpdatableEntity,
-} from '#/domain/_shared/entity';
-import {type EmailValueObject, type LanguageValueObject, type TimezoneValueObject} from '#/domain/_shared/value-object';
+import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
 import {ApiProperty} from '@nestjs/swagger';
-import {type PasswordValueObject} from '../value-object';
+import {UserStatusEnum} from '../enum';
 
-export class UserEntity implements IndexableEntity, CreatableEntity, UpdatableEntity, DeletableEntity {
+export class UserEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
   @ApiProperty({
-    example: '018f3b5e-1234-7000-8000-000000000000',
-    description: 'The unique identifier for the user (UUIDv7)',
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the user (UUIDv7)',
     format: 'uuid',
   })
   id!: string;
 
   @ApiProperty({
-    example: 'investor@example.com',
-    description: 'The primary email address used for authentication and notifications',
-    type: String,
+    example: 'user@example.com',
+    description: 'Unique electronic mail address',
   })
-  email!: EmailValueObject;
+  email!: string;
 
   @ApiProperty({
-    description: 'The hashed password string. Never returned in plain text.',
+    description: 'Bcrypt or Argon2 hashed password',
     writeOnly: true,
-    type: String,
   })
-  password!: PasswordValueObject;
+  passwordHash!: string;
 
   @ApiProperty({
-    example: 'John',
-    description: 'The user’s first or given name',
+    example: 'John Doe',
+    description: 'Full name of the user',
   })
-  givenName!: string;
+  name!: string;
 
   @ApiProperty({
-    example: 'Doe',
-    description: 'The user’s family name or surname',
+    example: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+    description: 'Ethereum-compatible wallet address',
     nullable: true,
   })
-  familyName!: string | null;
-
-  @ApiProperty({
-    example: 'en',
-    description: 'Preferred ISO 639-1 language code for the interface',
-    type: String,
-  })
-  language!: LanguageValueObject;
-
-  @ApiProperty({
-    example: 'America/Sao_Paulo',
-    description: 'IANA Timezone string for accurate transaction reporting',
-    type: String,
-  })
-  timezone!: TimezoneValueObject;
+  walletAddress!: string | null;
 
   @ApiProperty({
     example: new Date(),
-    description: 'Timestamp when the user account was created',
+    description: 'Timestamp when the wallet ownership was verified via signature',
+    nullable: true,
+  })
+  walletVerifiedAt!: Date | null;
+
+  @ApiProperty({
+    example: 'active',
+    description: 'Current account lifecycle status',
+    enum: Object.values(UserStatusEnum),
+  })
+  status!: UserStatusEnum;
+
+  @ApiProperty({
+    example: false,
+    description: 'Whether the user has enabled Two-Factor Authentication',
+  })
+  twoFactorEnabled!: boolean;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of account creation',
   })
   createdAt!: Date;
 
   @ApiProperty({
     example: new Date(),
-    description: 'Timestamp of the last update to user profile information',
+    description: 'Timestamp of the last profile update',
   })
   updatedAt!: Date;
-
-  @ApiProperty({
-    example: null,
-    description: 'Timestamp of soft deletion, if applicable',
-    nullable: true,
-  })
-  deletedAt!: Date | null;
 }

@@ -4,7 +4,7 @@ import {z} from 'zod';
 @Injectable()
 export class CacheRedisConfig {
   static readonly schema = z.object({
-    url: z.string().url().default('redis://localhost:6379/0'),
+    url: z.url().default('redis://localhost:6379/0'),
   });
 
   constructor() {
