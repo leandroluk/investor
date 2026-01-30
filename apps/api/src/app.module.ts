@@ -1,18 +1,23 @@
 import {Module} from '@nestjs/common';
 import {EventEmitterModule} from '@nestjs/event-emitter';
+import {AppConfig} from './app.config';
 import {AppLogger} from './app.logger';
-import {ContextModule} from './context/context.module';
-import {CoreModule} from './core/core.module';
+import {ApplicationModule} from './application/application.module';
+import {InfrastructureModule} from './infrastructure/infrastructure.module';
+import {PresentationModule} from './presentation/presentation.module';
+
+const providers = [AppLogger, AppConfig];
 
 @Module({
-  providers: [AppLogger],
-  exports: [AppLogger],
   imports: [
     // external
     EventEmitterModule.forRoot({wildcard: true}), //
     // internal
-    CoreModule,
-    ContextModule,
+    ApplicationModule,
+    InfrastructureModule,
+    PresentationModule,
   ],
+  providers,
+  exports: providers,
 })
 export class AppModule {}

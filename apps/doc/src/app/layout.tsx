@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import './globals.css';
 
 import {Footer, Layout, Navbar} from 'nextra-theme-docs';

@@ -1,4 +1,3 @@
-// src/app/[...mdxPath]/page.tsx
 import {useMDXComponents as getMDXComponents} from '@/mdx-components';
 import {generateStaticParamsFor, importPage} from 'nextra/pages';
 

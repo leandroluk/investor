@@ -2,19 +2,21 @@ import dotenvx from '@dotenvx/dotenvx';
 import {NestFactory} from '@nestjs/core';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {FastifyAdapter, type NestFastifyApplication} from '@nestjs/platform-fastify';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import helmet from 'helmet';
 import uuid from 'uuid';
+import {AppConfig} from './app.config';
 import {AppLogger} from './app.logger';
 import {AppModule} from './app.module';
-import {setupFastifyDrivingAdapter} from './core/presentation/http/fastify.setup';
-import {DomainExceptionFilter} from './core/presentation/http/filter/domain-exception.filter';
+import {DomainExceptionFilter} from './presentation/http/_shared/filter';
 
-dotenvx.config({path: ['.env', '../.env', '../../.env'], ignore: ['MISSING_ENV_FILE'], quiet: true});
+dotenvx.config({
+  path: ['.env', '../.env', '../../.env'],
+  ignore: ['MISSING_ENV_FILE'],
+  quiet: true,
+});
 
-const port = process.env.API_PORT || process.env.PORT || 3000;
-const prefix = process.env.API_PREFIX || '/';
-
-async function bootstrap(): Promise<void> {
+export async function bootstrap(): Promise<void> {
   const adapter = new FastifyAdapter({
     requestIdHeader: 'x-request-id',
     routerOptions: {ignoreTrailingSlash: true},
@@ -26,18 +28,41 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, adapter, {
     logger: ['error', 'warn'],
   });
-  const logger = await app.resolve(AppLogger);
 
-  app.setGlobalPrefix(prefix);
+  const [logger, config] = await Promise.all([app.resolve(AppLogger), app.resolve(AppConfig)]);
+
+  app.setGlobalPrefix(config.prefix);
   app.useLogger(logger);
-  app.useGlobalFilters(new DomainExceptionFilter());
+  app.useGlobalFilters(app.get(DomainExceptionFilter));
   app.use(helmet({contentSecurityPolicy: false}));
+  app.enableCors({origin: config.origin.includes('*') ? true : config.origin});
 
-  setupFastifyDrivingAdapter(app);
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addHook('onRequest', (req, _, done) => [((req as any).startTime = new Date()), done()])
+    .addHook('onSend', (req, rpl, value, done) => [rpl.header('x-request-id', req.id), done(null, value)]);
+
+  const document = SwaggerModule.createDocument(
+    app,
+    new DocumentBuilder()
+      .setTitle(config.openapi.title)
+      .setDescription(config.openapi.description)
+      .setContact(config.openapi.contact.name, config.openapi.contact.url, config.openapi.contact.email)
+      .setLicense(config.openapi.license.name, config.openapi.license.url)
+      .setVersion(config.openapi.version)
+      .addBearerAuth()
+      .build()
+  );
+
+  SwaggerModule.setup(config.prefix, app, document, {
+    swaggerOptions: {persistAuthorization: true},
+    customCss: '.topbar{display:none}',
+  });
 
   (globalThis as any).eventEmitter = app.get(EventEmitter2);
 
-  await app.listen(port);
-  logger.log(`🚀 running on port ${port}`);
+  await app.listen(config.port, '0.0.0.0');
+  logger.log(`🚀 running on port ${config.port}`);
 }
 void bootstrap();
