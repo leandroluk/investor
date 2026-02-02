@@ -4,7 +4,6 @@
     "apps/**/*",
     "libs/**/*",
     "tools/**/*",
-    "*.config,*"
   ],
   "exclude": [
     "node_modules",

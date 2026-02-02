@@ -66,7 +66,7 @@ export class BrokerKafkaAdapter implements BrokerPort {
       messages: [
         {
           key: event.correlationId,
-          timestamp: event.occurredAt.toJSON(),
+          timestamp: event.occurredAt.getTime().toString(),
           value: JSON.stringify(event.payload),
         },
       ],
@@ -74,20 +74,26 @@ export class BrokerKafkaAdapter implements BrokerPort {
   }
 
   async subscribe(...topics: string[]): Promise<void> {
-    await this.consumer.subscribe({topics, fromBeginning: false});
+    await this.consumer.subscribe({topics, fromBeginning: true});
   }
 
   async consume<TPayload extends object = any>(handler: (event: DomainEvent<TPayload>) => void): Promise<void> {
     await this.consumer.run({
-      eachMessage: async ({topic, message}) => {
-        handler(
-          Object.assign(new DomainEvent<TPayload>(), {
-            event: topic,
-            payload: message.value ? JSON.parse(message.value.toString()) : undefined,
-            correlationId: message.key ? message.key.toString() : undefined,
-            occurredAt: message.timestamp ? new Date(message.timestamp) : undefined,
-          })
-        );
+      autoCommit: false,
+      eachMessage: async ({topic, partition, message}) => {
+        try {
+          handler(
+            Object.assign(new DomainEvent<TPayload>(), {
+              name: topic,
+              payload: message.value ? JSON.parse(message.value.toString()) : undefined,
+              correlationId: message.key ? message.key.toString() : undefined,
+              occurredAt: message.timestamp ? new Date(Number(message.timestamp)) : undefined,
+            })
+          );
+          await this.consumer.commitOffsets([{topic, partition, offset: (BigInt(message.offset) + 1n).toString()}]);
+        } catch (error) {
+          this.eventEmitter.emit('infrastructure.broker.error', error);
+        }
       },
     });
   }

@@ -33,11 +33,6 @@
       "runtimeArgs": [
         "dev"
       ],
-      "presentation": {
-        "hidden": false,
-        "group": "doc",
-        "order": 1
-      },
       "skipFiles": [
         "<node_internals>/**"
       ]
@@ -52,11 +47,6 @@
       "runtimeArgs": [
         "dev"
       ],
-      "presentation": {
-        "hidden": false,
-        "group": "web",
-        "order": 2
-      },
       "skipFiles": [
         "<node_internals>/**",
         "${workspaceFolder}/node_modules/**"
@@ -73,11 +63,6 @@
       "request": "launch",
       "url": "http://127.0.0.1.nip.io:3000",
       "webRoot": "${workspaceFolder}/apps/web",
-      "presentation": {
-        "hidden": false,
-        "group": "web",
-        "order": 3
-      },
       "skipFiles": [
         "<node_internals>/**",
         "${workspaceFolder}/node_modules/**",
@@ -88,18 +73,4 @@
       ]
     },
   ],
-  "compounds": [
-    {
-      "name": "web",
-      "configurations": [
-        "web:server",
-        "web:chrome"
-      ],
-      "presentation": {
-        "hidden": false,
-        "group": "web",
-        "order": 101
-      }
-    }
-  ]
 }
