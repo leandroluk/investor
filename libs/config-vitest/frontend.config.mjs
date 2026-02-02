@@ -1,4 +1,3 @@
-// libs/config-vitest/frontend.config.mjs
 /// <reference types="vitest" />
 import {defineConfig, mergeConfig} from 'vitest/config';
 import base from './base.config.mjs';

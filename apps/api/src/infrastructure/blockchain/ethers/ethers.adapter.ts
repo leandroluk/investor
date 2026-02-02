@@ -1,13 +1,13 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {Blockchain} from '#/domain/_shared/port';
+import {BlockchainPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {FetchRequest, Interface, JsonRpcProvider, isAddress} from 'ethers';
 import {BlockchainEthersConfig} from './ethers.config';
 import {BlockchainEthersError} from './ethers.error';
 
 @Throws(BlockchainEthersError)
-@InjectableExisting(Blockchain)
-export class BlockchainEthersAdapter implements Blockchain {
+@InjectableExisting(BlockchainPort)
+export class BlockchainEthersAdapter implements BlockchainPort {
   private provider: JsonRpcProvider;
 
   constructor(private readonly config: BlockchainEthersConfig) {
@@ -51,7 +51,7 @@ export class BlockchainEthersAdapter implements Blockchain {
 
   @Trace()
   @Retry({attempts: 3, delay: 500})
-  async getTransaction(hash: string): Promise<Blockchain.Transaction | null> {
+  async getTransaction(hash: string): Promise<BlockchainPort.Transaction | null> {
     const [tx, receipt] = await Promise.all([
       this.provider.getTransaction(hash),
       this.provider.getTransactionReceipt(hash),

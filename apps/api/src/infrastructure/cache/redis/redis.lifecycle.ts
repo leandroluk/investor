@@ -1,9 +1,9 @@
-import {Cache} from '#/domain/_shared/port';
 import {Injectable, type OnApplicationBootstrap, type OnApplicationShutdown} from '@nestjs/common';
+import {CacheRedisAdapter} from './redis.adapter';
 
 @Injectable()
 export class CacheRedisLifecycle implements OnApplicationBootstrap, OnApplicationShutdown {
-  constructor(private readonly adapter: Cache) {}
+  constructor(private readonly adapter: CacheRedisAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
     await this.adapter.connect();

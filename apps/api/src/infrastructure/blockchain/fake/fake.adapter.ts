@@ -1,8 +1,8 @@
-import {Blockchain} from '#/domain/_shared/port';
+import {BlockchainPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Blockchain)
-export class BlockchainFakeAdapter extends Blockchain {
+@InjectableExisting(BlockchainPort)
+export class BlockchainFakeAdapter extends BlockchainPort {
   async ping(): Promise<void> {
     return;
   }
@@ -31,7 +31,7 @@ export class BlockchainFakeAdapter extends Blockchain {
     return /^0x[a-fA-F0-9]{40}$/.test(_address);
   }
 
-  async getTransaction(_hash: string): Promise<Blockchain.Transaction | null> {
+  async getTransaction(_hash: string): Promise<BlockchainPort.Transaction | null> {
     return {
       hash: _hash,
       from: '0x1234567890123456789012345678901234567890',

@@ -1,9 +1,9 @@
-import {Logger} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/port';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {LoggerFakeAdapter} from './fake.adapter';
 
 @EnhancedModule({
   providers: [LoggerFakeAdapter],
-  exports: [Logger],
+  exports: [LoggerPort],
 })
 export class LoggerFakeModule {}

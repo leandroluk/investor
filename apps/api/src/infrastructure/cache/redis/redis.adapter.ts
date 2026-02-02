@@ -1,13 +1,13 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {Cache} from '#/domain/_shared/port';
+import {CachePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import Redis from 'ioredis';
 import {CacheRedisConfig} from './redis.config';
 import {CacheRedisError} from './redis.error';
 
 @Throws(CacheRedisError)
-@InjectableExisting(Cache)
-export class CacheRedisAdapter implements Cache {
+@InjectableExisting(CachePort)
+export class CacheRedisAdapter implements CachePort {
   private readonly redis: Redis;
 
   constructor(private readonly config: CacheRedisConfig) {
@@ -38,12 +38,23 @@ export class CacheRedisAdapter implements Cache {
   }
 
   @Trace()
-  async get<TType = any>(key: string): Promise<TType | null> {
+  async get<TType = any>(pattern: string): Promise<{key: string; value: TType | null}> {
     try {
-      const value = await this.redis.get(key);
-      return value ? JSON.parse(value) : null;
+      let targetKey: string | undefined = pattern;
+
+      if (pattern.includes('*')) {
+        const [, keys] = await this.redis.scan(0, 'MATCH', pattern, 'COUNT', 1);
+        targetKey = keys[0];
+      }
+
+      if (!targetKey) {
+        return {key: '', value: null};
+      }
+
+      const value = await this.redis.get(targetKey);
+      return {key: targetKey, value: value ? JSON.parse(value) : null};
     } catch {
-      return null;
+      return {key: '', value: null};
     }
   }
 

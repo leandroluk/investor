@@ -1,0 +1,59 @@
+---
+title: Check Email
+description: Checks if an email address is already in use by another user.
+---
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- The email must be a valid email format.
+- If the email already exists in the system, an error is returned.
+
+## Request
+
+- **Method**: `GET`
+- **Path**: `/account/check/email/:email`
+- **Parameters**:
+    - `email`: The email address to check.
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A[Start] --> B{Validate Email Format}
+    B -- Invalid --> C[Return 422 Unprocessable Entity]
+    B -- Valid --> D{Check Repository}
+    D -- Exists --> E[Return 409 Conflict]
+    D -- Not Exists --> F[Return 200 OK]
+```
+</MermaidZoom>
+
+## Success Case
+
+- **Status**: `200 OK`
+- **Body**: Empty
+
+## Error Case
+
+### Email Invalid
+- **Status**: `422 Unprocessable Entity`
+- **Body**:
+```json
+{
+  "statusCode": 422,
+  "message": "Validation failed",
+  "error": "Unprocessable Entity"
+}
+```
+
+### Email In Use
+- **Status**: `409 Conflict`
+- **Body**:
+```json
+{
+  "statusCode": 409,
+  "message": "The provided email \"user@example.com\" is already in use.",
+  "error": "Conflict"
+}
+```

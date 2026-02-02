@@ -1,14 +1,13 @@
 {
   "extends": "@libs/config-typescript/base.json",
   "include": [
-    "libs/**/*",
     "apps/**/*",
+    "libs/**/*",
     "tools/**/*",
     "*.config,*"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/dist/**"
+    "dist"
   ]
 }

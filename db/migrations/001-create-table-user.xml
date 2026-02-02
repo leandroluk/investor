@@ -11,13 +11,14 @@
       CREATE TABLE "user" (
         "id"                 UUID           NOT NULL,
         "email"              VARCHAR(100)   NOT NULL,
-        "wallet_address"     CHAR(42)       NOT NULL,
         "password_hash"      TEXT           NOT NULL,
         "name"               VARCHAR(100)   NOT NULL,
-        "wallet_verified_at" TIMESTAMPTZ(3)     NULL,
         "status"             VARCHAR(20)    NOT NULL,
+        "wallet_address"     CHAR(42)           NULL,
+        "wallet_verified_at" TIMESTAMPTZ(3)     NULL,
         "two_factor_enabled" BOOLEAN        NOT NULL,
         "created_at"         TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"         TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         UNIQUE      ("email"),

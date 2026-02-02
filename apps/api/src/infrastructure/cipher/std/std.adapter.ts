@@ -1,13 +1,13 @@
 import {Throws} from '#/application/_shared/decorator';
-import {Cipher} from '#/domain/_shared/port';
+import {CipherPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import crypto from 'node:crypto';
 import {CipherStdConfig} from './std.config';
 import {CipherStdError} from './std.error';
 
 @Throws(CipherStdError)
-@InjectableExisting(Cipher)
-export class CipherStdAdapter implements Cipher {
+@InjectableExisting(CipherPort)
+export class CipherStdAdapter implements CipherPort {
   private readonly algorithm = 'aes-256-gcm';
   private readonly plainEncoding = 'utf8';
   private readonly cipherEncoding = 'base64url';

@@ -1,7 +1,7 @@
-import {type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
+import {type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class StrategyEntity implements TIndexableEntity, TUpdatableEntity {
+export class StrategyEntity implements Indexable, Updatable {
   @ApiProperty({
     example: 'stable-yield-v1',
     description: 'Unique slug for the investment strategy',

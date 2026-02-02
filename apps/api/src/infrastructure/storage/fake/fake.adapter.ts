@@ -1,8 +1,8 @@
-import {Storage} from '#/domain/_shared/port';
+import {StoragePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Storage)
-export class StorageFakeAdapter implements Storage {
+@InjectableExisting(StoragePort)
+export class StorageFakeAdapter implements StoragePort {
   async save(_path: string, _file: Buffer, _mimeType: string): Promise<string> {
     return 'http://fake/file';
   }

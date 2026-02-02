@@ -8,7 +8,6 @@ import uuid from 'uuid';
 import {AppConfig} from './app.config';
 import {AppLogger} from './app.logger';
 import {AppModule} from './app.module';
-import {DomainExceptionFilter} from './presentation/http/_shared/filter';
 
 dotenvx.config({
   path: ['.env', '../.env', '../../.env'],
@@ -33,7 +32,6 @@ export async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix(config.prefix);
   app.useLogger(logger);
-  app.useGlobalFilters(app.get(DomainExceptionFilter));
   app.use(helmet({contentSecurityPolicy: false}));
   app.enableCors({origin: config.origin.includes('*') ? true : config.origin});
 

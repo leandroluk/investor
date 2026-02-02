@@ -14,6 +14,7 @@
         "expected_apy_range_low"  DECIMAL        NOT NULL,
         "expected_apy_range_high" DECIMAL        NOT NULL,
         "created_at"              TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"              TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id")
       );

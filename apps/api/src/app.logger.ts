@@ -1,16 +1,16 @@
 import {Injectable, type LoggerService} from '@nestjs/common';
-import {Logger} from './domain/_shared/port';
+import {LoggerPort} from './domain/_shared/port';
 
 @Injectable()
 export class AppLogger implements LoggerService {
   private readonly ignoredContexts = ['RoutesResolver', 'RouterExplorer', 'NestApplication', 'InstanceLoader'];
 
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly loggerPort: LoggerPort) {}
 
   log(message: string, ...optionalParams: any[]): void {
     const context = optionalParams[optionalParams.length - 1];
     if (!this.ignoredContexts.includes(context)) {
-      this.logger.info(message, {context});
+      this.loggerPort.info(message, {context});
     }
   }
 
@@ -19,17 +19,17 @@ export class AppLogger implements LoggerService {
     const context = optionalParams[optionalParams.length - 1];
 
     const metadata = optionalParams.filter(p => !(p instanceof Error) && p !== context);
-    this.logger.error(message, error, {context, params: metadata, log_type: 'exception'});
+    this.loggerPort.error(message, error, {context, params: metadata, log_type: 'exception'});
   }
 
   warn(message: string, ...optionalParams: any[]): void {
     const context = optionalParams[optionalParams.length - 1];
-    this.logger.warn(message, {context, params: optionalParams.slice(0, -1)});
+    this.loggerPort.warn(message, {context, params: optionalParams.slice(0, -1)});
   }
 
   debug(message: string, ...optionalParams: any[]): void {
     const context = optionalParams[optionalParams.length - 1];
-    this.logger.debug(message, {context, params: optionalParams.slice(0, -1)});
+    this.loggerPort.debug(message, {context, params: optionalParams.slice(0, -1)});
   }
 
   verbose(message: string, ...optionalParams: any[]): void {

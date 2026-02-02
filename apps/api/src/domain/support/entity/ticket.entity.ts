@@ -1,8 +1,8 @@
-import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
+import {type Creatable, type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 import {TicketStatusEnum} from '../enum';
 
-export class TicketEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
+export class TicketEntity implements Indexable, Creatable, Updatable {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the support ticket (UUIDv7)',

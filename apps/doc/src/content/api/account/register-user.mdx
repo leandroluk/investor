@@ -28,25 +28,16 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 <MermaidZoom>
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant API
-    participant DB as Database
-    participant Mailer
-
-    User->>API: POST /account/register
-    API->>DB: Check if email exists
-    
-    alt Email already exists
-        DB-->>API: User found
-        API-->>User: 409 Conflict
-    end
-
-    API->>API: Hash password
-    API->>DB: Create user (PENDING)
-    API->>Mailer: Send activation email
-    API-->>User: 201 Created
+flowchart TD
+    Start([Start]) --> Request[User calls POST /account/register]
+    Request --> CheckEmail{Email exists in DB?}
+    CheckEmail -- Yes --> Conflict[Return 409 Conflict]
+    Conflict --> End([End])
+    CheckEmail -- No --> Hash[Hash Password]
+    Hash --> Create[Create User in DB]
+    Create --> Email[Send Activation Email]
+    Email --> Success[Return 201 Created]
+    Success --> End
 ```
 </MermaidZoom>
 

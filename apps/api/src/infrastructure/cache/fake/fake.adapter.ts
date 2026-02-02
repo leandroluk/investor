@@ -1,8 +1,8 @@
-import {Cache} from '#/domain/_shared/port';
+import {CachePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Cache)
-export class CacheFakeAdapter extends Cache {
+@InjectableExisting(CachePort)
+export class CacheFakeAdapter extends CachePort {
   private readonly storage = new Map<string, {value: string; expiresAt: number | null}>();
 
   async ping(): Promise<void> {
@@ -35,16 +35,16 @@ export class CacheFakeAdapter extends Cache {
     this.storage.set(key, {value: JSON.stringify(value), expiresAt});
   }
 
-  async get<TType = any>(key: string): Promise<TType | null> {
+  async get<TType = any>(key: string): Promise<{key: string; value: TType | null}> {
     const item = this.storage.get(key);
 
     if (!item) {
-      return null;
+      return {key, value: null};
     }
 
     if (item.expiresAt && Date.now() > item.expiresAt) {
       this.storage.delete(key);
-      return null;
+      return {key, value: null};
     }
 
     return JSON.parse(item.value);

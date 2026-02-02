@@ -1,12 +1,12 @@
 import {Throws} from '#/application/_shared/decorator';
-import {Hasher} from '#/domain/_shared/port';
+import {HasherPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import crypto from 'node:crypto';
 import {HasherStdError} from './std.error';
 
 @Throws(HasherStdError)
-@InjectableExisting(Hasher)
-export class HasherStdAdapter implements Hasher {
+@InjectableExisting(HasherPort)
+export class HasherStdAdapter implements HasherPort {
   private readonly cipherEncoding = 'base64url';
 
   async hash(plainText: string): Promise<string> {

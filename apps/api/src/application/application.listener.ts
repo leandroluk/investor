@@ -1,19 +1,22 @@
-import {Logger} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/port';
 import {Injectable} from '@nestjs/common';
 import {OnEvent} from '@nestjs/event-emitter';
+import ms from 'ms';
 
 @Injectable()
 export class ApplicationListener {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly loggerPort: LoggerPort) {}
 
   @OnEvent('monitor.trace')
   handleTrace(payload: {className: string; methodName: string; duration: number; timestamp: Date}): void {
-    const message = `[Trace] ${payload.className}.${payload.methodName} took ${payload.duration.toFixed(2)}ms`;
+    const duration = ms(Number(payload.duration.toFixed(2)));
+    const message = `[Trace] ${payload.className}.${payload.methodName} took ${duration}`;
 
-    this.logger.info(message, {
+    this.loggerPort.info(message, {
       context: 'Performance',
       labels: {category: 'performance', interface: payload.className, method: payload.methodName},
       ...payload,
+      duration,
     });
   }
 
@@ -22,7 +25,7 @@ export class ApplicationListener {
     const message = `[Retry] ${payload.className}.${payload.methodName} - Attempt ${payload.attempt + 1}`;
     const errorMessage = payload.error?.message || 'Unknown error';
 
-    this.logger.warn(`${message} due to error: ${errorMessage}`, {
+    this.loggerPort.warn(`${message} due to error: ${errorMessage}`, {
       context: 'Resiliency',
       labels: {category: 'resiliency', attempt: (payload.attempt + 1).toString()},
       ...payload,
@@ -34,7 +37,7 @@ export class ApplicationListener {
   handleInfrastructureBrokerError(payload: any): void {
     const error = payload instanceof Error ? payload : new Error('Infrastructure broker error');
 
-    this.logger.error('Infrastructure broker error', error, {
+    this.loggerPort.error('Infrastructure broker error', error, {
       context: 'Infrastructure',
       labels: {interface: 'Broker', category: 'infrastructure'},
       ...payload,

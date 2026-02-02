@@ -1,8 +1,8 @@
-import {Hasher} from '#/domain/_shared/port';
+import {HasherPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Hasher)
-export class HasherFakeAdapter extends Hasher {
+@InjectableExisting(HasherPort)
+export class HasherFakeAdapter extends HasherPort {
   async hash(_plainText: string): Promise<string> {
     return 'text';
   }

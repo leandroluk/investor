@@ -1,3 +1,3 @@
-export * from './retry';
-export * from './throws';
-export * from './trace';
+export * from './retry.decorator';
+export * from './throws.decorator';
+export * from './trace.decorator';

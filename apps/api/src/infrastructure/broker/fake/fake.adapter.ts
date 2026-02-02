@@ -1,8 +1,9 @@
-import {Broker} from '#/domain/_shared/port';
+import {DomainEvent} from '#/domain/_shared/event';
+import {BrokerPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Broker)
-export class BrokerFakeAdapter extends Broker {
+@InjectableExisting(BrokerPort)
+export class BrokerFakeAdapter extends BrokerPort {
   async ping(): Promise<void> {
     return;
   }
@@ -13,14 +14,14 @@ export class BrokerFakeAdapter extends Broker {
     return;
   }
 
-  async publish<TType extends object = any>(message: Broker.Message<TType>): Promise<void> {
-    console.log(`[Fake Broker] Published to ${message.kind}:`, message.payload);
+  async publish<TPayload extends object = any>(event: DomainEvent<TPayload>): Promise<void> {
+    console.log(`[Fake Broker] Published to ${event.constructor.name}:`, event.payload);
   }
 
   async subscribe(..._topics: string[]): Promise<void> {
     return;
   }
-  async consume<TType extends object = any>(_handler: (message: Broker.Message<TType>) => void): Promise<void> {
+  async consume<TPayload extends object = any>(_handler: (event: DomainEvent<TPayload>) => void): Promise<void> {
     return;
   }
 }

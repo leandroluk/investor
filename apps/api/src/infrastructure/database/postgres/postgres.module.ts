@@ -1,27 +1,19 @@
-import {Database} from '#/domain/_shared/port';
-import {AccountUnitOfWork} from '#/domain/account/account.unit-of-work';
+import {DatabasePort} from '#/domain/_shared/port';
 import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repository';
+import {AccountUOW} from '#/domain/account/repository/account.uow';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
-import {DatabasePostgresAccountUnitOfWork} from './account/account.unit-of-work';
-import {
-  DatabasePostgresDeviceRepository,
-  DatabasePostgresLoginRepository,
-  DatabasePostgresUserRepository,
-} from './account/repository';
+import * as account from './account';
 import {DatabasePostgresAdapter} from './postgres.adapter';
 import {DatabasePostgresConfig} from './postgres.config';
 import {DatabasePostgresLifecycle} from './postgres.lifecycle';
 
 @EnhancedModule({
-  providers: [
+  providers: Array().concat(
     DatabasePostgresAdapter,
     DatabasePostgresConfig,
     DatabasePostgresLifecycle,
-    DatabasePostgresDeviceRepository,
-    DatabasePostgresLoginRepository,
-    DatabasePostgresUserRepository,
-    DatabasePostgresAccountUnitOfWork,
-  ],
-  exports: [Database, DeviceRepository, LoginRepository, UserRepository, AccountUnitOfWork],
+    Object.values(account)
+  ),
+  exports: [DatabasePort, DeviceRepository, LoginRepository, UserRepository, AccountUOW],
 })
 export class DatabasePostgresModule {}

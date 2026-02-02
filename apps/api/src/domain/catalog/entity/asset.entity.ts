@@ -1,7 +1,7 @@
-import {type TCreatableEntity, type TIndexableEntity} from '#/domain/_shared/type';
+import {type Creatable, type Indexable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class AssetEntity implements TIndexableEntity, TCreatableEntity {
+export class AssetEntity implements Indexable, Creatable {
   @ApiProperty({
     example: 'usdc-polygon',
     description: 'Unique identifier for the asset (slug)',

@@ -11,7 +11,8 @@
       CREATE TABLE "earning" (
         "id"            UUID           NOT NULL,
         "investment_id" UUID           NOT NULL,
-        "amount"        DECIMAL        NOT NULL,
+        "amount_token"  DECIMAL        NOT NULL,
+        "amount_usd"    DECIMAL        NOT NULL,
         "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),

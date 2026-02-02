@@ -1,12 +1,12 @@
 import {Throws} from '#/application/_shared/decorator';
-import {Storage} from '#/domain/_shared/port';
+import {StoragePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {StorageS3CompatConfig} from './s3compat.config';
 import {S3CompatError} from './s3compat.error';
 
 @Throws(S3CompatError)
-@InjectableExisting(Storage)
-export class StorageS3CompatAdapter implements Storage {
+@InjectableExisting(StoragePort)
+export class StorageS3CompatAdapter implements StoragePort {
   constructor(private readonly config: StorageS3CompatConfig) {}
 
   async save(_path: string, _file: Buffer, _mimeType: string): Promise<string> {

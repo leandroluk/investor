@@ -1,9 +1,9 @@
-import {Database} from '#/domain/_shared/port';
 import {Injectable, type OnApplicationBootstrap, type OnApplicationShutdown} from '@nestjs/common';
+import {DatabasePostgresAdapter} from './postgres.adapter';
 
 @Injectable()
 export class DatabasePostgresLifecycle implements OnApplicationBootstrap, OnApplicationShutdown {
-  constructor(private readonly adapter: Database) {}
+  constructor(private readonly adapter: DatabasePostgresAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
     await this.adapter.connect();

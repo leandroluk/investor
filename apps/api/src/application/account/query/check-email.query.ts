@@ -1,22 +1,22 @@
 import {Query} from '#/application/_shared/bus';
-import {EmailConflitError} from '#/domain/account/error';
+import {EmailInUseError} from '#/domain/account/error/email-in-use.error';
 import {UserRepository} from '#/domain/account/repository';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const checkEmailQuerySchema = z.object({
+const querySchema = z.object({
   email: z.email(),
 });
 
-type CheckEmailQuerySchema = z.infer<typeof checkEmailQuerySchema>;
+type QuerySchema = z.infer<typeof querySchema>;
 
-export class CheckEmailQuery extends Query<CheckEmailQuerySchema> {
+export class CheckEmailQuery extends Query<QuerySchema> {
   @ApiProperty({description: 'Email to check'})
   readonly email!: string;
 
   constructor(payload: CheckEmailQuery) {
-    super(payload, checkEmailQuerySchema);
+    super(payload, querySchema);
   }
 }
 
@@ -24,10 +24,14 @@ export class CheckEmailQuery extends Query<CheckEmailQuerySchema> {
 export class CheckEmailQueryHandler implements IQueryHandler<CheckEmailQuery, void> {
   constructor(private readonly repository: UserRepository) {}
 
-  async execute(query: CheckEmailQuery): Promise<void> {
-    const exists = await this.repository.existsByEmail(query.email);
+  private async existsByEmail(email): Promise<void> {
+    const exists = await this.repository.existsByEmail(email);
     if (exists) {
-      throw new EmailConflitError(query.email);
+      throw new EmailInUseError(email);
     }
+  }
+
+  async execute(query: CheckEmailQuery): Promise<void> {
+    await this.existsByEmail(query.email);
   }
 }

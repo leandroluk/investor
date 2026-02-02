@@ -1,1 +1,1 @@
-export * from './email-conflit.error';
+export * from './email-in-use.error';

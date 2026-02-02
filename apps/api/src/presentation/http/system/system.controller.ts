@@ -1,10 +1,9 @@
-import {Envelope} from '#/application/_shared/bus';
 import {HealthQuery, HealthQueryResult} from '#/application/system/query';
 import {UnhealthyError} from '#/domain/system/error/unhealty.error';
-import {Controller, Get} from '@nestjs/common';
+import {Controller, Get, HttpStatus} from '@nestjs/common';
 import {QueryBus} from '@nestjs/cqrs';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {ApiDomainResponse, GetEnvelope} from '../_shared/decorator';
+import {DomainException, GetEnvelope} from '../_shared/decorator';
 
 @ApiTags('system')
 @Controller('system')
@@ -13,10 +12,10 @@ export class SystemController {
 
   @Get('health')
   @ApiOkResponse({type: HealthQueryResult})
-  @ApiDomainResponse(UnhealthyError)
+  @DomainException([UnhealthyError, HttpStatus.SERVICE_UNAVAILABLE])
   async getHealth(
-    @GetEnvelope() metadata: Envelope //
+    @GetEnvelope() envelope: GetEnvelope //
   ): Promise<HealthQueryResult> {
-    return this.queryBus.execute(new HealthQuery(metadata));
+    return this.queryBus.execute(new HealthQuery(envelope));
   }
 }

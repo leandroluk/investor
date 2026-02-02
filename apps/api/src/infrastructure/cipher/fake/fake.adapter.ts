@@ -1,8 +1,8 @@
-import {Cipher} from '#/domain/_shared/port';
+import {CipherPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Cipher)
-export class CipherFakeAdapter extends Cipher {
+@InjectableExisting(CipherPort)
+export class CipherFakeAdapter extends CipherPort {
   async hash(_plainText: string): Promise<string> {
     return 'text';
   }

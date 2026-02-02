@@ -1,12 +1,12 @@
 import {Envelope, Query} from '#/application/_shared/bus';
-import {Blockchain, Broker, Cache, Database} from '#/domain/_shared/port';
+import {BlockchainPort, BrokerPort, CachePort, DatabasePort} from '#/domain/_shared/port';
 import {UnhealthyError} from '#/domain/system/error';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import ms from 'ms';
 
-export class HealthQuery extends Query {
-  constructor(payload: Envelope) {
+export class HealthQuery extends Query<Envelope> {
+  constructor(payload) {
     super(payload);
   }
 }
@@ -19,14 +19,14 @@ export class HealthQueryResult {
 @QueryHandler(HealthQuery)
 export class HealthQueryHandler implements IQueryHandler<HealthQuery, HealthQueryResult> {
   constructor(
-    private readonly blockchain: Blockchain,
-    private readonly broker: Broker,
-    private readonly cache: Cache,
-    private readonly database: Database
+    private readonly blockchainPort: BlockchainPort,
+    private readonly brokerPort: BrokerPort,
+    private readonly cachePort: CachePort,
+    private readonly databasePort: DatabasePort
   ) {}
 
   async execute(): Promise<HealthQueryResult> {
-    const services = [this.blockchain, this.broker, this.cache, this.database];
+    const services = [this.blockchainPort, this.brokerPort, this.cachePort, this.databasePort];
 
     const results = await Promise.allSettled(services.map(service => service.ping()));
 

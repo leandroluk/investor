@@ -96,6 +96,11 @@
     ".*ClassName"
   ],
   // #endregion
+  // #region barrelr
+  "barrelr.lineEnding": "LF",
+  "barrelr.useSemiColons": true,
+  "barrelr.useDoubleQuotes": false,
+  // #endregion
   // #region xml
   "[xml]": {
     "editor.formatOnSave": false,

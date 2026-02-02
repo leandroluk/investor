@@ -1,9 +1,8 @@
-import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
+import {type Creatable, type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 import {DeviceTypeEnum} from '../enum';
-import {type PushTokenValueObject} from '../value-object';
 
-export class DeviceEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
+export class DeviceEntity implements Indexable, Creatable, Updatable {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the registered device (UUIDv7)',
@@ -23,15 +22,20 @@ export class DeviceEntity implements TIndexableEntity, TCreatableEntity, TUpdata
     description: 'Operational system platform',
     enum: Object.values(DeviceTypeEnum),
   })
-  type!: DeviceTypeEnum;
+  platform!: DeviceTypeEnum;
 
   @ApiProperty({
     example: 'fCM_token_82h1...',
     description: 'Firebase Cloud Messaging or APNs push token for notifications',
     nullable: true,
-    type: String,
   })
-  pushToken!: PushTokenValueObject | null;
+  pushToken!: string | null;
+
+  @ApiProperty({
+    example: true,
+    description: 'Whether the device is active for push notifications',
+  })
+  isActive!: boolean;
 
   @ApiProperty({
     example: 'Apple',

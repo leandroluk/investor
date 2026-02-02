@@ -50,4 +50,8 @@ body {
   gap: 0.5rem !important;
 }
 
+.nextra-sidebar ul::before {
+  content: none !important;
+}
+
 /* #endregion */

@@ -1,5 +1,5 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {Mailer} from '#/domain/_shared/port';
+import {MailerPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
@@ -7,8 +7,8 @@ import {MailerSmtpConfig} from './smtp.config';
 import {MailerSmtpError} from './smtp.error';
 
 @Throws(MailerSmtpError)
-@InjectableExisting(Mailer)
-export class MailerSmtpAdapter implements Mailer {
+@InjectableExisting(MailerPort)
+export class MailerSmtpAdapter implements MailerPort {
   private readonly transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor(private readonly config: MailerSmtpConfig) {
@@ -26,7 +26,7 @@ export class MailerSmtpAdapter implements Mailer {
 
   @Trace()
   @Retry({attempts: 3, delay: 2000})
-  async send(message: Mailer.Message): Promise<void> {
+  async send(message: MailerPort.Message): Promise<void> {
     await this.transporter.sendMail({
       from: message.from || this.config.from,
       to: message.to.join(','),

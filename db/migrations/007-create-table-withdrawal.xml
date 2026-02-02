@@ -15,6 +15,7 @@
         "status"           VARCHAR(20)    NOT NULL,
         "transaction_hash" CHAR(66)           NULL,
         "created_at"       TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"       TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user" ("id")

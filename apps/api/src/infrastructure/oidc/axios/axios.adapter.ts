@@ -1,11 +1,11 @@
-import {Oidc} from '#/domain/_shared/port';
+import {OidcPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios from 'axios';
 import {Readable} from 'node:stream';
 import {OidcAxiosConfig} from './axios.config';
 
-@InjectableExisting(Oidc)
-export class OidcAxiosResolver extends Oidc {
+@InjectableExisting(OidcPort)
+export class OidcAxiosResolver extends OidcPort {
   private readonly googleAdapter!: OidcAxiosGoogleAdapter;
   private readonly microsoftAdapter!: OidcAxiosMicrosoftAdapter;
 
@@ -20,7 +20,7 @@ export class OidcAxiosResolver extends Oidc {
     this.microsoftAdapter = new OidcAxiosMicrosoftAdapter(config);
   }
 
-  getAdapter(provider: 'microsoft' | 'google'): Oidc.Adapter {
+  getAdapter(provider: 'microsoft' | 'google'): OidcPort.Adapter {
     const adapter = this.adapterMap[provider];
 
     if (!adapter) {
@@ -31,7 +31,7 @@ export class OidcAxiosResolver extends Oidc {
   }
 }
 
-class OidcAxiosGoogleAdapter implements Oidc.Adapter {
+class OidcAxiosGoogleAdapter implements OidcPort.Adapter {
   private readonly authorizeURL = 'https://accounts.google.com/o/oauth2/v2/auth';
   private readonly tokenURL = 'https://oauth2.googleapis.com/token';
   private readonly userinfoURL = 'https://openidconnect.googleapis.com/v1/userinfo';
@@ -54,7 +54,7 @@ class OidcAxiosGoogleAdapter implements Oidc.Adapter {
     return url.toString();
   }
 
-  async exchange(code: string): Promise<Oidc.Tokens> {
+  async exchange(code: string): Promise<OidcPort.Tokens> {
     const body = new URLSearchParams({
       client_id: this.config.googleClientId,
       client_secret: this.config.googleClientSecret,
@@ -71,7 +71,7 @@ class OidcAxiosGoogleAdapter implements Oidc.Adapter {
     };
   }
 
-  async getToken(refreshToken: string): Promise<Oidc.Tokens> {
+  async getToken(refreshToken: string): Promise<OidcPort.Tokens> {
     const body = new URLSearchParams({
       client_id: this.config.googleClientId,
       client_secret: this.config.googleClientSecret,
@@ -87,7 +87,7 @@ class OidcAxiosGoogleAdapter implements Oidc.Adapter {
     };
   }
 
-  async getInfo(accessToken: string): Promise<Oidc.Claims> {
+  async getInfo(accessToken: string): Promise<OidcPort.Claims> {
     const data = await axios
       .get(this.userinfoURL, {headers: {Authorization: `Bearer ${accessToken}`}})
       .then(res => res.data);
@@ -111,7 +111,7 @@ class OidcAxiosGoogleAdapter implements Oidc.Adapter {
   }
 }
 
-class OidcAxiosMicrosoftAdapter implements Oidc.Adapter {
+class OidcAxiosMicrosoftAdapter implements OidcPort.Adapter {
   private readonly authorizeURL = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
   private readonly tokenURL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
   private readonly pictureURL = 'https://graph.microsoft.com/v1.0/me/photo/$value';
@@ -132,7 +132,7 @@ class OidcAxiosMicrosoftAdapter implements Oidc.Adapter {
     return url.toString();
   }
 
-  async exchange(code: string): Promise<Oidc.Tokens> {
+  async exchange(code: string): Promise<OidcPort.Tokens> {
     const body = new URLSearchParams({
       client_id: this.config.microsoftClientId,
       client_secret: this.config.microsoftClientSecret,
@@ -147,7 +147,7 @@ class OidcAxiosMicrosoftAdapter implements Oidc.Adapter {
     return data.refresh_token;
   }
 
-  async getToken(refreshToken: string): Promise<Oidc.Tokens> {
+  async getToken(refreshToken: string): Promise<OidcPort.Tokens> {
     const body = new URLSearchParams({
       client_id: this.config.microsoftClientId,
       client_secret: this.config.microsoftClientSecret,
@@ -164,7 +164,7 @@ class OidcAxiosMicrosoftAdapter implements Oidc.Adapter {
     };
   }
 
-  async getInfo(accessToken: string): Promise<Oidc.Claims> {
+  async getInfo(accessToken: string): Promise<OidcPort.Claims> {
     const data = await axios //
       .get('https://graph.microsoft.com/oidc/userinfo', {headers: {Authorization: `Bearer ${accessToken}`}})
       .then(res => res.data);

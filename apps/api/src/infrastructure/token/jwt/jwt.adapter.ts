@@ -1,5 +1,5 @@
 import {Throws} from '#/application/_shared/decorator';
-import {Token} from '#/domain/_shared/port';
+import {TokenPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import jsonwebtoken from 'jsonwebtoken';
 import ms from 'ms';
@@ -8,16 +8,16 @@ import {TokenJwtError} from './jwt.error';
 
 @Throws(TokenJwtError)
 @Throws(TokenJwtError)
-@InjectableExisting(Token)
-export class TokenJwtAdapter implements Token {
+@InjectableExisting(TokenPort)
+export class TokenJwtAdapter implements TokenPort {
   constructor(private readonly config: TokenJwtConfig) {}
 
   create<T extends boolean>(
     sessionKey: string,
-    claims: Token.Claims,
+    claims: TokenPort.Claims,
     includeRefresh?: T
-  ): T extends true ? Required<Token.Authorization> : Token.Authorization {
-    const token: Token.Authorization = {
+  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
+    const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
       accessToken: jsonwebtoken.sign(claims, this.config.privateKey, {
         algorithm: this.config.algorithm,
@@ -44,7 +44,7 @@ export class TokenJwtAdapter implements Token {
     return token as any;
   }
 
-  decode(token: string): Token.Decoded {
+  decode(token: string): TokenPort.Decoded {
     const {header, payload} = jsonwebtoken.verify(token, this.config.publicKey, {
       algorithms: [this.config.algorithm],
       audience: this.config.audience,
@@ -53,7 +53,7 @@ export class TokenJwtAdapter implements Token {
     }) as Omit<jsonwebtoken.Jwt, 'payload'> & {payload: jsonwebtoken.JwtPayload};
 
     return {
-      kind: header.typ as Token.Decoded['kind'],
+      kind: header.typ as TokenPort.Decoded['kind'],
       sessionKey: payload.jti!,
       claims: {
         subject: payload.sub!,
@@ -62,7 +62,7 @@ export class TokenJwtAdapter implements Token {
         givenName: payload.given_name,
         language: payload.language,
         timezone: payload.timezone,
-      } as Token.Claims,
+      } as TokenPort.Claims,
     };
   }
 

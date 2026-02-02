@@ -1,4 +1,4 @@
-export type Envelope = {
-  messageId: string;
-  occurredAt: Date;
-};
+export interface Envelope {
+  readonly correlationId: string;
+  readonly occurredAt: Date;
+}

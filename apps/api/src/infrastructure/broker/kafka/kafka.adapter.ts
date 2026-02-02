@@ -1,5 +1,6 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {Broker} from '#/domain/_shared/port';
+import {DomainEvent} from '#/domain/_shared/event';
+import {BrokerPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Kafka, logLevel, type Consumer, type Producer} from 'kafkajs';
@@ -7,8 +8,8 @@ import {BrokerKafkaConfig} from './kafka.config';
 import {BrokerKafkaError} from './kafka.error';
 
 @Throws(BrokerKafkaError)
-@InjectableExisting(Broker)
-export class BrokerKafkaAdapter implements Broker {
+@InjectableExisting(BrokerPort)
+export class BrokerKafkaAdapter implements BrokerPort {
   private readonly kafka: Kafka;
   private readonly producer: Producer;
   private readonly consumer: Consumer;
@@ -59,10 +60,16 @@ export class BrokerKafkaAdapter implements Broker {
 
   @Trace()
   @Retry({attempts: 3, delay: 1000})
-  async publish<TType extends object = any>(message: Broker.Message<TType>): Promise<void> {
+  async publish<TPayload extends object = any>(event: DomainEvent<TPayload>): Promise<void> {
     await this.producer.send({
-      topic: message.kind,
-      messages: [{key: message.key, value: JSON.stringify(message.payload)}],
+      topic: event.constructor.name,
+      messages: [
+        {
+          key: event.correlationId,
+          timestamp: event.occurredAt.toJSON(),
+          value: JSON.stringify(event.payload),
+        },
+      ],
     });
   }
 
@@ -70,15 +77,17 @@ export class BrokerKafkaAdapter implements Broker {
     await this.consumer.subscribe({topics, fromBeginning: false});
   }
 
-  async consume<TType extends object = any>(handler: (message: Broker.Message<TType>) => void): Promise<void> {
+  async consume<TPayload extends object = any>(handler: (event: DomainEvent<TPayload>) => void): Promise<void> {
     await this.consumer.run({
       eachMessage: async ({topic, message}) => {
-        handler({
-          key: message.key?.toString() || '',
-          kind: topic,
-          tz: new Date(),
-          payload: JSON.parse(message.value?.toString() || '{}'),
-        });
+        handler(
+          Object.assign(new DomainEvent<TPayload>(), {
+            event: topic,
+            payload: message.value ? JSON.parse(message.value.toString()) : undefined,
+            correlationId: message.key ? message.key.toString() : undefined,
+            occurredAt: message.timestamp ? new Date(message.timestamp) : undefined,
+          })
+        );
       },
     });
   }

@@ -51,7 +51,7 @@ Com base no caso de uso definido, o agente deve **inferir** a documentação da 
 
     <MermaidZoom>
     ```mermaid
-    sequenceDiagram
+    flowchart TD
       ...
     ```
     </MermaidZoom>
@@ -106,12 +106,11 @@ os diretórios deverão ser perguntados ao usuário
     *   Associar o método HTTP e URL ao do caso de uso criado.
     *   fazer a implementação com injeção direta do (Command|Query)Bus do NestJS, sem extender classe base.
         ```ts
-        import {Envelope} from '#/application/_shared/bus';
         import {ExampleCommand} from '#/application/example/command';
         import {Controller, Post, Req} from '@nestjs/common';
         import {CommandBus} from '@nestjs/cqrs';
         import {ApiTags} from '@nestjs/swagger';
-        import {ApiDomainResponse, GetEnvelope} from '../_shared/decorator';
+        import {ApiDomainResponse, GetDomainEvent} from '../_shared/decorator';
         import {ExampleRequest} from './request';
         import {ExampleResponse} from './response';
 
@@ -124,9 +123,9 @@ os diretórios deverão ser perguntados ao usuário
           @ApiDomainResponse(SomeError)
           async postExample(
             @Req() {params: {id}, body: changes}: ExampleRequest,
-            @GetEnvelope() envelope: Envelope
+            @GetDomainEvent() domainEvent: DomainEvent
           ): Promise<ExampleResponse> {
-            return await this.commandBus.execute(new ExampleCommand({...envelope, id, changes}));
+            return await this.commandBus.execute(new ExampleCommand({...domainEvent, id, changes}));
           }
         }
         ```    

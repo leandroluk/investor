@@ -1,8 +1,23 @@
-import {type TCreatableEntity, type TIndexableEntity, type TUpdatableEntity} from '#/domain/_shared/type';
+import {type Creatable, type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
+import uuid from 'uuid';
 import {UserStatusEnum} from '../enum';
+export class UserEntity implements Indexable, Creatable, Updatable {
+  static create(data: Pick<UserEntity, 'email' | 'name' | 'passwordHash'>): UserEntity {
+    return Object.assign(new UserEntity(), {
+      id: uuid.v7(),
+      email: data.email,
+      name: data.name,
+      passwordHash: data.passwordHash,
+      walletAddress: null,
+      walletVerifiedAt: null,
+      status: UserStatusEnum.PENDING,
+      twoFactorEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } satisfies UserEntity);
+  }
 
-export class UserEntity implements TIndexableEntity, TCreatableEntity, TUpdatableEntity {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the user (UUIDv7)',
@@ -11,7 +26,7 @@ export class UserEntity implements TIndexableEntity, TCreatableEntity, TUpdatabl
   id!: string;
 
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'john.doe@email.com',
     description: 'Unique electronic mail address',
   })
   email!: string;

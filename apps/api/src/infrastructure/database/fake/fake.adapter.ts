@@ -1,8 +1,8 @@
-import {Database} from '#/domain/_shared/port';
+import {DatabasePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Database)
-export class DatabaseFakeAdapter extends Database {
+@InjectableExisting(DatabasePort)
+export class DatabaseFakeAdapter extends DatabasePort {
   async ping(): Promise<void> {
     return;
   }
@@ -23,11 +23,11 @@ export class DatabaseFakeAdapter extends Database {
     return null;
   }
 
-  async exec(): Promise<Database.Result> {
+  async exec(): Promise<DatabasePort.Result> {
     return {rowsAffected: 0};
   }
 
-  async transaction<TType>(fn: (tx: Database.Transaction) => Promise<TType>): Promise<TType> {
+  async transaction<TType>(fn: (tx: DatabasePort.Transaction) => Promise<TType>): Promise<TType> {
     return fn(this);
   }
 }

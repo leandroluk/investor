@@ -1,11 +1,11 @@
-import {Logger} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Logger as WinstonLogger, createLogger, format, transports} from 'winston';
 import LokiTransport from 'winston-loki';
 import {LoggerWinstonConfig} from './winston.config';
 
-@InjectableExisting(Logger)
-export class LoggerWinstonAdapter implements Logger {
+@InjectableExisting(LoggerPort)
+export class LoggerWinstonAdapter implements LoggerPort {
   private readonly winston: WinstonLogger;
   private readonly noJsonFormat = format.combine(
     format.colorize(),
@@ -60,7 +60,7 @@ export class LoggerWinstonAdapter implements Logger {
       ...meta,
       error,
       stack: error.stack,
-      labels: {correlationId: meta?.messageId || 'internal-process'},
+      labels: {correlationId: meta?.correlationId || 'internal-process'},
     });
   }
 }

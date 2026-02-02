@@ -1,10 +1,10 @@
-import {Oidc} from '#/domain/_shared/port';
+import {OidcPort} from '#/domain/_shared/port';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {OidcAxiosResolver} from './axios.adapter';
 import {OidcAxiosConfig} from './axios.config';
 
 @EnhancedModule({
   providers: [OidcAxiosResolver, OidcAxiosConfig],
-  exports: [Oidc],
+  exports: [OidcPort],
 })
 export class OidcAxiosModule {}

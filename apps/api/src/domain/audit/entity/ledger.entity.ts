@@ -1,8 +1,8 @@
-import {type TCreatableEntity, type TIndexableEntity} from '#/domain/_shared/type';
+import {type Creatable, type Indexable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 import {LedgerTypeEnum} from '../enum';
 
-export class LedgerEntity implements TIndexableEntity, TCreatableEntity {
+export class LedgerEntity implements Indexable, Creatable {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the ledger entry (UUIDv7)',

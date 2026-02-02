@@ -1,13 +1,13 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {Coinbase} from '#/domain/_shared/port';
+import {CoinbasePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios, {AxiosInstance} from 'axios';
 import {CoinbaseAxiosConfig} from './axios.config';
 import {CoinbaseAxiosError} from './axios.error';
 
 @Throws(CoinbaseAxiosError)
-@InjectableExisting(Coinbase)
-export class CoinbaseAxiosAdapter implements Coinbase {
+@InjectableExisting(CoinbasePort)
+export class CoinbaseAxiosAdapter implements CoinbasePort {
   private readonly http: AxiosInstance;
 
   constructor(private readonly config: CoinbaseAxiosConfig) {
@@ -19,7 +19,7 @@ export class CoinbaseAxiosAdapter implements Coinbase {
 
   @Trace()
   @Retry({attempts: 3, delay: 1000})
-  async getPrice(base: string, quote: string): Promise<Coinbase.Quote> {
+  async getPrice(base: string, quote: string): Promise<CoinbasePort.Quote> {
     const {data} = await this.http.get('/simple/price', {
       params: {ids: base, vs_currencies: quote, include_24hr_change: true},
     });
@@ -35,13 +35,13 @@ export class CoinbaseAxiosAdapter implements Coinbase {
   }
 
   @Trace()
-  async getPrices(pairs: Coinbase.Pair[]): Promise<Coinbase.Quote[]> {
+  async getPrices(pairs: CoinbasePort.Pair[]): Promise<CoinbasePort.Quote[]> {
     return Promise.all(pairs.map(p => this.getPrice(p.base, p.quote)));
   }
 
   @Trace()
   @Retry({attempts: 2, delay: 2000})
-  async getHistoricalPrice(base: string, quote: string, date: Date): Promise<Coinbase.Quote> {
+  async getHistoricalPrice(base: string, quote: string, date: Date): Promise<CoinbasePort.Quote> {
     const formattedDate = date.toLocaleDateString('en-GB').replace(/\//g, '-'); // DD-MM-YYYY
     const {data} = await this.http.get(`/coins/${base}/history`, {
       params: {date: formattedDate, localization: false},

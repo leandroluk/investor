@@ -1,8 +1,7 @@
-import {type TCreatableEntity, type TIndexableEntity} from '#/domain/_shared/type';
-import {type AmountValueObject} from '#/domain/_shared/value-object';
+import {type Creatable, type Indexable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class EarningEntity implements TIndexableEntity, TCreatableEntity {
+export class EarningEntity implements Indexable, Creatable {
   @ApiProperty({
     example: '018f3b5e-ccdd-7000-8000-000000000000',
     description: 'Unique identifier for the earning record (UUIDv7)',
@@ -20,16 +19,14 @@ export class EarningEntity implements TIndexableEntity, TCreatableEntity {
   @ApiProperty({
     example: '0.005234',
     description: 'The amount earned in the native token of the strategy',
-    type: String,
   })
-  amountToken!: AmountValueObject;
+  amountToken!: string;
 
   @ApiProperty({
     example: '15.50',
     description: 'The equivalent value of the earning in USD at the time of record',
-    type: String,
   })
-  amountUsd!: AmountValueObject;
+  amountUsd!: string;
 
   @ApiProperty({
     example: new Date(),

@@ -1,8 +1,8 @@
-import {Logger} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
-@InjectableExisting(Logger)
-export class LoggerFakeAdapter extends Logger {
+@InjectableExisting(LoggerPort)
+export class LoggerFakeAdapter extends LoggerPort {
   debug(): void {}
   info(): void {}
   warn(): void {}

@@ -6,7 +6,10 @@
         varchar   platform   ""
         varchar   push_token ""
         boolean   is_active  ""
+        varchar   brand      ""
+        varchar   model      ""
         timestamp created_at ""
+        timestamp updated_at ""
     }
     login {
         uuidv7    id         PK
@@ -16,15 +19,16 @@
         timestamp created_at ""
     }
     user {
-        uuidv7    id                 PK
-        varchar   email              UK
-        char      wallet_address     UK
-        text      password_hash      ""
-        varchar   name               ""
-        timestamp wallet_verified_at ""
-        varchar   status             ""
-        boolean   two_factor_enabled ""
-        timestamp created_at         ""
+        uuidv7          id                 PK
+        varchar         email              UK
+        text            password_hash      ""
+        varchar         name               ""
+        varchar         status             ""
+        null[char]      wallet_address     UK
+        null[timestamp] wallet_verified_at ""
+        boolean         two_factor_enabled ""
+        timestamp       created_at         ""
+        timestamp       updated_at         ""
     }
 
     %% MODULE: audit
@@ -51,13 +55,15 @@
         decimal   expected_apy_range_low  ""
         decimal   expected_apy_range_high ""
         timestamp created_at              ""
+        timestamp updated_at              ""
     }
 
     %% MODULE: portfolio
     earning {
         uuidv7    id            PK
         uuidv7    investment_id FK
-        decimal   amount        ""
+        decimal   amount_token  ""
+        decimal   amount_usd    ""
         timestamp created_at    ""
     }
     investment {
@@ -68,6 +74,7 @@
         decimal   amount_usd  ""
         varchar   status      ""
         timestamp created_at  ""
+        timestamp updated_at  ""
     }
 
     %% MODULE: signal
@@ -87,12 +94,15 @@
         text      message    ""
         varchar   status     ""
         timestamp created_at ""
+        timestamp updated_at ""
     }
 
     %% MODULE: system
     config {
-        varchar   key          PK
+        uuidv7    id           PK
+        varchar   key          UK
         text      value        ""
+        timestamp created_at   ""
         timestamp updated_at   ""
     }
 
@@ -104,6 +114,7 @@
         varchar   status           ""
         char      transaction_hash ""
         timestamp created_at       ""
+        timestamp updated_at       ""
     }
 
     user       ||--o{ device     : "has"

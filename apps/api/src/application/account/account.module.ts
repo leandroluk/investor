@@ -1,7 +1,8 @@
 import {Module} from '@nestjs/common';
-import {CheckEmailQueryHandler} from './query';
+import * as command from './command';
+import * as query from './query';
 
 @Module({
-  providers: [CheckEmailQueryHandler],
+  providers: Array().concat(Object.values(command), Object.values(query)),
 })
 export class AccountModule {}

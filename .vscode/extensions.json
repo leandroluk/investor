@@ -10,8 +10,6 @@
     // seamlessly navigate and explore Git repositories, gain valuable insights via rich visualizations and powerful
     // comparison commands, and so much more
     "eamodio.gitlens",
-    // Makes it easy to create, manage, and debug containerized applications.
-    "ms-azuretools.vscode-docker",
     // Intelligent Tailwind CSS tooling for VS Code
     "bradlc.vscode-tailwindcss",
     // Adds Mermaid diagram and flowchart support to VS Code's builtin markdown preview

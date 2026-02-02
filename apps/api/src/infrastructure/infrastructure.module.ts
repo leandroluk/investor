@@ -9,6 +9,7 @@ import {HasherModule} from './hasher/hasher.module';
 import {LoggerModule} from './logger/logger.module';
 import {MailerModule} from './mailer/mailer.module';
 import {OidcModule} from './oidc/oidc.module';
+import {TemplateModule} from './template/template.module';
 import {TokenModule} from './token/token.module';
 
 const modules = [
@@ -22,6 +23,7 @@ const modules = [
   LoggerModule.forRoot(),
   MailerModule.forRoot(),
   OidcModule.forRoot(),
+  TemplateModule.forRoot(),
   TokenModule.forRoot(),
 ];
 
