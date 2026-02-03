@@ -1,0 +1,72 @@
+---
+title: Login using token
+description: Authenticate user with a temporary token (e.g. from SSO)
+---
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- User provides a temporary encrypted token (typically from SSO callback).
+- System validates and decrypts the token to extract user ID.
+- Checks 2FA status for the user.
+- If 2FA is enabled, returns challenge token.
+- If 2FA is disabled, returns access and refresh tokens.
+- Logs the login attempt.
+
+## Request
+
+- Method: `POST`
+- Path: `/auth/login/token`
+- Body:
+  - `token`: Encrypted temporary token (required, string)
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+  A["Client"] -- "POST /auth/login/token" --> B["API"]
+  B --> C{"Valid Token?"}
+  C -- "No" --> D["Return 401 Unauthorized"]
+  C -- "Yes" --> E{"2FA Enabled?"}
+  E -- "Yes" --> F["Log Success (Challenge)"]
+  F --> G["Return 200 OK (ChallengeToken, is2faRequired=true)"]
+  E -- "No" --> H["Log Success (Full)"]
+  H --> I["Return 200 OK (AccessToken, RefreshToken)"]
+```
+</MermaidZoom>
+
+## Success Case (2FA Disabled)
+
+- Status: `200 OK`
+- Body:
+```json
+{
+  "accessToken": "ey...",
+  "refreshToken": "ey...",
+  "expiresIn": 3600
+}
+```
+
+## Success Case (2FA Enabled)
+
+- Status: `200 OK`
+- Body:
+```json
+{
+  "challengeToken": "ey...",
+  "is2faRequired": true
+}
+```
+
+## Error Case
+
+- Status: `401 Unauthorized`
+- Body:
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid or expired token",
+  "error": "Unauthorized"
+}
+```

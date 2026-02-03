@@ -21,11 +21,12 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A[Start] --> B{Validate Email Format}
-    B -- Invalid --> C[Return 422 Unprocessable Entity]
-    B -- Valid --> D{Check Repository}
-    D -- Exists --> E[Return 409 Conflict]
-    D -- Not Exists --> F[Return 200 OK]
+    A["Client"] -- "GET /account/check/email/:email" --> B["API"]
+    B --> C{"Validate Email Format"}
+    C -- "Invalid" --> D["Return 422 Unprocessable Entity"]
+    C -- "Valid" --> E{"Check Repository"}
+    E -- "Exists" --> F["Return 409 Conflict"]
+    E -- "Not Exists" --> G["Return 200 OK"]
 ```
 </MermaidZoom>
 

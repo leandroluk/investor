@@ -1,5 +1,4 @@
-import {Footer, Layout, Navbar} from 'nextra-theme-docs';
-import 'nextra-theme-docs/style.css';
+import {Layout, Navbar} from 'nextra-theme-docs';
 import {Head} from 'nextra/components';
 import {getPageMap} from 'nextra/page-map';
 import './globals.css';
@@ -7,8 +6,6 @@ import './globals.css';
 export const metadata = {};
 
 const navbar = <Navbar logo={<b>Investor</b>} />;
-
-const footer = <Footer>MIT {new Date().getFullYear()} © Investor.</Footer>;
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
   return (
@@ -19,8 +16,8 @@ export default async function RootLayout({children}: {children: React.ReactNode}
           navbar={navbar}
           sidebar={{autoCollapse: true}}
           pageMap={await getPageMap()}
+          nextThemes={{defaultTheme: 'dark'}}
           docsRepositoryBase="https://github.com/leandroluk/investor/apps/doc"
-          footer={footer}
         >
           {children}
         </Layout>

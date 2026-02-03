@@ -3,7 +3,7 @@ title: Register User
 description: Register a new user using email and password
 ---
 
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -29,15 +29,15 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    Start([Start]) --> Request[User calls POST /account/register]
-    Request --> CheckEmail{Email exists in DB?}
-    CheckEmail -- Yes --> Conflict[Return 409 Conflict]
-    Conflict --> End([End])
-    CheckEmail -- No --> Hash[Hash Password]
-    Hash --> Create[Create User in DB]
-    Create --> Email[Send Activation Email]
-    Email --> Success[Return 201 Created]
-    Success --> End
+    A["Client"] -- "POST /account/register" --> B["API"]
+    B --> C{"Email exists in DB?"}
+    C -- "Yes" --> D["Return 409 Conflict"]
+    D --> End([End])
+    C -- "No" --> E["Hash Password"]
+    E --> F["Create User in DB"]
+    F --> G["Send Activation Email"]
+    G --> H["Return 201 Created"]
+    H --> End
 ```
 </MermaidZoom>
 
