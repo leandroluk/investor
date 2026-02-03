@@ -86,7 +86,7 @@ We are building a comprehensive suite of financial services. Current status:
 ### Local Development
 1.  **Clone the repository**:
     ```bash
-    git clone [https://github.com/leandroluk/investor.git](https://github.com/leandroluk/investor.git)
+    git clone https://github.com/leandroluk/investor.git
     cd investor
     ```
 2.  **Install dependencies**:
