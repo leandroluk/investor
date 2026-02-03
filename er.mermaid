@@ -19,16 +19,31 @@
         timestamp created_at ""
     }
     user {
-        uuidv7          id                 PK
-        varchar         email              UK
-        text            password_hash      ""
-        varchar         name               ""
-        varchar         status             ""
-        null[char]      wallet_address     UK
-        null[timestamp] wallet_verified_at ""
-        boolean         two_factor_enabled ""
-        timestamp       created_at         ""
-        timestamp       updated_at         ""
+        uuidv7          id                    PK
+        varchar         email                 UK
+        text            password_hash         ""
+        varchar         name                  ""
+        varchar         status                ""
+        null[char]      wallet_address        UK
+        null[timestamp] wallet_verified_at    ""
+        null[text]      wallet_seed_encrypted ""
+        varchar         kyc_status            ""
+        null[timestamp] kyc_verified_at       ""
+        boolean         two_factor_enabled    ""
+        timestamp       created_at            ""
+        timestamp       updated_at            ""
+    }
+
+    %% MODULE: account (documents)
+    document {
+        uuidv7     id            PK
+        uuidv7     user_id       FK
+        varchar    type          ""
+        varchar    storage_key   ""
+        varchar    status        ""
+        null[text] reject_reason ""
+        timestamp  created_at    ""
+        timestamp  updated_at    ""
     }
 
     %% MODULE: audit
@@ -120,6 +135,7 @@
     user       ||--o{ device     : "has"
     user       ||--o{ login      : "logs"
     user       ||--o{ notice     : "receives"
+    user       ||--o{ document   : "uploads"
     investment }o--|| user       : "owns"
     withdrawal }o--|| user       : "requests"
     ticket     }o--|| user       : "opens"

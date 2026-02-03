@@ -11,9 +11,9 @@ export class CipherStdAdapter implements CipherPort {
   private readonly algorithm = 'aes-256-gcm';
   private readonly plainEncoding = 'utf8';
   private readonly cipherEncoding = 'base64url';
-  private readonly key = this.config.key.padEnd(32, '_');
+  private readonly key = this.cipherStdConfig.key.padEnd(32, '_');
 
-  constructor(private readonly config: CipherStdConfig) {}
+  constructor(private readonly cipherStdConfig: CipherStdConfig) {}
 
   async hash(plainText: string): Promise<string> {
     return crypto.createHash('sha256').update(plainText).digest(this.cipherEncoding);

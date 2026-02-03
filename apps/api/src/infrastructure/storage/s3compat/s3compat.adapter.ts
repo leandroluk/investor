@@ -7,7 +7,7 @@ import {S3CompatError} from './s3compat.error';
 @Throws(S3CompatError)
 @InjectableExisting(StoragePort)
 export class StorageS3CompatAdapter implements StoragePort {
-  constructor(private readonly config: StorageS3CompatConfig) {}
+  constructor(private readonly storageS3CompatConfig: StorageS3CompatConfig) {}
 
   async save(_path: string, _file: Buffer, _mimeType: string): Promise<string> {
     return 'http://s3-compat/file';

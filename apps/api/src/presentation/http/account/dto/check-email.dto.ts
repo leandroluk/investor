@@ -1,9 +1,7 @@
+import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
 import {UserEntity} from '#/domain/account/entity';
-import {ApiProperty, PickType} from '@nestjs/swagger';
 
-class CheckEmailDTOParams extends PickType(UserEntity, ['email']) {}
-
-export class CheckEmailDTO {
-  @ApiProperty({type: CheckEmailDTOParams})
-  params!: CheckEmailDTOParams;
+export class CheckEmailDTOParams {
+  @ApiPropertyOf(UserEntity, 'email')
+  email!: string;
 }

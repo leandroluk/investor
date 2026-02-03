@@ -13,8 +13,7 @@ export class UserSaga {
       ofType(UserRegisteredEvent),
       map(event => {
         return new SendActivationEmailCommand({
-          userId: event.payload.userId,
-          userEmail: event.payload.userEmail,
+          email: event.payload.userEmail,
           correlationId: event.correlationId,
           occurredAt: event.occurredAt,
         });

@@ -1,13 +1,15 @@
 import {Module} from '@nestjs/common';
 import {CqrsModule} from '@nestjs/cqrs';
-import {AccountController} from './account/account.controller';
-import {SystemController} from './system/system.controller';
+import {AuthController} from './account/auth.controller';
+import {SsoController} from './account/sso.controller';
+import {StatusController} from './system/status.controller';
 
 @Module({
   imports: [CqrsModule],
   controllers: [
-    AccountController, //
-    SystemController,
+    AuthController, //
+    SsoController,
+    StatusController,
   ],
 })
 export class HttpModule {}

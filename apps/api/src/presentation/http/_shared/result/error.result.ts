@@ -1,6 +1,10 @@
+import {Envelope} from '#/application/_shared/bus';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class ErrorResult {
+export class ErrorResult implements Envelope {
+  @ApiProperty({example: '123e4567-e89b-12d3-a456-426614174000', description: 'Unique identifier for the request'})
+  readonly correlationId!: string;
+
   @ApiProperty({example: 'context.example_error', description: 'Domain error code'})
   readonly code!: string;
 

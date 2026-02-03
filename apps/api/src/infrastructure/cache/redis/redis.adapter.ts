@@ -1,4 +1,4 @@
-import {Retry, Throws, Trace} from '#/application/_shared/decorator';
+import {Retry, Throws} from '#/application/_shared/decorator';
 import {CachePort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import Redis from 'ioredis';
@@ -10,8 +10,8 @@ import {CacheRedisError} from './redis.error';
 export class CacheRedisAdapter implements CachePort {
   private readonly redis: Redis;
 
-  constructor(private readonly config: CacheRedisConfig) {
-    this.redis = new Redis(this.config.url, {lazyConnect: true});
+  constructor(private readonly cacheRedisConfig: CacheRedisConfig) {
+    this.redis = new Redis(this.cacheRedisConfig.url, {lazyConnect: true});
   }
 
   async ping(): Promise<void> {
@@ -26,7 +26,6 @@ export class CacheRedisAdapter implements CachePort {
     await this.redis.quit();
   }
 
-  @Trace()
   @Retry({attempts: 2, delay: 200})
   async set<TType = any>(key: string, value: TType, ttl?: number): Promise<void> {
     const stringValue = JSON.stringify(value);
@@ -37,7 +36,6 @@ export class CacheRedisAdapter implements CachePort {
     await multi.exec();
   }
 
-  @Trace()
   async get<TType = any>(pattern: string): Promise<{key: string; value: TType | null}> {
     try {
       let targetKey: string | undefined = pattern;
@@ -58,8 +56,25 @@ export class CacheRedisAdapter implements CachePort {
     }
   }
 
-  async delete(...keys: string[]): Promise<void> {
-    await this.redis.del(...keys);
+  async delete(...patterns: string[]): Promise<void> {
+    const keysToDelete: string[] = [];
+
+    for (const pattern of patterns) {
+      if (pattern.includes('*')) {
+        let cursor = '0';
+        do {
+          const [nextCursor, keys] = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+          cursor = nextCursor;
+          keysToDelete.push(...keys);
+        } while (cursor !== '0');
+      } else {
+        keysToDelete.push(pattern);
+      }
+    }
+
+    if (keysToDelete.length > 0) {
+      await this.redis.del(...keysToDelete);
+    }
   }
 
   async exists(...keys: string[]): Promise<number> {

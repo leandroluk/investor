@@ -10,10 +10,10 @@ import {CoinbaseAxiosError} from './axios.error';
 export class CoinbaseAxiosAdapter implements CoinbasePort {
   private readonly http: AxiosInstance;
 
-  constructor(private readonly config: CoinbaseAxiosConfig) {
+  constructor(private readonly coinbaseAxiosConfig: CoinbaseAxiosConfig) {
     this.http = axios.create({
-      baseURL: this.config.apiUrl,
-      headers: this.config.apiKey ? {'x-cg-demo-api-key': this.config.apiKey} : {},
+      baseURL: this.coinbaseAxiosConfig.apiUrl,
+      headers: this.coinbaseAxiosConfig.apiKey ? {'x-cg-demo-api-key': this.coinbaseAxiosConfig.apiKey} : {},
     });
   }
 

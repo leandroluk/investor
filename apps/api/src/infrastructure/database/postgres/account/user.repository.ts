@@ -11,12 +11,58 @@ const existsByEmail = `
   WHERE "email" = $1
 `;
 
+const findByEmail = `
+  SELECT
+    "id",
+    "email",
+    "name",
+    "password_hash",
+    "wallet_address",
+    "wallet_verified_at",
+    "wallet_seed_encrypted",
+    "kyc_status",
+    "kyc_verified_at",
+    "status",
+    "two_factor_enabled",
+    "created_at",
+    "updated_at"
+  FROM "user"
+  WHERE "email" = $1
+`;
+
 const create = `
   INSERT INTO "user" (
-    "id", "email", "name", "password_hash", "wallet_address",
-    "wallet_verified_at", "status", "two_factor_enabled", "created_at",
+    "id",
+    "email",
+    "name",
+    "password_hash",
+    "wallet_address",
+    "wallet_verified_at",
+    "wallet_seed_encrypted",
+    "kyc_status",
+    "kyc_verified_at",
+    "status",
+    "two_factor_enabled",
+    "created_at",
     "updated_at"
-  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+`;
+
+const update = `
+  UPDATE "user"
+  SET
+    "email" = $2,
+    "name" = $3,
+    "password_hash" = $4,
+    "wallet_address" = $5,
+    "wallet_verified_at" = $6,
+    "wallet_seed_encrypted" = $7,
+    "kyc_status" = $8,
+    "kyc_verified_at" = $9,
+    "status" = $10,
+    "two_factor_enabled" = $11,
+    "updated_at" = $12
+  WHERE "id" = $1
 `;
 
 @Throws(DatabasePostgresError)
@@ -29,6 +75,28 @@ export class DatabasePostgresUserRepository implements UserRepository {
     return count !== 0;
   }
 
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    const [row] = await this.database.query(findByEmail, [email]);
+    if (row) {
+      return {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        passwordHash: row.password_hash,
+        walletAddress: row.wallet_address,
+        walletVerifiedAt: row.wallet_verified_at,
+        walletSeedEncrypted: row.wallet_seed_encrypted,
+        kycStatus: row.kyc_status,
+        kycVerifiedAt: row.kyc_verified_at,
+        status: row.status,
+        twoFactorEnabled: row.two_factor_enabled,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    }
+    return null;
+  }
+
   async create(user: UserEntity): Promise<void> {
     await this.database.exec(create, [
       user.id,
@@ -37,9 +105,29 @@ export class DatabasePostgresUserRepository implements UserRepository {
       user.passwordHash,
       user.walletAddress,
       user.walletVerifiedAt,
+      user.walletSeedEncrypted,
+      user.kycStatus,
+      user.kycVerifiedAt,
       user.status,
       user.twoFactorEnabled,
       user.createdAt,
+      user.updatedAt,
+    ]);
+  }
+
+  async update(user: UserEntity): Promise<void> {
+    await this.database.exec(update, [
+      user.id,
+      user.email,
+      user.name,
+      user.passwordHash,
+      user.walletAddress,
+      user.walletVerifiedAt,
+      user.walletSeedEncrypted,
+      user.kycStatus,
+      user.kycVerifiedAt,
+      user.status,
+      user.twoFactorEnabled,
       user.updatedAt,
     ]);
   }

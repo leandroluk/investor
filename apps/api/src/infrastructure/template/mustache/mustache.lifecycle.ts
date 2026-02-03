@@ -3,9 +3,9 @@ import {TemplateMustacheAdapter} from './mustache.adapter';
 
 @Injectable()
 export class TemplateMustacheLifecycle implements OnApplicationBootstrap {
-  constructor(private readonly adapter: TemplateMustacheAdapter) {}
+  constructor(private readonly templateMustacheAdapter: TemplateMustacheAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.adapter.load();
+    await this.templateMustacheAdapter.load();
   }
 }

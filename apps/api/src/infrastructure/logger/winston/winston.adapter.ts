@@ -16,13 +16,13 @@ export class LoggerWinstonAdapter implements LoggerPort {
     })
   );
 
-  constructor(private readonly config: LoggerWinstonConfig) {
+  constructor(private readonly loggerWinstonConfig: LoggerWinstonConfig) {
     const loggerTransports: any[] = [new transports.Console()];
 
-    if (this.config.lokiUrl) {
+    if (this.loggerWinstonConfig.lokiUrl) {
       loggerTransports.push(
         new LokiTransport({
-          host: this.config.lokiUrl,
+          host: this.loggerWinstonConfig.lokiUrl,
           labels: {app: 'investor-api'},
           json: true,
           format: format.json(),
@@ -33,11 +33,11 @@ export class LoggerWinstonAdapter implements LoggerPort {
     }
 
     this.winston = createLogger({
-      level: this.config.level,
+      level: this.loggerWinstonConfig.level,
       format: format.combine(
         format.timestamp(),
         format.errors({stack: true}),
-        this.config.isJson ? format.json() : this.noJsonFormat
+        this.loggerWinstonConfig.isJson ? format.json() : this.noJsonFormat
       ),
       transports: loggerTransports,
     });

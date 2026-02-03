@@ -26,12 +26,12 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
     ),
   };
 
-  constructor(private readonly config: OidcFakeConfig) {}
+  constructor(private readonly oidcFakeConfig: OidcFakeConfig) {}
 
   onModuleInit(): void {
     this.server = http.createServer(async (req, res) => {
       const {method, url} = req;
-      const fullUrl = new URL(url || '', `http://localhost:${this.config.port}`);
+      const fullUrl = new URL(url || '', `http://localhost:${this.oidcFakeConfig.port}`);
 
       // --- REDIRECT (Simulates Provider Auth) ---
       if (fullUrl.pathname === '/auth') {
@@ -73,8 +73,8 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
       res.end();
     });
 
-    this.server.listen(this.config.port, () => {
-      this.logger.log(`🤖 OIDC Stateful Server running on http://localhost:${this.config.port}`);
+    this.server.listen(this.oidcFakeConfig.port, () => {
+      this.logger.log(`🤖 OIDC Stateful Server running on http://localhost:${this.oidcFakeConfig.port}`);
     });
   }
 

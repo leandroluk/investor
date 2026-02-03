@@ -70,5 +70,13 @@ export function DomainException(...mappings: ErrorMapping[]): ClassDecorator & M
     })
   );
 
+  swaggerDecorators.push(
+    ApiResponse({
+      status: HttpStatus.UNPROCESSABLE_ENTITY,
+      description: 'Validation Error',
+      type: ErrorResult,
+    })
+  );
+
   return applyDecorators(UseFilters(createDomainExceptionFilter(mappingMap)), ...swaggerDecorators);
 }

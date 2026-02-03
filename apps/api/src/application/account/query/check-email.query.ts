@@ -1,5 +1,5 @@
 import {Query} from '#/application/_shared/bus';
-import {EmailInUseError} from '#/domain/account/error/email-in-use.error';
+import {UserEmailInUseError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
@@ -27,7 +27,7 @@ export class CheckEmailQueryHandler implements IQueryHandler<CheckEmailQuery, vo
   private async existsByEmail(email): Promise<void> {
     const exists = await this.repository.existsByEmail(email);
     if (exists) {
-      throw new EmailInUseError(email);
+      throw new UserEmailInUseError(email);
     }
   }
 

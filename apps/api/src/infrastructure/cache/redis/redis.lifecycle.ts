@@ -3,13 +3,13 @@ import {CacheRedisAdapter} from './redis.adapter';
 
 @Injectable()
 export class CacheRedisLifecycle implements OnApplicationBootstrap, OnApplicationShutdown {
-  constructor(private readonly adapter: CacheRedisAdapter) {}
+  constructor(private readonly cacheRedisAdapter: CacheRedisAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.adapter.connect();
+    await this.cacheRedisAdapter.connect();
   }
 
   async onApplicationShutdown(): Promise<void> {
-    await this.adapter.close();
+    await this.cacheRedisAdapter.close();
   }
 }

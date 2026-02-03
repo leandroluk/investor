@@ -1,23 +1,7 @@
 import {type Creatable, type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
-import uuid from 'uuid';
 import {UserStatusEnum} from '../enum';
 export class UserEntity implements Indexable, Creatable, Updatable {
-  static create(data: Pick<UserEntity, 'email' | 'name' | 'passwordHash'>): UserEntity {
-    return Object.assign(new UserEntity(), {
-      id: uuid.v7(),
-      email: data.email,
-      name: data.name,
-      passwordHash: data.passwordHash,
-      walletAddress: null,
-      walletVerifiedAt: null,
-      status: UserStatusEnum.PENDING,
-      twoFactorEnabled: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } satisfies UserEntity);
-  }
-
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the user (UUIDv7)',
@@ -69,6 +53,26 @@ export class UserEntity implements Indexable, Creatable, Updatable {
     description: 'Whether the user has enabled Two-Factor Authentication',
   })
   twoFactorEnabled!: boolean;
+
+  @ApiProperty({
+    description: 'Encrypted BIP39 seed phrase for wallet recovery',
+    nullable: true,
+    writeOnly: true,
+  })
+  walletSeedEncrypted!: string | null;
+
+  @ApiProperty({
+    example: 'NONE',
+    description: 'KYC verification status',
+    enum: ['NONE', 'PENDING', 'APPROVED', 'REJECTED'],
+  })
+  kycStatus!: string;
+
+  @ApiProperty({
+    description: 'Timestamp when KYC was verified',
+    nullable: true,
+  })
+  kycVerifiedAt!: Date | null;
 
   @ApiProperty({
     example: new Date(),

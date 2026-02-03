@@ -3,11 +3,13 @@ import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.dec
 import {BrokerPort, HasherPort} from '#/domain/_shared/port';
 import {PASSWORD_REGEX} from '#/domain/account/constant';
 import {UserEntity} from '#/domain/account/entity';
-import {EmailInUseError} from '#/domain/account/error';
-import {UserRegisteredEvent} from '#/domain/account/event/user-registered.event';
+import {KycStatusEnum, UserStatusEnum} from '#/domain/account/enum';
+import {UserNotFoundError} from '#/domain/account/error';
+import {UserRegisteredEvent} from '#/domain/account/event/user.event';
 import {UserRepository} from '#/domain/account/repository';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
+import uuid from 'uuid';
 import z from 'zod';
 
 const commandSchema = z.object({
@@ -50,23 +52,35 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
   private async existsByEmail(email: string): Promise<void> {
     const exists = await this.userRepository.existsByEmail(email);
     if (exists) {
-      throw new EmailInUseError(email);
+      throw new UserNotFoundError(email);
     }
   }
 
   private async createUser(email: string, name: string, password: string): Promise<UserEntity> {
-    const passwordHash = await this.hasherPort.hash(password);
-    const user = UserEntity.create({email, name, passwordHash});
+    const user: UserEntity = {
+      id: uuid.v7(),
+      email,
+      passwordHash: await this.hasherPort.hash(password),
+      name,
+      walletAddress: null,
+      walletVerifiedAt: null,
+      walletSeedEncrypted: null,
+      kycStatus: KycStatusEnum.NONE,
+      kycVerifiedAt: null,
+      status: UserStatusEnum.PENDING,
+      twoFactorEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     await this.userRepository.create(user);
     return user;
   }
 
   private async publishEvent(correlationId: string, user: UserEntity): Promise<void> {
     await this.brokerPort.publish(
-      Object.assign(new UserRegisteredEvent(), {
-        correlationId,
-        occurredAt: user.createdAt,
-        payload: {userId: user.id, userEmail: user.email},
+      new UserRegisteredEvent(correlationId, user.createdAt, {
+        userId: user.id,
+        userEmail: user.email,
       })
     );
   }

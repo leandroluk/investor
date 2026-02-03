@@ -20,7 +20,7 @@ export function createHandlerDecorator(
 
       const originalMethod = methodDescriptor.value;
       methodDescriptor.value = function (...args: any[]): any {
-        return handler.call(this, originalMethod.bind(this), ...args);
+        return handler.call(this, originalMethod.bind(this), propertyName, ...args);
       };
 
       Object.defineProperty(target.prototype, propertyName, methodDescriptor);

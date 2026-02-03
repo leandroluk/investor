@@ -1,4 +1,13 @@
+import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
 import {RegisterUserCommand} from '#/application/account/command';
-import {PickType} from '@nestjs/swagger';
 
-export class RegisterUserDTO extends PickType(RegisterUserCommand, ['email', 'name', 'password']) {}
+export class RegisterUserBodyDTO {
+  @ApiPropertyOf(RegisterUserCommand, 'email')
+  email!: string;
+
+  @ApiPropertyOf(RegisterUserCommand, 'name')
+  name!: string;
+
+  @ApiPropertyOf(RegisterUserCommand, 'password')
+  password!: string;
+}

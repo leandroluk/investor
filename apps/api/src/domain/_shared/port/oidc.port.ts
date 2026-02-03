@@ -1,5 +1,3 @@
-import {type Readable} from 'node:stream';
-
 export abstract class OidcPort {
   abstract getAdapter(provider: 'microsoft' | 'google'): OidcPort.Adapter;
 
@@ -32,6 +30,5 @@ export namespace OidcPort {
     exchange(code: string): Promise<Tokens>;
     getToken(refreshToken: string): Promise<Tokens>;
     getInfo(accessToken: string): Promise<Claims>;
-    getPicture(accessToken: string): Promise<Readable>;
   }
 }

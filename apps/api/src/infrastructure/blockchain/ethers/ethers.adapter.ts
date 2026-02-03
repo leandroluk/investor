@@ -10,11 +10,11 @@ import {BlockchainEthersError} from './ethers.error';
 export class BlockchainEthersAdapter implements BlockchainPort {
   private provider: JsonRpcProvider;
 
-  constructor(private readonly config: BlockchainEthersConfig) {
-    const request = new FetchRequest(this.config.rpcURL);
+  constructor(private readonly blockchainEthersConfig: BlockchainEthersConfig) {
+    const request = new FetchRequest(this.blockchainEthersConfig.rpcURL);
     request.timeout = 15000;
 
-    this.provider = new JsonRpcProvider(request, this.config.chainId, {staticNetwork: true});
+    this.provider = new JsonRpcProvider(request, this.blockchainEthersConfig.chainId, {staticNetwork: true});
   }
 
   async ping(): Promise<void> {

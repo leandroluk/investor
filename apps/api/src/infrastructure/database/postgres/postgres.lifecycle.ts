@@ -3,13 +3,13 @@ import {DatabasePostgresAdapter} from './postgres.adapter';
 
 @Injectable()
 export class DatabasePostgresLifecycle implements OnApplicationBootstrap, OnApplicationShutdown {
-  constructor(private readonly adapter: DatabasePostgresAdapter) {}
+  constructor(private readonly databasePostgresAdapter: DatabasePostgresAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.adapter.connect();
+    await this.databasePostgresAdapter.connect();
   }
 
   async onApplicationShutdown(): Promise<void> {
-    await this.adapter.close();
+    await this.databasePostgresAdapter.close();
   }
 }

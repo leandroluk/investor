@@ -3,13 +3,13 @@ import {BlockchainEthersAdapter} from './ethers.adapter';
 
 @Injectable()
 export class BlockchainEthersLifecycle implements OnApplicationBootstrap, OnApplicationShutdown {
-  constructor(private readonly adapter: BlockchainEthersAdapter) {}
+  constructor(private readonly blockchainEthersAdapter: BlockchainEthersAdapter) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.adapter.connect();
+    await this.blockchainEthersAdapter.connect();
   }
 
   async onApplicationShutdown(): Promise<void> {
-    await this.adapter.close();
+    await this.blockchainEthersAdapter.close();
   }
 }

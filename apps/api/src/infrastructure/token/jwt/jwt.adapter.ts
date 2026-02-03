@@ -10,7 +10,7 @@ import {TokenJwtError} from './jwt.error';
 @Throws(TokenJwtError)
 @InjectableExisting(TokenPort)
 export class TokenJwtAdapter implements TokenPort {
-  constructor(private readonly config: TokenJwtConfig) {}
+  constructor(private readonly tokenJwtConfig: TokenJwtConfig) {}
 
   create<T extends boolean>(
     sessionKey: string,
@@ -19,25 +19,25 @@ export class TokenJwtAdapter implements TokenPort {
   ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
-      accessToken: jsonwebtoken.sign(claims, this.config.privateKey, {
-        algorithm: this.config.algorithm,
-        audience: this.config.audience,
-        issuer: this.config.issuer,
+      accessToken: jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
+        algorithm: this.tokenJwtConfig.algorithm,
+        audience: this.tokenJwtConfig.audience,
+        issuer: this.tokenJwtConfig.issuer,
         jwtid: sessionKey,
-        expiresIn: this.config.accessTTL,
-        header: {alg: this.config.algorithm, typ: 'access'},
+        expiresIn: this.tokenJwtConfig.accessTTL,
+        header: {alg: this.tokenJwtConfig.algorithm, typ: 'access'},
       }),
-      expiresIn: ms(this.config.accessTTL),
+      expiresIn: ms(this.tokenJwtConfig.accessTTL),
     };
 
     if (includeRefresh) {
-      token.refreshToken = jsonwebtoken.sign(claims, this.config.privateKey, {
-        algorithm: this.config.algorithm,
-        audience: this.config.audience,
-        issuer: this.config.issuer,
+      token.refreshToken = jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
+        algorithm: this.tokenJwtConfig.algorithm,
+        audience: this.tokenJwtConfig.audience,
+        issuer: this.tokenJwtConfig.issuer,
         jwtid: sessionKey,
-        expiresIn: this.config.refreshTTL,
-        header: {alg: this.config.algorithm, typ: 'refresh'},
+        expiresIn: this.tokenJwtConfig.refreshTTL,
+        header: {alg: this.tokenJwtConfig.algorithm, typ: 'refresh'},
       });
     }
 
@@ -45,10 +45,10 @@ export class TokenJwtAdapter implements TokenPort {
   }
 
   decode(token: string): TokenPort.Decoded {
-    const {header, payload} = jsonwebtoken.verify(token, this.config.publicKey, {
-      algorithms: [this.config.algorithm],
-      audience: this.config.audience,
-      issuer: this.config.issuer,
+    const {header, payload} = jsonwebtoken.verify(token, this.tokenJwtConfig.publicKey, {
+      algorithms: [this.tokenJwtConfig.algorithm],
+      audience: this.tokenJwtConfig.audience,
+      issuer: this.tokenJwtConfig.issuer,
       complete: true,
     }) as Omit<jsonwebtoken.Jwt, 'payload'> & {payload: jsonwebtoken.JwtPayload};
 
@@ -67,10 +67,10 @@ export class TokenJwtAdapter implements TokenPort {
   }
 
   getAccessTokenTTL(): number {
-    return this.config.accessTTL;
+    return this.tokenJwtConfig.accessTTL;
   }
 
   getRefreshTokenTTL(): number {
-    return this.config.refreshTTL;
+    return this.tokenJwtConfig.refreshTTL;
   }
 }

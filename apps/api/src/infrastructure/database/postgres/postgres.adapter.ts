@@ -10,13 +10,13 @@ import {DatabasePostgresError} from './postgres.error';
 export class DatabasePostgresAdapter implements DatabasePort {
   readonly pool: Pool;
 
-  constructor(private readonly config: DatabasePostgresConfig) {
+  constructor(private readonly databasePostgresConfig: DatabasePostgresConfig) {
     types.setTypeParser(20, val => parseInt(val, 10));
 
     this.pool = new Pool({
-      connectionString: this.config.url,
-      max: this.config.maxConnections,
-      idleTimeoutMillis: this.config.idleTimeoutMillis,
+      connectionString: this.databasePostgresConfig.url,
+      max: this.databasePostgresConfig.maxConnections,
+      idleTimeoutMillis: this.databasePostgresConfig.idleTimeoutMillis,
     });
   }
 

@@ -11,7 +11,7 @@ function decorator<T>(
 }
 
 export const InjectableExisting = Object.assign(decorator, {
-  KEY: Symbol('InjectableExisting.KEY'),
+  KEY: Symbol('InjectableExisting'),
   getMetadata(target: Type<any>): Type<any> | undefined {
     return Reflect.getMetadata(InjectableExisting.KEY, target)?.token;
   },

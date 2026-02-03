@@ -12,7 +12,7 @@ import {TemplateMustacheError} from './mustache.error';
 export class TemplateMustacheAdapter implements TemplatePort {
   private readonly templateMap = new Map<string, string>();
 
-  constructor(private readonly config: TemplateMustacheConfig) {}
+  constructor(private readonly templateMustacheConfig: TemplateMustacheConfig) {}
 
   async render<T extends object>(templatePath: string, values: T): Promise<string> {
     const template = this.templateMap.get(templatePath);
@@ -23,7 +23,7 @@ export class TemplateMustacheAdapter implements TemplatePort {
   }
 
   async load(): Promise<void> {
-    const fullPath = path.resolve(process.cwd(), this.config.path);
+    const fullPath = path.resolve(process.cwd(), this.templateMustacheConfig.path);
     try {
       await fs.promises.access(fullPath);
     } catch {

@@ -11,15 +11,15 @@ import {MailerSmtpError} from './smtp.error';
 export class MailerSmtpAdapter implements MailerPort {
   private readonly transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
-  constructor(private readonly config: MailerSmtpConfig) {
+  constructor(private readonly mailerSmtpConfig: MailerSmtpConfig) {
     this.transporter = nodemailer.createTransport({
-      host: this.config.host,
-      port: this.config.port,
-      secure: this.config.port === 465,
-      requireTLS: this.config.port === 587,
+      host: this.mailerSmtpConfig.host,
+      port: this.mailerSmtpConfig.port,
+      secure: this.mailerSmtpConfig.port === 465,
+      requireTLS: this.mailerSmtpConfig.port === 587,
       auth: {
-        user: this.config.username,
-        pass: this.config.password,
+        user: this.mailerSmtpConfig.username,
+        pass: this.mailerSmtpConfig.password,
       },
     } satisfies SMTPTransport.Options);
   }
@@ -29,7 +29,7 @@ export class MailerSmtpAdapter implements MailerPort {
   async send(message: MailerPort.Message): Promise<void> {
     try {
       await this.transporter.sendMail({
-        from: message.from || this.config.from,
+        from: message.from || this.mailerSmtpConfig.from,
         to: message.to.join(','),
         cc: message.cc?.join(','),
         bcc: message.bcc?.join(','),
