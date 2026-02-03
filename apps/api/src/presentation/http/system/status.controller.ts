@@ -10,6 +10,7 @@ import {DomainException, GetEnvelope} from '../_shared/decorator';
 export class StatusController {
   constructor(private readonly queryBus: QueryBus) {}
 
+  // #region getHealth
   @Get('health')
   @ApiOkResponse({type: HealthQueryResult})
   @DomainException([UnhealthyError, HttpStatus.SERVICE_UNAVAILABLE])
@@ -18,4 +19,5 @@ export class StatusController {
   ): Promise<HealthQueryResult> {
     return this.queryBus.execute(new HealthQuery(envelope));
   }
+  // #endregion
 }

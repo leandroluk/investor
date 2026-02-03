@@ -33,7 +33,7 @@ legend:
       - Valida complexidade da nova senha (mesmo padrão do registro).
       - Atualiza hash da senha no banco.
       - Invalida todas as sessões ativas do usuário (logout forçado).
-    - ⛔ [auth] login using credential
+    - ✅ [auth] login using credential
       - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
       - O sistema irá verificar as credenciais e se o 2FA estiver ativo, emite um desafio de segurança em vez do token final.
       - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
@@ -47,7 +47,7 @@ legend:
     - ✅ [sso] callback from provider and upsert
       - Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
       - A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
-    - ⛔ [auth] login using token
+    - ✅ [auth] login using token
       - Após a autenticação via token, o sistema irá validar o token e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
       - O frontend então irá pegar esse token e enviar para o backend para prosseguir com a autenticação. Assim como no login using email and password, se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
       - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.

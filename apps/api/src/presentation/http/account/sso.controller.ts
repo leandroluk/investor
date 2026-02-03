@@ -16,6 +16,7 @@ export class SsoController {
     private readonly commandBus: CommandBus
   ) {}
 
+  // #region getRedirect
   @Get(':provider')
   @HttpCode(HttpStatus.TEMPORARY_REDIRECT)
   @DomainException([SsoInvalidProviderError, HttpStatus.UNPROCESSABLE_ENTITY])
@@ -35,7 +36,9 @@ export class SsoController {
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     reply.redirect(result.redirectUrl, HttpStatus.TEMPORARY_REDIRECT);
   }
+  // #endregion
 
+  // #region getCallback
   @Get(':provider/callback')
   @HttpCode(HttpStatus.TEMPORARY_REDIRECT)
   @DomainException(
@@ -59,4 +62,5 @@ export class SsoController {
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     reply.redirect(result.redirectUrl, HttpStatus.TEMPORARY_REDIRECT);
   }
+  // #endregion
 }

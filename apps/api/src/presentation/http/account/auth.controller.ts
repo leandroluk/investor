@@ -44,6 +44,7 @@ export class AuthController {
     private readonly commandBus: CommandBus
   ) {}
 
+  // #region getCheckEmail
   @Get('check/email/:email')
   @HttpCode(HttpStatus.NO_CONTENT)
   @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
@@ -53,7 +54,9 @@ export class AuthController {
   ): Promise<void> {
     return this.queryBus.execute(new CheckEmailQuery({...envelope, ...params}));
   }
+  // #endregion
 
+  // #region postRegisterUser
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
@@ -63,7 +66,9 @@ export class AuthController {
   ): Promise<void> {
     await this.commandBus.execute(new RegisterUserCommand({...envelope, ...body}));
   }
+  // #endregion
 
+  // #region postResendActivationEmail
   @Post('activate')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException(
@@ -76,7 +81,9 @@ export class AuthController {
   ): Promise<void> {
     await this.commandBus.execute(new SendActivationEmailCommand({...envelope, ...body}));
   }
+  // #endregion
 
+  // #region patchActivateUser
   @Patch('activate')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException(
@@ -90,7 +97,9 @@ export class AuthController {
   ): Promise<void> {
     await this.commandBus.execute(new ActivateUserCommand({...envelope, ...body}));
   }
+  // #endregion
 
+  // #region postRequestPasswordReset
   @Post('recover')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
@@ -100,7 +109,9 @@ export class AuthController {
   ): Promise<void> {
     await this.commandBus.execute(new RequestPasswordResetCommand({...envelope, ...body}));
   }
+  // #endregion
 
+  // #region patchResetPassword
   @Patch('recover')
   @HttpCode(HttpStatus.OK)
   @DomainException(
@@ -113,7 +124,9 @@ export class AuthController {
   ): Promise<void> {
     await this.commandBus.execute(new ResetPasswordCommand({...envelope, ...body}));
   }
+  // #endregion
 
+  // #region postLoginUsingCredential
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
@@ -138,7 +151,9 @@ export class AuthController {
       reply.status(HttpStatus.OK).send(result);
     }
   }
+  // #endregion
 
+  // #region postLoginUsingToken
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
@@ -163,4 +178,5 @@ export class AuthController {
       reply.status(HttpStatus.OK).send(result);
     }
   }
+  // #endregion
 }
