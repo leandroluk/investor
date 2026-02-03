@@ -18,10 +18,17 @@ export class BrokerSubscriber implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     await this.broker.subscribe(...Object.keys(eventMap));
-    void this.broker.consume<any>(({constructor: {name}, payload, occurredAt, correlationId}: DomainEvent<any>) => {
-      const EventClass = eventMap[name as keyof typeof eventMap];
+    void this.broker.consume<any>((domainEvent: DomainEvent<any>) => {
+      const EventClass = eventMap[domainEvent.name as keyof typeof eventMap];
       if (EventClass) {
-        this.eventBus.publish(new EventClass(correlationId, occurredAt, payload, name));
+        this.eventBus.publish(
+          new EventClass(
+            domainEvent.correlationId, //
+            domainEvent.occurredAt,
+            domainEvent.payload,
+            domainEvent.name
+          )
+        );
       }
     });
   }
