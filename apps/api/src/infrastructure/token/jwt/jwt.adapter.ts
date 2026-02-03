@@ -63,12 +63,4 @@ export class TokenJwtAdapter implements TokenPort {
       } as TokenPort.Claims,
     };
   }
-
-  getAccessTokenTTL(): number {
-    return this.tokenJwtConfig.accessTTL;
-  }
-
-  getRefreshTokenTTL(): number {
-    return this.tokenJwtConfig.refreshTTL;
-  }
 }

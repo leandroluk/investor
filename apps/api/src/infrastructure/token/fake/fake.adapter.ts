@@ -31,12 +31,4 @@ export class TokenFakeAdapter extends TokenPort {
       },
     };
   }
-
-  getAccessTokenTTL(): number {
-    return 3600;
-  }
-
-  getRefreshTokenTTL(): number {
-    return 86400;
-  }
 }

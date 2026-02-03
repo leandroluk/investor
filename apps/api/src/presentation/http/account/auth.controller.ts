@@ -1,5 +1,7 @@
 import {
   ActivateUserCommand,
+  Authorize2FACommand,
+  Authorize2FACommandResult,
   LoginUsingCredentialCommand,
   LoginUsingCredentialCommandAuthorizationResult,
   LoginUsingCredentialCommandChallengeResult,
@@ -9,6 +11,8 @@ import {
   RegisterUserCommand,
   RequestPasswordResetCommand,
   ResetPasswordCommand,
+  Send2FACommand,
+  Send2FACommandResult,
   SendActivationEmailCommand,
 } from '#/application/account/command';
 import {CheckEmailQuery} from '#/application/account/query';
@@ -27,12 +31,14 @@ import {FastifyReply} from 'fastify';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
   ActivateUserBodyDTO,
+  Authorize2FABodyDTO,
   CheckEmailDTOParams as CheckEmailParamsDTO,
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
   RegisterUserBodyDTO,
   RequestPasswordResetBodyDTO,
   ResetPasswordBodyDTO,
+  Send2FABodyDTO,
   SendActivationEmailBodyDTO,
 } from './dto';
 
@@ -68,14 +74,14 @@ export class AuthController {
   }
   // #endregion
 
-  // #region postResendActivationEmail
+  // #region postSendActivationEmail
   @Post('activate')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserAlreadyActiveError, HttpStatus.CONFLICT]
   )
-  async postResendActivationEmail(
+  async postSendActivationEmail(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: SendActivationEmailBodyDTO
   ): Promise<void> {
@@ -99,11 +105,11 @@ export class AuthController {
   }
   // #endregion
 
-  // #region postRequestPasswordReset
+  // #region postSendPasswordReset
   @Post('recover')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
-  async postRequestPasswordReset(
+  async postSendPasswordReset(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: RequestPasswordResetBodyDTO
   ): Promise<void> {
@@ -111,18 +117,43 @@ export class AuthController {
   }
   // #endregion
 
-  // #region patchResetPassword
+  // #region patchPasswordReset
   @Patch('recover')
   @HttpCode(HttpStatus.OK)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
-  async patchResetPassword(
+  async patchPasswordReset(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: ResetPasswordBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new ResetPasswordCommand({...envelope, ...body}));
+  }
+  // #endregion
+
+  // #region postSend2FA
+  @Post('2fa')
+  @HttpCode(HttpStatus.OK)
+  @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
+  async postSend2FA(
+    @GetEnvelope() envelope: GetEnvelope, //
+    @Body() body: Send2FABodyDTO
+  ): Promise<Send2FACommandResult> {
+    return await this.commandBus.execute(new Send2FACommand({...envelope, ...body}));
+  }
+  // #endregion
+
+  // #region patch2FA
+  @Patch('2fa')
+  @HttpCode(HttpStatus.OK)
+  @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN])
+  async patch2FA(
+    @GetEnvelope() envelope: GetEnvelope, //
+    @Body() body: Authorize2FABodyDTO,
+    @Ip() ip: string
+  ): Promise<Authorize2FACommandResult> {
+    return this.commandBus.execute(new Authorize2FACommand({...envelope, ...body, ip}));
   }
   // #endregion
 

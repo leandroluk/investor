@@ -5,8 +5,6 @@ export abstract class TokenPort {
     complete?: true
   ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization>;
   abstract decode(token: string): Promise<TokenPort.Decoded>;
-  abstract getAccessTokenTTL(): number;
-  abstract getRefreshTokenTTL(): number;
 }
 export namespace TokenPort {
   export interface Claims {

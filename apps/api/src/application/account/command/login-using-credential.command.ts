@@ -1,9 +1,9 @@
 import {Command} from '#/application/_shared/bus';
 import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
-import {BrokerPort, HasherPort, MailerPort, TemplatePort, TokenPort} from '#/domain/_shared/port';
+import {BrokerPort, HasherPort, TokenPort} from '#/domain/_shared/port';
 import {LoginEntity, UserEntity} from '#/domain/account/entity';
 import {UserInvalidCredentialsError, UserNotFoundError} from '#/domain/account/error';
-import {UserLoggedInEvent} from '#/domain/account/event';
+import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
 import {LoginRepository, UserRepository} from '#/domain/account/repository';
 import {ChallengeStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -74,9 +74,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     private readonly loginRepository: LoginRepository,
     private readonly hasherPort: HasherPort,
     private readonly challengeStore: ChallengeStore,
-    private readonly templatePort: TemplatePort,
     private readonly brokerPort: BrokerPort,
-    private readonly mailerPort: MailerPort,
     private readonly tokenPort: TokenPort
   ) {}
 
@@ -106,13 +104,16 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     await this.loginRepository.create(login);
   }
 
-  private async sendChallenge(user: UserEntity): Promise<string> {
-    const {challengeId, otp: otp} = await this.challengeStore.create(user.id);
-    const [html, text] = await Promise.all([
-      this.templatePort.render('2fa.html', {otp}),
-      this.templatePort.render('2fa.text', {otp}),
-    ]);
-    await this.mailerPort.send({to: [user.email], subject: '2FA Challenge', text, html});
+  private async sendChallenge(correlationId: string, occurredAt: Date, user: UserEntity): Promise<string> {
+    const {challengeId, otp} = await this.challengeStore.create(user.id);
+    await this.brokerPort.publish(
+      new UserRequestChallengeEvent(correlationId, occurredAt, {
+        userId: user.id,
+        challengeId,
+        otp,
+        email: user.email,
+      })
+    );
     return challengeId;
   }
 
@@ -141,15 +142,20 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
       await this.createLogin(command.ip, user, true);
 
       if (user.twoFactorEnabled) {
-        return {type: 'challenge', result: {challengeId: await this.sendChallenge(user)}};
+        return {
+          type: 'challenge',
+          result: {
+            challengeId: await this.sendChallenge(command.correlationId, command.occurredAt, user),
+          },
+        };
       }
 
-      return {type: 'authorization', result: await this.createToken(user)};
+      const token = await this.createToken(user);
+      await this.publishLoginEvent(command.correlationId, command.occurredAt, user.id);
+      return {type: 'authorization', result: token};
     } catch (error) {
       void this.createLogin(command.ip, user, false);
       throw error;
-    } finally {
-      await this.publishLoginEvent(command.correlationId, command.occurredAt, user.id);
     }
   }
 }

@@ -36,18 +36,14 @@ export class SendActivationEmailHandler implements ICommandHandler<SendActivatio
     private readonly mailerPort: MailerPort
   ) {}
 
-  private async checkUserEmail(userEmail: string): Promise<void> {
-    const user = await this.userRepository.findByEmail(userEmail);
+  private async checkUserEmail(email: string): Promise<void> {
+    const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new UserNotFoundError();
     }
     if (user.status === UserStatusEnum.ACTIVE) {
       throw new UserAlreadyActiveError();
     }
-  }
-
-  private async createCodeOTP(userEmail: string): Promise<string> {
-    return this.otpStore.create(userEmail);
   }
 
   private async renderTemplate(otp: string): Promise<{html: string; text: string}> {
@@ -61,7 +57,7 @@ export class SendActivationEmailHandler implements ICommandHandler<SendActivatio
 
   async execute(command: SendActivationEmailCommand): Promise<void> {
     await this.checkUserEmail(command.email);
-    const otp = await this.createCodeOTP(command.email);
+    const otp = await this.otpStore.create(command.email);
     const {html, text} = await this.renderTemplate(otp);
     await this.mailerPort.send({to: [command.email], subject: 'Account Activation', text, html});
   }

@@ -34,13 +34,9 @@ export class RequestPasswordResetHandler implements ICommandHandler<RequestPassw
     private readonly mailerPort: MailerPort
   ) {}
 
-  private async checkUserExists(userEmail: string): Promise<boolean> {
-    const user = await this.userRepository.findByEmail(userEmail);
+  private async checkUserExists(email: string): Promise<boolean> {
+    const user = await this.userRepository.findByEmail(email);
     return !!user;
-  }
-
-  private async createCodeOTP(userEmail: string): Promise<string> {
-    return this.otpStore.create(userEmail);
   }
 
   private async renderTemplate(otp: string): Promise<{html: string; text: string}> {
@@ -59,7 +55,7 @@ export class RequestPasswordResetHandler implements ICommandHandler<RequestPassw
       return;
     }
 
-    const otp = await this.createCodeOTP(command.email);
+    const otp = await this.otpStore.create(command.email);
     const {html, text} = await this.renderTemplate(otp);
     await this.mailerPort.send({to: [command.email], subject: 'Password Reset', text, html});
   }

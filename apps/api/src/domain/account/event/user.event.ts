@@ -18,3 +18,10 @@ export class UserLoggedInEvent extends DomainEvent<{
   userId: UserEntity['id'];
   provider: string;
 }> {}
+
+export class UserRequestChallengeEvent extends DomainEvent<{
+  userId: UserEntity['id'];
+  email: UserEntity['email'];
+  otp: string;
+  challengeId: string;
+}> {}
