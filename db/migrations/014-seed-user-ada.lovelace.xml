@@ -20,6 +20,8 @@
         "kyc_status",
         "kyc_verified_at",
         "two_factor_enabled",
+        "language",
+        "timezone",
         "created_at",
         "updated_at"
       ) VALUES (
@@ -34,6 +36,8 @@
         /* kyc_status            */ 'NONE',
         /* kyc_verified_at       */ null,
         /* two_factor_enabled    */ false,
+        /* language              */ 'en',
+        /* timezone              */ 'UTC',
         /* created_at            */ NOW(),
         /* updated_at            */ NOW()
       );
