@@ -64,10 +64,10 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
   }
 
   private async upsertUser(claims: OidcPort.Claims): Promise<UserEntity> {
-    const existingUser = await this.userRepository.findByEmail(claims.email);
+    const oldUser = await this.userRepository.findByEmail(claims.email);
 
-    if (existingUser) {
-      return existingUser;
+    if (oldUser) {
+      return oldUser;
     }
 
     const newUser: UserEntity = {

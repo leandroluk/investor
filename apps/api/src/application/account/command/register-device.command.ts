@@ -43,15 +43,14 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
   constructor(private readonly deviceRepository: DeviceRepository) {}
 
   async execute(command: RegisterDeviceCommand): Promise<void> {
-    const existingDevice = await this.deviceRepository.findByFingerprint(command.userId, command.fingerprint);
+    const oldDevice = await this.deviceRepository.findByFingerprint(command.userId, command.fingerprint);
 
-    if (existingDevice) {
-      existingDevice.isActive = true;
-      existingDevice.brand = command.brand;
-      existingDevice.model = command.model;
-      existingDevice.updatedAt = new Date();
-      await this.deviceRepository.update(existingDevice);
-      return;
+    if (oldDevice) {
+      oldDevice.isActive = true;
+      oldDevice.brand = command.brand;
+      oldDevice.model = command.model;
+      oldDevice.updatedAt = new Date();
+      return await this.deviceRepository.update(oldDevice);
     }
 
     const newDevice: DeviceEntity = {
