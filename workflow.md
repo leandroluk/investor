@@ -22,7 +22,7 @@ O agente deve solicitar ao usuário qual o próximo caso de uso a ser implementa
 
 Com base no caso de uso definido, o agente deve **inferir** a documentação da API seguindo o padrão existente em @[control/doc].
 
-*   **Localização**: `apps/doc/src/content/use-cases-(api|web)/<context>/<use-case>.mdx`. já criei os diretórios que provavelmente serão criados os arquivos com apenas um "index.mdx", quando ouver algum usecase dentro deles remova o gitkeep pois não será mais necessários.
+*   **Localização**: `apps/doc/src/content/(api|web)/<context>/<use-case>.mdx`. já criei os diretórios que provavelmente serão criados os arquivos com apenas um "index.mdx", quando ouver algum usecase dentro deles remova o gitkeep pois não será mais necessários.
 *   **Formato**: MDX com Frontmatter.
 *   **Estrutura Esperada**:
     *   Título e Descrição.
