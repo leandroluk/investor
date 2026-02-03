@@ -14,9 +14,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
       <body>
         <Layout
           navbar={navbar}
-          sidebar={{autoCollapse: true}}
           pageMap={await getPageMap()}
-          nextThemes={{defaultTheme: 'dark'}}
           docsRepositoryBase="https://github.com/leandroluk/investor/apps/doc"
         >
           {children}

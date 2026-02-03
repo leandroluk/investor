@@ -24,7 +24,7 @@
 
 .nextra-sidebar {
   width: 100% !important;
-  max-width: 320px !important;
+  max-width: 360px !important;
 }
 
 .nextra-sidebar ul::before {
