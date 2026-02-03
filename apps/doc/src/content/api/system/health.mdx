@@ -12,14 +12,14 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 - **Method**: `GET`
-- **Path**: `/status/health`
+- **Path**: `/system/health`
 
 ## Diagram
 
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A[Client] -- "GET /status/health" --> B[API]
+    A[Client] -- "GET /system/health" --> B[API]
     B --> PingDB[Ping Database]
     B --> PingCache[Ping Cache]
     PingDB --> C{All Healthy?}

@@ -164,11 +164,11 @@ legend:
 
 - system (Health & Config)
   - application/command
-    - ⛔ 🔒 [support] send support ticket/feedback (46)
+    - ⛔ 🔒 [system] send support ticket/feedback (46)
       - Canal para o usuário reportar problemas ou enviar sugestões para o back-office.
 
   - application/query
-    - ✅ [status] healthcheck (47)
+    - ✅ [system] healthcheck (47)
       - Valida se o banco de dados, cache, mensageria e storage estão operacionais.
-    - ⛔ [status] get configuration (48)
+    - ⛔ [system] get configuration (48)
       - Retorna parâmetros dinâmicos do sistema, como taxas e limites globais.

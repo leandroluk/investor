@@ -5,9 +5,9 @@ import {QueryBus} from '@nestjs/cqrs';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 
-@ApiTags('status')
-@Controller('status')
-export class StatusController {
+@ApiTags('system')
+@Controller('system')
+export class SystemController {
   constructor(private readonly queryBus: QueryBus) {}
 
   // #region getHealth

@@ -2,6 +2,7 @@ export * from './activate-user.command';
 export * from './authorize-2fa.command';
 export * from './login-using-credential.command';
 export * from './login-using-token.command';
+export * from './register-device.command';
 export * from './register-user.command';
 export * from './reset-password.command';
 export * from './send-2fa-email.command';
