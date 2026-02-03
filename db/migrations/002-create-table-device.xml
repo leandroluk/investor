@@ -9,15 +9,15 @@
   <changeSet id="create-table-device" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "device" (
-        "id"         UUID           NOT NULL,
-        "user_id"    UUID           NOT NULL,
-        "platform"   VARCHAR(20)    NOT NULL,
-        "push_token" VARCHAR(255)   NOT NULL,
-        "is_active"  BOOLEAN        NOT NULL,
-        "brand"      VARCHAR(50)        NULL,
-        "model"      VARCHAR(50)        NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at" TIMESTAMPTZ(3)     NULL,
+        "id"          UUID           NOT NULL,
+        "user_id"     UUID           NOT NULL,
+        "platform"    VARCHAR(20)    NOT NULL,
+        "fingerprint" VARCHAR(255)   NOT NULL,
+        "is_active"   BOOLEAN        NOT NULL,
+        "brand"       VARCHAR(50)        NULL,
+        "model"       VARCHAR(50)        NULL,
+        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"  TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user" ("id")

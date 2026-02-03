@@ -59,8 +59,10 @@ legend:
       - Após a autenticação, o sistema irá emitir um token de acesso e um token de refresh.
     - ⛔ 🔒 [profile] update user profile (12)
       - Permite editar o nome; impede a alteração direta de email e endereço de carteira por segurança.
-    - ⛔ 🔒 [device] register device (push token) (13)
-      - Salva o token de push e a plataforma (iOS/Android) como ativos.
+    - ⛔ 🔒 [device] register device (fingerprint) (13)
+      - O sistema identifica unicamente o dispositivo do usuário através de um fingerprint gerado pela compilação de múltiplos fatores de hardware e software (web ou mobile).
+      - Esse identificador é utilizado para monitorar sessões ativas, prevenir fraudes e permitir o logout remoto.
+      - Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
     - ⛔ 🔒 [device] revoke device (remote logout) (14)
       - Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
     - ⛔ 🔒 [wallet] generate wallet (15)

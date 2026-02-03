@@ -1,15 +1,15 @@
  erDiagram
     %% MODULE: account
     device {
-        uuidv7    id         PK
-        uuidv7    user_id    FK
-        varchar   platform   ""
-        varchar   push_token ""
-        boolean   is_active  ""
-        varchar   brand      ""
-        varchar   model      ""
-        timestamp created_at ""
-        timestamp updated_at ""
+        uuidv7    id          PK
+        uuidv7    user_id     FK
+        varchar   platform    ""
+        varchar   fingerprint ""
+        boolean   is_active   ""
+        varchar   brand       ""
+        varchar   model       ""
+        timestamp created_at  ""
+        timestamp updated_at  ""
     }
     login {
         uuidv7    id         PK

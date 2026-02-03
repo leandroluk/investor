@@ -25,11 +25,11 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
   platform!: DeviceTypeEnum;
 
   @ApiProperty({
-    example: 'fCM_token_82h1...',
-    description: 'Firebase Cloud Messaging or APNs push token for notifications',
+    example: 'fingerprint_82h1...',
+    description: 'Unique fingerprint for device identification',
     nullable: true,
   })
-  pushToken!: string | null;
+  fingerprint!: string | null;
 
   @ApiProperty({
     example: true,
