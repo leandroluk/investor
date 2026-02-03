@@ -30,6 +30,25 @@ const findByEmail = `
   WHERE "email" = $1
 `;
 
+const findById = `
+  SELECT
+    "id",
+    "email",
+    "name",
+    "password_hash",
+    "wallet_address",
+    "wallet_verified_at",
+    "wallet_seed_encrypted",
+    "kyc_status",
+    "kyc_verified_at",
+    "status",
+    "two_factor_enabled",
+    "created_at",
+    "updated_at"
+  FROM "user"
+  WHERE "id" = $1
+`;
+
 const create = `
   INSERT INTO "user" (
     "id",
@@ -77,6 +96,28 @@ export class DatabasePostgresUserRepository implements UserRepository {
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const [row] = await this.database.query(findByEmail, [email]);
+    if (row) {
+      return {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        passwordHash: row.password_hash,
+        walletAddress: row.wallet_address,
+        walletVerifiedAt: row.wallet_verified_at,
+        walletSeedEncrypted: row.wallet_seed_encrypted,
+        kycStatus: row.kyc_status,
+        kycVerifiedAt: row.kyc_verified_at,
+        status: row.status,
+        twoFactorEnabled: row.two_factor_enabled,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    }
+    return null;
+  }
+
+  async findById(id: string): Promise<UserEntity | null> {
+    const [row] = await this.database.query(findById, [id]);
     if (row) {
       return {
         id: row.id,

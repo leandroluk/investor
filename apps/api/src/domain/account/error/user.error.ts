@@ -29,3 +29,9 @@ export class UserNotPendingError extends DomainError {
     super(message, 'user.not_pending');
   }
 }
+
+export class UserInvalidCredentialsError extends DomainError {
+  constructor(message = 'Invalid credentials') {
+    super(message, 'user.invalid_credentials');
+  }
+}

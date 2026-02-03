@@ -12,22 +12,22 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 - **Method**: `GET`
-- **Path**: `/support/health`
+- **Path**: `/status/health`
 
 ## Diagram
 
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    Start([Start]) --> Request[Client calls GET /support/health]
-    Request --> PingDB[Ping Database]
-    Request --> PingCache[Ping Cache]
-    PingDB --> Check{All Healthy?}
-    PingCache --> Check
-    Check -- Yes --> Success[Return 200 OK]
-    Check -- No --> Error[Return 503 Service Unavailable]
-    Success --> End([End])
-    Error --> End
+    A[Client] -- "GET /status/health" --> B[API]
+    B --> PingDB[Ping Database]
+    B --> PingCache[Ping Cache]
+    PingDB --> C{All Healthy?}
+    PingCache --> C
+    C -- Yes --> D[Return 200 OK]
+    C -- No --> E[Return 503 Service Unavailable]
+    D --> End([End])
+    E --> End
 ```
 </MermaidZoom>
 

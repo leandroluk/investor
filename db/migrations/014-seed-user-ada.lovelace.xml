@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="seed-user-ada.lovelace" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      INSERT INTO "user" (
+        "id",
+        "email",
+        "password_hash",
+        "name",
+        "status",
+        "wallet_address",
+        "wallet_verified_at",
+        "wallet_seed_encrypted",
+        "kyc_status",
+        "kyc_verified_at",
+        "two_factor_enabled",
+        "created_at",
+        "updated_at"
+      ) VALUES (
+        /* id                    */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* email                 */ 'ada.lovelace@email.com',
+        /* password_hash         */ 'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4',
+        /* name                  */ 'Ada Lovelace', 
+        /* status                */ 'ACTIVE', 
+        /* wallet_address        */ null,
+        /* wallet_verified_at    */ null,
+        /* wallet_seed_encrypted */ null,
+        /* kyc_status            */ 'NONE',
+        /* kyc_verified_at       */ null,
+        /* two_factor_enabled    */ false,
+        /* created_at            */ NOW(),
+        /* updated_at            */ NOW()
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DELETE FROM "user" WHERE "email" = 'ada.lovelace@email.com'
+    ]]></sql></rollback>
+  </changeSet>
+
+  <changeSet id="tag" author="leandroluk@gmail.com">
+    <tagDatabase tag="014" />
+  </changeSet>
+</databaseChangeLog>

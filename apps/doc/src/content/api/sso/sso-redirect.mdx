@@ -1,0 +1,56 @@
+---
+title: Single Sign On Redirect
+description: Initiate Single Sign On flow
+---
+
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- Client requests SSO login for a provider (google, microsoft).
+- Client provides a `callback_url` (where the UI wants to go after login).
+- System validates provider and callback_url.
+- System encrypts `callback_url` into the `state` parameter.
+- System redirects user to the provider's OAuth2 authorization URL.
+
+## Request
+
+`GET /sso/:provider?callback_url=...`
+
+### Parameters
+
+- `provider`: google | microsoft
+- `callback_url`: URL to return to after successful login
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["Client"] -- "GET /sso/:provider?callback_url=..." --> B["API"]
+    B --> C{"Provider valid?"}
+    C -- "No" --> D["Return 422 Unprocessable Entity"]
+    D --> End([End])
+    C -- "Yes" --> E{"callback_url valid?"}
+    E -- "No" --> F["Return 400 Bad Request"]
+    F --> End
+    E -- "Yes" --> G["Encrypt callback_url into state"]
+    G --> H["Get OAuth2 redirect URL from provider"]
+    H --> I["Return 302 Redirect to provider"]
+    I --> End
+```
+</MermaidZoom>
+
+## Success Case
+
+`302 Found` (Redirect)
+
+## Error Cases
+
+### Invalid Provider
+
+`422 Unprocessable Entity`
+
+### Invalid Callback URL
+
+`400 Bad Request`

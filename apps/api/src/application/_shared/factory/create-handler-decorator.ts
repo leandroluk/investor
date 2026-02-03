@@ -1,11 +1,13 @@
 export function createHandlerDecorator(
-  handler: (originalMethod: any, ...args: any[]) => Promise<any>
+  handler: (originalMethod: any, methodName: string, ...args: any[]) => Promise<any>
 ): MethodDecorator & ClassDecorator {
-  return (target: any, _propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any => {
+  return (target: any, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any => {
     if (descriptor) {
       const originalMethod = descriptor.value;
+      const methodName = propertyKey?.toString() || '';
+
       descriptor.value = function (...args: any[]): any {
-        return handler.call(this, originalMethod.bind(this), ...args);
+        return handler.call(this, originalMethod.bind(this), methodName, ...args);
       };
       return descriptor;
     }

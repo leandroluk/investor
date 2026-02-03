@@ -1,16 +1,16 @@
 ---
 title: Resend Activation Email
-description: Resends the activation email with a new OTP code to a pending user.
+description: Resend the activation email with a new OTP
 ---
 
 import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
-- The user must exist in the system.
-- The user must have status `PENDING` (not already active).
-- A new 6-digit OTP is generated and stored in cache with 15-minute expiration.
-- An activation email is sent with a link containing the OTP.
+- User submits their email address.
+- If the user exists and status is `PENDING`, a new 6-digit OTP is generated and sent.
+- If the user is already `ACTIVE`, a conflict error is returned.
+- If the user does not exist, a 404 error is returned (typically).
 
 ## Request
 
@@ -53,31 +53,6 @@ flowchart TD
 
 `404 Not Found`
 
-```json
-{
-  "code": "USER_NOT_FOUND",
-  "message": "User not found."
-}
-```
-
-### User Already Active
+### Already Active
 
 `409 Conflict`
-
-```json
-{
-  "code": "USER_ALREADY_ACTIVE",
-  "message": "User is already active."
-}
-```
-
-### Validation Error
-
-`400 Bad Request`
-
-```json
-{
-  "code": "VALIDATION_ERROR",
-  "message": "Invalid email format."
-}
-```

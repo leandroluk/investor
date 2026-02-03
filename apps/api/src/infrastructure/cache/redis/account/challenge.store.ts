@@ -10,18 +10,18 @@ import {CacheRedisError} from '../redis.error';
 export class CacheRedisChallengeStore implements ChallengeStore {
   constructor(private readonly cacheRedisAdapter: CacheRedisAdapter) {}
 
-  async create(userId: UserEntity['id']): Promise<{challengeId: string; code: string}> {
+  async create(userId: UserEntity['id']): Promise<{challengeId: string; otp: string}> {
     await this.cacheRedisAdapter.delete(`user:${userId}:challenge:*`);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const challengeId = crypto.randomUUID();
     const key = `user:${userId}:challenge:${challengeId}`;
-    await this.cacheRedisAdapter.set(key, code, 60 * 15);
-    return {challengeId, code};
+    await this.cacheRedisAdapter.set(key, otp, 60 * 15);
+    return {challengeId, otp};
   }
 
-  async verify(challengeId: string, code: string): Promise<UserEntity['id']> {
+  async verify(challengeId: string, otp: string): Promise<UserEntity['id']> {
     const {key, value} = await this.cacheRedisAdapter.get(`user:*:challenge:${challengeId}`);
-    if (code === value) {
+    if (otp === value) {
       await this.cacheRedisAdapter.delete(key);
       return key.split(':')[1]!;
     }

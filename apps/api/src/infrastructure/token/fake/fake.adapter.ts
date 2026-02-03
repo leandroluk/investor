@@ -3,15 +3,15 @@ import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 
 @InjectableExisting(TokenPort)
 export class TokenFakeAdapter extends TokenPort {
-  create<T extends boolean>(
+  async create<T extends boolean>(
     _sessionKey: string,
     _claims: TokenPort.Claims,
     includeRefresh?: true
-  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
+  ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization> {
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
       accessToken: 'fake-access-token',
-      expiresIn: '3600',
+      expiresIn: 3600,
     };
     if (includeRefresh) {
       token.refreshToken = 'fake-refresh-token';
@@ -19,7 +19,7 @@ export class TokenFakeAdapter extends TokenPort {
     return token as any;
   }
 
-  decode(_token: string): TokenPort.Decoded {
+  async decode(_token: string): Promise<TokenPort.Decoded> {
     return {
       kind: 'access',
       sessionKey: 'fake-session-key',

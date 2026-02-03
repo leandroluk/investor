@@ -1,4 +1,6 @@
 export * from './activate-user.command';
+export * from './login-using-credential.command';
+export * from './login-using-token.command';
 export * from './register-user.command';
 export * from './request-password-reset.command';
 export * from './reset-password.command';

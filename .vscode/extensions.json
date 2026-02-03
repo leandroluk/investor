@@ -23,9 +23,7 @@
     // Barreler for typescript apps
     "mikerhyssmith.ts-barrelr",
     // Markdown syntax support for the Mermaid charting language
-    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
-    // fill-labs.dependi
-    "fill-labs.dependi"
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting"
   ],
   "unwantedRecommendations": [
     // Code formatter using prettier

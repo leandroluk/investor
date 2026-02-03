@@ -2,21 +2,19 @@ import {Throws} from '#/application/_shared/decorator';
 import {TokenPort} from '#/domain/_shared/port';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import jsonwebtoken from 'jsonwebtoken';
-import ms from 'ms';
 import {TokenJwtConfig} from './jwt.config';
 import {TokenJwtError} from './jwt.error';
 
-@Throws(TokenJwtError)
 @Throws(TokenJwtError)
 @InjectableExisting(TokenPort)
 export class TokenJwtAdapter implements TokenPort {
   constructor(private readonly tokenJwtConfig: TokenJwtConfig) {}
 
-  create<T extends boolean>(
+  async create<T extends boolean>(
     sessionKey: string,
     claims: TokenPort.Claims,
     includeRefresh?: T
-  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
+  ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization> {
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
       accessToken: jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
@@ -27,7 +25,7 @@ export class TokenJwtAdapter implements TokenPort {
         expiresIn: this.tokenJwtConfig.accessTTL,
         header: {alg: this.tokenJwtConfig.algorithm, typ: 'access'},
       }),
-      expiresIn: ms(this.tokenJwtConfig.accessTTL),
+      expiresIn: this.tokenJwtConfig.accessTTL,
     };
 
     if (includeRefresh) {
@@ -44,7 +42,7 @@ export class TokenJwtAdapter implements TokenPort {
     return token as any;
   }
 
-  decode(token: string): TokenPort.Decoded {
+  async decode(token: string): Promise<TokenPort.Decoded> {
     const {header, payload} = jsonwebtoken.verify(token, this.tokenJwtConfig.publicKey, {
       algorithms: [this.tokenJwtConfig.algorithm],
       audience: this.tokenJwtConfig.audience,

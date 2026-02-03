@@ -1,7 +1,7 @@
 import {createHandlerDecorator} from '../factory';
 
 export function Retry({attempts, delay = 1000}: {attempts: number; delay?: number}): ClassDecorator & MethodDecorator {
-  return createHandlerDecorator(async (originalMethod, ...args) => {
+  return createHandlerDecorator(async (originalMethod, _methodName, ...args) => {
     let lastError: any;
     for (let i = 0; i < attempts; i++) {
       try {

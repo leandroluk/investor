@@ -3,8 +3,8 @@ export abstract class TokenPort {
     sessionKey: string,
     claims: TokenPort.Claims,
     complete?: true
-  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization;
-  abstract decode(token: string): TokenPort.Decoded;
+  ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization>;
+  abstract decode(token: string): Promise<TokenPort.Decoded>;
   abstract getAccessTokenTTL(): number;
   abstract getRefreshTokenTTL(): number;
 }
@@ -20,7 +20,7 @@ export namespace TokenPort {
   export interface Authorization {
     tokenType: string;
     accessToken: string;
-    expiresIn: string;
+    expiresIn: number;
     refreshToken?: string;
   }
   export interface Decoded {

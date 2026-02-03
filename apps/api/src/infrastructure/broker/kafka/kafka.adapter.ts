@@ -10,7 +10,7 @@ import {BrokerKafkaError} from './kafka.error';
 @Throws(BrokerKafkaError)
 @InjectableExisting(BrokerPort)
 export class BrokerKafkaAdapter implements BrokerPort {
-  private readonly ignoredMessagesPattern = [/.*SyncGroup\(.*/];
+  private readonly ignoredMessagesPattern = [/.*SyncGroup\(.*/, /.*Heartbeat\(.*/];
   private readonly kafka: Kafka;
   private readonly producer: Producer;
   private readonly consumer: Consumer;

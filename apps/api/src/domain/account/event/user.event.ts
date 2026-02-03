@@ -16,5 +16,5 @@ export class UserPasswordChangedEvent extends DomainEvent<{
 
 export class UserLoggedInEvent extends DomainEvent<{
   userId: UserEntity['id'];
-  provider: 'credential' | 'google' | 'microsoft';
+  provider: string;
 }> {}

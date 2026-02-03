@@ -35,7 +35,7 @@ export class LoggerWinstonAdapter implements LoggerPort {
     this.winston = createLogger({
       level: this.loggerWinstonConfig.level,
       format: format.combine(
-        format.timestamp(),
+        format.timestamp({format: 'isoDateTime'}),
         format.errors({stack: true}),
         this.loggerWinstonConfig.isJson ? format.json() : this.noJsonFormat
       ),

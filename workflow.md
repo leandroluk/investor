@@ -52,6 +52,7 @@ Com base no caso de uso definido, o agente deve **inferir** a documentação da 
     <MermaidZoom>
     ```mermaid
     flowchart TD
+      A["Client"] -- "{METHOD} {PATH}" --> B["API"]
       ...
     ```
     </MermaidZoom>
@@ -146,7 +147,7 @@ os diretórios deverão ser perguntados ao usuário
           @ApiProperty({ example: 'investor@example.com', description: 'User email' })
           readonly email!: string;
 
-          @ApiProperty({ example: 'password123', description: 'Plain text password' })
+          @ApiProperty({ example: 'Test@123', description: 'Plain text password' })
           readonly password!: string;
 
           @ApiProperty({ example: 'en', description: 'ISO 639-1 language code' })

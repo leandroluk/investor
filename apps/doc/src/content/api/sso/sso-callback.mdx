@@ -1,0 +1,66 @@
+---
+title: Single Sign On Callback
+description: Handle the callback from OAuth2 provider
+---
+
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- Provider redirects user back to this endpoint with `code` and `state`.
+- System decrypts `state` to retrieve the original `callback_url`.
+- System exchanges `code` for tokens (id_token, access_token) via OidcPort.
+- System retrieves user info from provider.
+- System upserts user in database (by email).
+- System generates a temporary encrypted token with 1-min TTL.
+- System redirects user to `callback_url` with the temporary token.
+
+## Request
+
+`GET /sso/:provider/callback`
+
+### Parameters
+
+- `provider`: google | microsoft
+- `code`: Authorization code from provider
+- `state`: Encrypted state containing callback_url
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["Provider"] -- "GET /sso/:provider/callback" --> B["API"]
+    B --> C{"Provider valid?"}
+    C -- "No" --> D["Return 422 Unprocessable Entity"]
+    D --> End([End])
+    C -- "Yes" --> E["Decrypt state to get callback_url"]
+    E --> F{"Decryption OK?"}
+    F -- "No" --> G["Return 400 Bad Request"]
+    G --> End
+    F -- "Yes" --> H["Exchange code for tokens via OidcPort"]
+    H --> I{"Exchange OK?"}
+    I -- "No" --> J["Return 400 Bad Request"]
+    J --> End
+    I -- "Yes" --> K["Get user claims from provider"]
+    K --> L["Upsert user in database by email"]
+    L --> M["Generate encrypted token with 1min TTL"]
+    M --> N["Publish UserLoggedInEvent"]
+    N --> O["Return 302 Redirect to callback_url with token"]
+    O --> End([End])
+```
+</MermaidZoom>
+
+## Success Case
+
+`302 Found` (Redirect)
+
+## Error Cases
+
+### Invalid Provider
+
+`422 Unprocessable Entity`
+
+### Invalid State/Code
+
+`400 Bad Request`

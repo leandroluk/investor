@@ -2,7 +2,7 @@ import {type applyDecorators} from '@nestjs/common';
 import {createHandlerDecorator} from '../factory';
 
 export function Throws(errorConstructor: new (...args: any[]) => Error): ReturnType<typeof applyDecorators> {
-  return createHandlerDecorator(async (originalMethod, ...args) => {
+  return createHandlerDecorator(async (originalMethod, _methodName, ...args) => {
     try {
       return await originalMethod(...args);
     } catch (error: any) {

@@ -38,6 +38,8 @@ export interface SsoCallbackCommandResult {
 
 @CommandHandler(SsoCallbackCommand)
 export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, SsoCallbackCommandResult> {
+  private readonly addOneMinute = 60 * 1000;
+
   constructor(
     private readonly oidcPort: OidcPort,
     private readonly userRepository: UserRepository,
@@ -88,11 +90,8 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
     return newUser;
   }
 
-  private async generateLoginToken(userId: string): Promise<string> {
-    const payload = {
-      userId,
-      exp: Date.now() + 60 * 1000, // 1 minuto
-    };
+  private async generateLoginToken(provider: 'google' | 'microsoft', userId: UserEntity['id']): Promise<string> {
+    const payload = {provider, userId, exp: Date.now() + this.addOneMinute};
     return await this.cipherPort.encrypt(JSON.stringify(payload));
   }
 
@@ -102,7 +101,7 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
     const tokens = await this.exchangeCode(adapter, command.code);
     const claims = await adapter.getInfo(tokens.accessToken);
     const user = await this.upsertUser(claims);
-    const loginToken = await this.generateLoginToken(user.id);
+    const loginToken = await this.generateLoginToken(command.provider, user.id);
 
     await this.brokerPort.publish(
       new UserLoggedInEvent(command.correlationId, new Date(), {
