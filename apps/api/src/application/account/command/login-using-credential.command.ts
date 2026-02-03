@@ -24,10 +24,6 @@ export class LoginUsingCredentialCommand extends Command<CommandSchema> {
   @ApiPropertyOf(LoginEntity, 'ip')
   readonly ip!: string;
 
-  @ApiProperty({
-    description: 'User Agent',
-    example: 'Mozilla/5.0...',
-  })
   readonly userAgent!: string;
 
   @ApiPropertyOf(UserEntity, 'email')

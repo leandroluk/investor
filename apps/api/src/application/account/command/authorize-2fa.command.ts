@@ -25,10 +25,6 @@ export class Authorize2FACommand extends Command<CommandSchema> {
   })
   readonly ip!: string;
 
-  @ApiProperty({
-    description: 'User Agent',
-    example: 'Mozilla/5.0...',
-  })
   readonly userAgent!: string;
 
   @ApiPropertyOf(UserEntity, 'email')
