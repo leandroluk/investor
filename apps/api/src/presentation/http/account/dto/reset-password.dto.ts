@@ -1,4 +1,4 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {ResetPasswordCommand} from '#/application/account/command';
 
 export class ResetPasswordBodyDTO {

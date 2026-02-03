@@ -1,10 +1,11 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {Authorize2FACommand} from '#/application/account/command';
+import {UserEntity} from '#/domain/account/entity';
 
 export class Authorize2FABodyDTO {
-  @ApiPropertyOf(Authorize2FACommand, 'challengeId')
-  challengeId!: string;
+  @ApiPropertyOf(UserEntity, 'email')
+  email!: string;
 
-  @ApiPropertyOf(Authorize2FACommand, 'code')
-  code!: string;
+  @ApiPropertyOf(Authorize2FACommand, 'otp')
+  otp!: string;
 }

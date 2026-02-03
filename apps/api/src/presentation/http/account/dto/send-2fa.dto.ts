@@ -1,7 +1,7 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
-import {Send2FACommand} from '#/application/account/command';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
+import {Send2FAEmailCommand} from '#/application/account/command';
 
 export class Send2FABodyDTO {
-  @ApiPropertyOf(Send2FACommand, 'email')
+  @ApiPropertyOf(Send2FAEmailCommand, 'email')
   email!: string;
 }

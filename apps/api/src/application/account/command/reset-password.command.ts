@@ -1,5 +1,5 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {BrokerPort, HasherPort} from '#/domain/_shared/port';
 import {PASSWORD_REGEX} from '#/domain/account/constant';
 import {UserEntity} from '#/domain/account/entity';

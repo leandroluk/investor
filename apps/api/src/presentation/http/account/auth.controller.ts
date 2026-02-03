@@ -3,30 +3,25 @@ import {
   Authorize2FACommand,
   Authorize2FACommandResult,
   LoginUsingCredentialCommand,
-  LoginUsingCredentialCommandAuthorizationResult,
-  LoginUsingCredentialCommandChallengeResult,
   LoginUsingTokenCommand,
-  LoginUsingTokenCommandAuthorizationResult,
-  LoginUsingTokenCommandChallengeResult,
   RegisterUserCommand,
-  RequestPasswordResetCommand,
   ResetPasswordCommand,
-  Send2FACommand,
-  Send2FACommandResult,
-  SendActivationEmailCommand,
+  Send2FAEmailCommand,
+  SendActivateEmailCommand,
+  SendRecoverCommand,
 } from '#/application/account/command';
 import {CheckEmailQuery} from '#/application/account/query';
 import {
-  UserAlreadyActiveError,
   UserEmailInUseError,
   UserInvalidCredentialsError,
   UserInvalidOtpError,
   UserNotFoundError,
   UserNotPendingError,
+  UserStatusError,
 } from '#/domain/account/error';
 import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Patch, Post, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiAcceptedResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
+import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
@@ -36,10 +31,10 @@ import {
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
   RegisterUserBodyDTO,
-  RequestPasswordResetBodyDTO,
   ResetPasswordBodyDTO,
   Send2FABodyDTO,
   SendActivationEmailBodyDTO,
+  SendRecoverBodyDTO,
 } from './dto';
 
 @ApiTags('auth')
@@ -54,6 +49,9 @@ export class AuthController {
   @Get('check/email/:email')
   @HttpCode(HttpStatus.NO_CONTENT)
   @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
+  @ApiNoContentResponse({
+    description: 'Email is available.',
+  })
   async getCheckEmail(
     @GetEnvelope() envelope: GetEnvelope, //
     @Param() params: CheckEmailParamsDTO
@@ -66,6 +64,9 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
+  @ApiCreatedResponse({
+    description: 'User registered successfully.',
+  })
   async postRegisterUser(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: RegisterUserBodyDTO
@@ -79,13 +80,16 @@ export class AuthController {
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
-    [UserAlreadyActiveError, HttpStatus.CONFLICT]
+    [UserStatusError, HttpStatus.CONFLICT]
   )
+  @ApiAcceptedResponse({
+    description: 'Activation email sent.',
+  })
   async postSendActivationEmail(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: SendActivationEmailBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new SendActivationEmailCommand({...envelope, ...body}));
+    await this.commandBus.execute(new SendActivateEmailCommand({...envelope, ...body}));
   }
   // #endregion
 
@@ -97,6 +101,9 @@ export class AuthController {
     [UserNotPendingError, HttpStatus.CONFLICT],
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
+  @ApiAcceptedResponse({
+    description: 'User activated successfully.',
+  })
   async patchActivateUser(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: ActivateUserBodyDTO
@@ -105,26 +112,32 @@ export class AuthController {
   }
   // #endregion
 
-  // #region postSendPasswordReset
+  // #region postSendRecover
   @Post('recover')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
-  async postSendPasswordReset(
+  @ApiAcceptedResponse({
+    description: 'Password reset email sent.',
+  })
+  async postSendRecover(
     @GetEnvelope() envelope: GetEnvelope, //
-    @Body() body: RequestPasswordResetBodyDTO
+    @Body() body: SendRecoverBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RequestPasswordResetCommand({...envelope, ...body}));
+    await this.commandBus.execute(new SendRecoverCommand({...envelope, ...body}));
   }
   // #endregion
 
-  // #region patchPasswordReset
+  // #region patchResetPassword
   @Patch('recover')
   @HttpCode(HttpStatus.OK)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
-  async patchPasswordReset(
+  @ApiOkResponse({
+    description: 'Password reset successfully.',
+  })
+  async patchResetPassword(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: ResetPasswordBodyDTO
   ): Promise<void> {
@@ -136,19 +149,26 @@ export class AuthController {
   @Post('2fa')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
+  @ApiOkResponse({
+    description: '2FA email sent.',
+  })
   async postSend2FA(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: Send2FABodyDTO
-  ): Promise<Send2FACommandResult> {
-    return await this.commandBus.execute(new Send2FACommand({...envelope, ...body}));
+  ): Promise<void> {
+    await this.commandBus.execute(new Send2FAEmailCommand({...envelope, ...body}));
   }
   // #endregion
 
-  // #region patch2FA
+  // #region patchAuthorize2FA
   @Patch('2fa')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN])
-  async patch2FA(
+  @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
+  @ApiOkResponse({
+    description: 'User authenticated successfully.',
+    type: Authorize2FACommandResult,
+  })
+  async patchAuthorize2FA(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: Authorize2FABodyDTO,
     @Ip() ip: string
@@ -162,12 +182,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
   @ApiAcceptedResponse({
-    description: 'Returns an MFA challenge.',
-    type: LoginUsingCredentialCommandChallengeResult,
+    description: 'Requires 2FA verification. OTP sent to email.',
   })
   @ApiOkResponse({
     description: 'Returns the final authorization token.',
-    type: LoginUsingCredentialCommandAuthorizationResult,
   })
   async postLoginUsingCredential(
     @GetEnvelope() envelope: GetEnvelope, //
@@ -175,9 +193,9 @@ export class AuthController {
     @Ip() ip: string,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const {type, result} = await this.commandBus.execute(new LoginUsingCredentialCommand({...envelope, ...body, ip}));
-    if (type === 'challenge') {
-      reply.status(HttpStatus.ACCEPTED).send(result);
+    const {otp, result} = await this.commandBus.execute(new LoginUsingCredentialCommand({...envelope, ...body, ip}));
+    if (otp) {
+      reply.status(HttpStatus.ACCEPTED).send();
     } else {
       reply.status(HttpStatus.OK).send(result);
     }
@@ -189,12 +207,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
   @ApiAcceptedResponse({
-    description: 'Returns an MFA challenge.',
-    type: LoginUsingTokenCommandChallengeResult,
+    description: 'Requires 2FA verification. OTP sent to email.',
   })
   @ApiOkResponse({
     description: 'Returns the final authorization token.',
-    type: LoginUsingTokenCommandAuthorizationResult,
   })
   async postLoginUsingToken(
     @GetEnvelope() envelope: GetEnvelope, //
@@ -202,9 +218,9 @@ export class AuthController {
     @Ip() ip: string,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const {type, result} = await this.commandBus.execute(new LoginUsingTokenCommand({...envelope, ...body, ip}));
-    if (type === 'challenge') {
-      reply.status(HttpStatus.ACCEPTED).send(result);
+    const {otp, result} = await this.commandBus.execute(new LoginUsingTokenCommand({...envelope, ...body, ip}));
+    if (otp) {
+      reply.status(HttpStatus.ACCEPTED).send();
     } else {
       reply.status(HttpStatus.OK).send(result);
     }

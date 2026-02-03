@@ -6,17 +6,16 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
-- User provides `challengeId` (received from login step) and `code` (received via email/app).
-- System verifies if the code corresponds to the challenge and is not expired.
+- User provides `email` and `code` (received via email).
+- System verifies if the code matches the user's OTP.
 - If valid, system generates access and refresh tokens.
-- Invalidates the challenge after use.
 
 ## Request
 
-- Method: `POST`
+- Method: `PATCH`
 - Path: `/auth/2fa`
 - Body:
-  - `challengeId`: ID of the challenge (required, uuid)
+  - `email`: User's email (required, email format)
   - `code`: The 2FA code (required, string)
 
 ## Diagram
@@ -24,7 +23,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-  A["Client"] -- "POST /auth/2fa" --> B["API"]
+  A["Client"] -- "PATCH /auth/2fa" --> B["API"]
   B --> C{"Valid Code?"}
   C -- "No" --> D["Return 403 Forbidden"]
   C -- "Yes" --> E["Generate Tokens"]

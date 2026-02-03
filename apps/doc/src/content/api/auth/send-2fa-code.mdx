@@ -7,24 +7,23 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
-- User must provide a valid `challengeId`.
-- The system generates a new 6-digit OTP for the same user.
-- The previous OTP associated with that challenge might be invalidated (depending on security policy), but the `challengeId` context remains.
+- User provides a valid `email`.
+- The system generates a new OTP for the user.
 - The new code is sent via email.
-- Returns 202 Accepted.
+- Returns 200 OK.
 
 ## Request
 
 - Method: `POST`
-- Path: `/auth/2fa/resend`
+- Path: `/auth/2fa`
 - Body:
-  - `challengeId`: ID of the challenge (required, uuid)
+  - `email`: User's email (required, email format)
 
 ### Example Body
 
 ```json
 {
-  "challengeId": "12345678-1234-1234-1234-123456789012"
+  "email": "john.doe@example.com"
 }
 ```
 
@@ -33,12 +32,12 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-  A["Client"] -- "POST /auth/2fa/resend" --> B["API"]
-  B --> C{"Challenge Exists?"}
+  A["Client"] -- "POST /auth/2fa" --> B["API"]
+  B --> C{"User Found?"}
   C -- "No" --> D["Return 404 Not Found"]
   C -- "Yes" --> E["Generate New OTP"]
   E --> F["Send Email with OTP"]
-  F --> G["Return 202 Accepted"]
+  F --> G["Return 200 OK"]
 ```
 </MermaidZoom>
 
@@ -46,9 +45,9 @@ flowchart TD
 
 ### Success
 
-`202 Accepted`
+`200 OK`
 
 ### Error Cases
 
-#### Challenge Not Found
+#### User Not Found
 `404 Not Found`

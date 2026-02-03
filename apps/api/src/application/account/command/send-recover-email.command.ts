@@ -1,7 +1,9 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {MailerPort, TemplatePort} from '#/domain/_shared/port';
 import {UserEntity} from '#/domain/account/entity';
+import {UserStatusEnum} from '#/domain/account/enum';
+import {UserNotFoundError, UserStatusError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
 import {OtpStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -15,17 +17,17 @@ const commandSchema = z.object({
 
 type CommandSchema = z.infer<typeof commandSchema>;
 
-export class RequestPasswordResetCommand extends Command<CommandSchema> {
+export class SendRecoverCommand extends Command<CommandSchema> {
   @ApiPropertyOf(UserEntity, 'email')
   readonly email!: string;
 
-  constructor(payload: RequestPasswordResetCommand) {
+  constructor(payload: SendRecoverCommand) {
     super(payload, commandSchema);
   }
 }
 
-@CommandHandler(RequestPasswordResetCommand)
-export class RequestPasswordResetHandler implements ICommandHandler<RequestPasswordResetCommand> {
+@CommandHandler(SendRecoverCommand)
+export class SendRecoverCommandHandler implements ICommandHandler<SendRecoverCommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly otpStore: OtpStore,
@@ -34,9 +36,14 @@ export class RequestPasswordResetHandler implements ICommandHandler<RequestPassw
     private readonly mailerPort: MailerPort
   ) {}
 
-  private async checkUserExists(email: string): Promise<boolean> {
+  private async checkUserEmail(email: string): Promise<void> {
     const user = await this.userRepository.findByEmail(email);
-    return !!user;
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+    if (user.status !== UserStatusEnum.ACTIVE) {
+      throw new UserStatusError('User is not active');
+    }
   }
 
   private async renderTemplate(otp: string): Promise<{html: string; text: string}> {
@@ -48,13 +55,8 @@ export class RequestPasswordResetHandler implements ICommandHandler<RequestPassw
     return {html, text};
   }
 
-  async execute(command: RequestPasswordResetCommand): Promise<void> {
-    const userExists = await this.checkUserExists(command.email);
-
-    if (!userExists) {
-      return;
-    }
-
+  async execute(command: SendRecoverCommand): Promise<void> {
+    await this.checkUserEmail(command.email);
     const otp = await this.otpStore.create(command.email);
     const {html, text} = await this.renderTemplate(otp);
     await this.mailerPort.send({to: [command.email], subject: 'Password Reset', text, html});

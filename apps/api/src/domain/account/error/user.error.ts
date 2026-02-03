@@ -12,9 +12,9 @@ export class UserNotFoundError extends DomainError {
   }
 }
 
-export class UserAlreadyActiveError extends DomainError {
-  constructor(message = 'User already active') {
-    super(message, 'user.already_active');
+export class UserStatusError extends DomainError {
+  constructor(message = 'User status error') {
+    super(message, 'user.status_error');
   }
 }
 

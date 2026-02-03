@@ -21,7 +21,5 @@ export class UserLoggedInEvent extends DomainEvent<{
 
 export class UserRequestChallengeEvent extends DomainEvent<{
   userId: UserEntity['id'];
-  email: UserEntity['email'];
-  otp: string;
-  challengeId: string;
+  userEmail: UserEntity['email'];
 }> {}

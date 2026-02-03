@@ -1,11 +1,10 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {BrokerPort, HasherPort, TokenPort} from '#/domain/_shared/port';
 import {LoginEntity, UserEntity} from '#/domain/account/entity';
-import {UserInvalidCredentialsError, UserNotFoundError} from '#/domain/account/error';
+import {UserInvalidCredentialsError} from '#/domain/account/error';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
 import {LoginRepository, UserRepository} from '#/domain/account/repository';
-import {ChallengeStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import uuid from 'uuid';
@@ -37,32 +36,16 @@ export class LoginUsingCredentialCommand extends Command<CommandSchema> {
   }
 }
 
-export class LoginUsingCredentialCommandChallengeResult {
+export class LoginUsingCredentialCommandResult {
+  @ApiProperty()
+  otp!: boolean;
+
   @ApiProperty({
-    description: 'Challenge ID',
-    example: '12345678-1234-1234-1234-123456789012',
+    description: 'Authorization token if OTP is false, otherwise null',
+    nullable: true,
   })
-  challengeId?: string;
+  result!: TokenPort.Authorization | null;
 }
-
-export class LoginUsingCredentialCommandAuthorizationResult implements TokenPort.Authorization {
-  @ApiProperty({example: 'Bearer', description: 'Token type'})
-  tokenType!: string;
-
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
-  accessToken!: string;
-
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
-  expiresIn!: number;
-
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
-  refreshToken!: string;
-}
-
-export type LoginUsingCredentialCommandResult = {
-  type: 'challenge' | 'authorization';
-  result: LoginUsingCredentialCommandChallengeResult | LoginUsingCredentialCommandAuthorizationResult;
-};
 
 @CommandHandler(LoginUsingCredentialCommand)
 export class LoginUsingCredentialHandler implements ICommandHandler<
@@ -73,7 +56,6 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     private readonly userRepository: UserRepository,
     private readonly loginRepository: LoginRepository,
     private readonly hasherPort: HasherPort,
-    private readonly challengeStore: ChallengeStore,
     private readonly brokerPort: BrokerPort,
     private readonly tokenPort: TokenPort
   ) {}
@@ -81,7 +63,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   private async getUserByEmail(email: string): Promise<UserEntity> {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      throw new UserNotFoundError();
+      throw new UserInvalidCredentialsError();
     }
     return user;
   }
@@ -104,19 +86,6 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     await this.loginRepository.create(login);
   }
 
-  private async sendChallenge(correlationId: string, occurredAt: Date, user: UserEntity): Promise<string> {
-    const {challengeId, otp} = await this.challengeStore.create(user.id);
-    await this.brokerPort.publish(
-      new UserRequestChallengeEvent(correlationId, occurredAt, {
-        userId: user.id,
-        challengeId,
-        otp,
-        email: user.email,
-      })
-    );
-    return challengeId;
-  }
-
   private async createToken(user: UserEntity): Promise<Required<TokenPort.Authorization>> {
     return await this.tokenPort.create<true>(
       user.id,
@@ -125,7 +94,24 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     );
   }
 
-  private async publishLoginEvent(correlationId: string, occurredAt: Date, userId: UserEntity['id']): Promise<void> {
+  private async publishUserRequestChallengeEvent(
+    correlationId: string,
+    occurredAt: Date,
+    user: UserEntity
+  ): Promise<void> {
+    await this.brokerPort.publish(
+      new UserRequestChallengeEvent(correlationId, occurredAt, {
+        userId: user.id,
+        userEmail: user.email,
+      })
+    );
+  }
+
+  private async publishUserLoggedInEvent(
+    correlationId: string,
+    occurredAt: Date,
+    userId: UserEntity['id']
+  ): Promise<void> {
     await this.brokerPort.publish(
       new UserLoggedInEvent(correlationId, occurredAt, {
         userId,
@@ -138,21 +124,16 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     const user = await this.getUserByEmail(command.email);
     try {
       await this.validatePassword(command.password, user.passwordHash);
-
       await this.createLogin(command.ip, user, true);
 
       if (user.twoFactorEnabled) {
-        return {
-          type: 'challenge',
-          result: {
-            challengeId: await this.sendChallenge(command.correlationId, command.occurredAt, user),
-          },
-        };
+        await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
+        return {otp: true, result: null};
       }
 
       const token = await this.createToken(user);
-      await this.publishLoginEvent(command.correlationId, command.occurredAt, user.id);
-      return {type: 'authorization', result: token};
+      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
+      return {otp: false, result: token};
     } catch (error) {
       void this.createLogin(command.ip, user, false);
       throw error;

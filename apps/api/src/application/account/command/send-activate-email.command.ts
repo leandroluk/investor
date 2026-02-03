@@ -1,9 +1,9 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {MailerPort, TemplatePort} from '#/domain/_shared/port';
 import {UserEntity} from '#/domain/account/entity';
 import {UserStatusEnum} from '#/domain/account/enum';
-import {UserAlreadyActiveError, UserNotFoundError} from '#/domain/account/error';
+import {UserNotFoundError, UserStatusError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
 import {OtpStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -17,17 +17,17 @@ const commandSchema = z.object({
 
 type CommandSchema = z.infer<typeof commandSchema>;
 
-export class SendActivationEmailCommand extends Command<CommandSchema> {
+export class SendActivateEmailCommand extends Command<CommandSchema> {
   @ApiPropertyOf(UserEntity, 'email')
   readonly email!: string;
 
-  constructor(payload: SendActivationEmailCommand) {
+  constructor(payload: SendActivateEmailCommand) {
     super(payload, commandSchema);
   }
 }
 
-@CommandHandler(SendActivationEmailCommand)
-export class SendActivationEmailHandler implements ICommandHandler<SendActivationEmailCommand> {
+@CommandHandler(SendActivateEmailCommand)
+export class SendActivateEmailHandler implements ICommandHandler<SendActivateEmailCommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly otpStore: OtpStore,
@@ -42,7 +42,7 @@ export class SendActivationEmailHandler implements ICommandHandler<SendActivatio
       throw new UserNotFoundError();
     }
     if (user.status === UserStatusEnum.ACTIVE) {
-      throw new UserAlreadyActiveError();
+      throw new UserStatusError('User is already active');
     }
   }
 
@@ -55,7 +55,7 @@ export class SendActivationEmailHandler implements ICommandHandler<SendActivatio
     return {html, text};
   }
 
-  async execute(command: SendActivationEmailCommand): Promise<void> {
+  async execute(command: SendActivateEmailCommand): Promise<void> {
     await this.checkUserEmail(command.email);
     const otp = await this.otpStore.create(command.email);
     const {html, text} = await this.renderTemplate(otp);

@@ -2,7 +2,7 @@
 title: Login using token
 description: Authenticate user with a temporary token (e.g. from SSO)
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -29,8 +29,8 @@ flowchart TD
   B --> C{"Valid Token?"}
   C -- "No" --> D["Return 401 Unauthorized"]
   C -- "Yes" --> E{"2FA Enabled?"}
-  E -- "Yes" --> F["Log Success (Challenge)"]
-  F --> G["Return 200 OK (ChallengeToken, is2faRequired=true)"]
+  E -- "Yes" --> F["Publish UserRequestChallengeEvent"]
+  F --> G["Return 202 Accepted"]
   E -- "No" --> H["Log Success (Full)"]
   H --> I["Return 200 OK (AccessToken, RefreshToken)"]
 ```
@@ -50,14 +50,8 @@ flowchart TD
 
 ## Success Case (2FA Enabled)
 
-- Status: `200 OK`
-- Body:
-```json
-{
-  "challengeToken": "ey...",
-  "is2faRequired": true
-}
-```
+- Status: `202 Accepted`
+- Body: _Empty_
 
 ## Error Case
 

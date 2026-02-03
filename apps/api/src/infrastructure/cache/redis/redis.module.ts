@@ -1,5 +1,5 @@
 import {CachePort} from '#/domain/_shared/port';
-import {ChallengeStore, OtpStore} from '#/domain/account/store';
+import {OtpStore} from '#/domain/account/store';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import * as accountStore from './account';
 import {CacheRedisAdapter} from './redis.adapter';
@@ -13,6 +13,6 @@ import {CacheRedisLifecycle} from './redis.lifecycle';
     CacheRedisLifecycle,
     Object.values(accountStore)
   ),
-  exports: [CachePort, OtpStore, ChallengeStore],
+  exports: [CachePort, OtpStore],
 })
 export class CacheRedisModule {}

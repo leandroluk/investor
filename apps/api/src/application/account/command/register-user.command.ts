@@ -1,10 +1,10 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator/api-property-of.decorator';
+import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {BrokerPort, HasherPort} from '#/domain/_shared/port';
 import {PASSWORD_REGEX} from '#/domain/account/constant';
 import {UserEntity} from '#/domain/account/entity';
 import {KycStatusEnum, UserStatusEnum} from '#/domain/account/enum';
-import {UserNotFoundError} from '#/domain/account/error';
+import {UserEmailInUseError} from '#/domain/account/error';
 import {UserRegisteredEvent} from '#/domain/account/event/user.event';
 import {UserRepository} from '#/domain/account/repository';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -52,7 +52,7 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
   private async existsByEmail(email: string): Promise<void> {
     const exists = await this.userRepository.existsByEmail(email);
     if (exists) {
-      throw new UserNotFoundError(email);
+      throw new UserEmailInUseError(email);
     }
   }
 
