@@ -20,6 +20,8 @@
         "kyc_status"            VARCHAR(20)    NOT NULL DEFAULT 'NONE',
         "kyc_verified_at"       TIMESTAMPTZ(3)     NULL,
         "two_factor_enabled"    BOOLEAN        NOT NULL,
+        "language"              VARCHAR(10)    NOT NULL,
+        "timezone"              VARCHAR(100)   NOT NULL,
         "created_at"            TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"            TIMESTAMPTZ(3)     NULL,
         ---

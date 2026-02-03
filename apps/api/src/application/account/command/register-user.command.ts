@@ -69,6 +69,8 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
       kycVerifiedAt: null,
       status: UserStatusEnum.PENDING,
       twoFactorEnabled: false,
+      language: 'en',
+      timezone: 'UTC',
       createdAt: new Date(),
       updatedAt: new Date(),
     };

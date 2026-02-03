@@ -1,19 +1,20 @@
+import {type UserEntity} from '#/domain/account/entity';
+
 export abstract class TokenPort {
   abstract create<T extends boolean>(
     sessionKey: string,
-    claims: TokenPort.Claims,
+    user: UserEntity,
     complete?: true
   ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization>;
   abstract decode(token: string): Promise<TokenPort.Decoded>;
 }
 export namespace TokenPort {
   export interface Claims {
-    subject: string;
-    email: string;
-    givenName?: string;
-    familyName?: string;
-    language?: string;
-    timezone?: string;
+    subject: UserEntity['id'];
+    email: UserEntity['email'];
+    name: UserEntity['name'];
+    language: UserEntity['language'];
+    timezone: UserEntity['timezone'];
   }
   export interface Authorization {
     tokenType: string;

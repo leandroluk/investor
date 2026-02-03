@@ -5,7 +5,7 @@ import {LoginEntity, UserEntity} from '#/domain/account/entity';
 import {UserInvalidCredentialsError} from '#/domain/account/error';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
 import {LoginRepository, UserRepository} from '#/domain/account/repository';
-import {OtpStore} from '#/domain/account/store';
+import {SessionStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import uuid from 'uuid';
@@ -13,6 +13,7 @@ import z from 'zod';
 
 const commandSchema = z.object({
   ip: z.string(),
+  userAgent: z.string(),
   token: z.string().min(1),
 });
 
@@ -21,6 +22,12 @@ type CommandSchema = z.infer<typeof commandSchema>;
 export class LoginUsingTokenCommand extends Command<CommandSchema> {
   @ApiPropertyOf(LoginEntity, 'ip')
   readonly ip!: string;
+
+  @ApiProperty({
+    description: 'User Agent',
+    example: 'Mozilla/5.0...',
+  })
+  readonly userAgent!: string;
 
   @ApiProperty({
     description: 'Encrypted temporary token',
@@ -51,7 +58,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     private readonly loginRepository: LoginRepository,
     private readonly cipherPort: CipherPort,
     private readonly tokenPort: TokenPort,
-    private readonly otpStore: OtpStore,
+    private readonly sessionStore: SessionStore,
     private readonly brokerPort: BrokerPort
   ) {}
 
@@ -90,12 +97,13 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     await this.loginRepository.create(login);
   }
 
-  private async createToken(user: UserEntity): Promise<Required<TokenPort.Authorization>> {
-    return await this.tokenPort.create<true>(
-      user.id,
-      {subject: user.id, email: user.email, givenName: user.name},
-      true
-    );
+  private async createToken(
+    ip: string,
+    userAgent: string,
+    user: UserEntity
+  ): Promise<Required<TokenPort.Authorization>> {
+    const sessionKey = await this.sessionStore.create(user.id, ip, userAgent);
+    return await this.tokenPort.create<true>(sessionKey, user, true);
   }
 
   private async publishUserRequestChallengeEvent(
@@ -137,7 +145,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
         return {otp: true, result: null};
       }
 
-      const token = await this.createToken(user);
+      const token = await this.createToken(command.ip, command.userAgent, user);
       await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, provider, user.id);
       return {otp: false, result: token};
     } catch (error) {

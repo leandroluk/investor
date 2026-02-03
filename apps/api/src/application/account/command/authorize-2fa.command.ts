@@ -4,13 +4,14 @@ import {TokenPort} from '#/domain/_shared/port';
 import {UserEntity} from '#/domain/account/entity';
 import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
-import {OtpStore} from '#/domain/account/store';
+import {OtpStore, SessionStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
 const commandSchema = z.object({
   ip: z.string(),
+  userAgent: z.string(),
   email: z.email(),
   otp: z.string().min(1),
 });
@@ -23,6 +24,12 @@ export class Authorize2FACommand extends Command<CommandSchema> {
     example: '127.0.0.1',
   })
   readonly ip!: string;
+
+  @ApiProperty({
+    description: 'User Agent',
+    example: 'Mozilla/5.0...',
+  })
+  readonly userAgent!: string;
 
   @ApiPropertyOf(UserEntity, 'email')
   readonly email!: string;
@@ -57,6 +64,7 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
   constructor(
     private readonly userRepository: UserRepository,
     private readonly otpStore: OtpStore,
+    private readonly sessionStore: SessionStore,
     private readonly tokenPort: TokenPort
   ) {}
 
@@ -76,12 +84,13 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
     return user;
   }
 
-  private async createToken(user: UserEntity): Promise<Required<TokenPort.Authorization>> {
-    return await this.tokenPort.create<true>(
-      user.id,
-      {subject: user.id, email: user.email, givenName: user.name},
-      true
-    );
+  private async createToken(
+    ip: string,
+    userAgent: string,
+    user: UserEntity
+  ): Promise<Required<TokenPort.Authorization>> {
+    const sessionKey = await this.sessionStore.create(user.id, ip, userAgent);
+    return await this.tokenPort.create<true>(sessionKey, user, true);
   }
 
   async execute(command: Authorize2FACommand): Promise<Authorize2FACommandResult> {
@@ -93,6 +102,6 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
     }
 
     const user = await this.getUserByEmail(email);
-    return await this.createToken(user);
+    return await this.createToken(command.ip, command.userAgent, user);
   }
 }

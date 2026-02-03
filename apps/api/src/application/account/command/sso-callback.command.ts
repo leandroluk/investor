@@ -82,6 +82,8 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
       kycStatus: KycStatusEnum.NONE,
       kycVerifiedAt: null,
       twoFactorEnabled: false,
+      language: 'en',
+      timezone: 'UTC',
       createdAt: new Date(),
       updatedAt: new Date(),
     };

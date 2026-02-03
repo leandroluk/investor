@@ -75,6 +75,18 @@ export class UserEntity implements Indexable, Creatable, Updatable {
   kycVerifiedAt!: Date | null;
 
   @ApiProperty({
+    example: 'en',
+    description: 'User preferred language (ISO 639-1 code)',
+  })
+  language!: string;
+
+  @ApiProperty({
+    example: 'America/Sao_Paulo',
+    description: 'User preferred timezone (IANA format)',
+  })
+  timezone!: string;
+
+  @ApiProperty({
     example: new Date(),
     description: 'Timestamp of account creation',
   })

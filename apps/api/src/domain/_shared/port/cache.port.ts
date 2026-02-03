@@ -2,7 +2,12 @@ export abstract class CachePort {
   abstract ping(): Promise<void>;
   abstract connect(): Promise<void>;
   abstract close(): Promise<void>;
-  abstract set<TType = any>(key: string, value: TType, ttl?: number): Promise<void>;
+  abstract set<TType = any>(
+    key: string,
+    value: TType,
+    /** in seconds */
+    ttl?: number
+  ): Promise<void>;
   abstract get<TType = any>(pattern: string): Promise<{key: string; value: TType | null}>;
   abstract delete(...matches: string[]): Promise<void>;
   abstract exists(...matches: string[]): Promise<number>;

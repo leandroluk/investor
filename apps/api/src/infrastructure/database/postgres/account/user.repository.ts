@@ -24,6 +24,8 @@ const findByEmail = `
     "kyc_verified_at",
     "status",
     "two_factor_enabled",
+    "language",
+    "timezone",
     "created_at",
     "updated_at"
   FROM "user"
@@ -43,6 +45,8 @@ const findById = `
     "kyc_verified_at",
     "status",
     "two_factor_enabled",
+    "language",
+    "timezone",
     "created_at",
     "updated_at"
   FROM "user"
@@ -62,9 +66,11 @@ const create = `
     "kyc_verified_at",
     "status",
     "two_factor_enabled",
+    "language",
+    "timezone",
     "created_at",
     "updated_at"
-  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 `;
 
 const update = `
@@ -80,7 +86,9 @@ const update = `
     "kyc_verified_at" = $9,
     "status" = $10,
     "two_factor_enabled" = $11,
-    "updated_at" = $12
+    "language" = $12,
+    "timezone" = $13,
+    "updated_at" = $14
   WHERE "id" = $1
 `;
 
@@ -109,6 +117,8 @@ export class DatabasePostgresUserRepository implements UserRepository {
         kycVerifiedAt: row.kyc_verified_at,
         status: row.status,
         twoFactorEnabled: row.two_factor_enabled,
+        language: row.language,
+        timezone: row.timezone,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       };
@@ -131,6 +141,8 @@ export class DatabasePostgresUserRepository implements UserRepository {
         kycVerifiedAt: row.kyc_verified_at,
         status: row.status,
         twoFactorEnabled: row.two_factor_enabled,
+        language: row.language,
+        timezone: row.timezone,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       };
@@ -151,6 +163,8 @@ export class DatabasePostgresUserRepository implements UserRepository {
       user.kycVerifiedAt,
       user.status,
       user.twoFactorEnabled,
+      user.language,
+      user.timezone,
       user.createdAt,
       user.updatedAt,
     ]);
@@ -169,6 +183,8 @@ export class DatabasePostgresUserRepository implements UserRepository {
       user.kycVerifiedAt,
       user.status,
       user.twoFactorEnabled,
+      user.language,
+      user.timezone,
       user.updatedAt,
     ]);
   }

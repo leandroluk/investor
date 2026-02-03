@@ -19,7 +19,7 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Patch, Post, Res} from '@nestjs/common';
+import {Body, Controller, Get, Headers, HttpCode, HttpStatus, Ip, Param, Patch, Post, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
@@ -171,9 +171,10 @@ export class AuthController {
   async patchAuthorize2FA(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: Authorize2FABodyDTO,
-    @Ip() ip: string
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string
   ): Promise<Authorize2FACommandResult> {
-    return this.commandBus.execute(new Authorize2FACommand({...envelope, ...body, ip}));
+    return this.commandBus.execute(new Authorize2FACommand({...envelope, ...body, ip, userAgent}));
   }
   // #endregion
 
@@ -191,9 +192,12 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingCredentialBodyDTO,
     @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const {otp, result} = await this.commandBus.execute(new LoginUsingCredentialCommand({...envelope, ...body, ip}));
+    const {otp, result} = await this.commandBus.execute(
+      new LoginUsingCredentialCommand({...envelope, ...body, ip, userAgent})
+    );
     if (otp) {
       reply.status(HttpStatus.ACCEPTED).send();
     } else {
@@ -216,9 +220,12 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingTokenBodyDTO,
     @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const {otp, result} = await this.commandBus.execute(new LoginUsingTokenCommand({...envelope, ...body, ip}));
+    const {otp, result} = await this.commandBus.execute(
+      new LoginUsingTokenCommand({...envelope, ...body, ip, userAgent})
+    );
     if (otp) {
       reply.status(HttpStatus.ACCEPTED).send();
     } else {

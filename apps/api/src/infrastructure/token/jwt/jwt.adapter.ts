@@ -1,5 +1,6 @@
 import {Throws} from '#/application/_shared/decorator';
 import {TokenPort} from '#/domain/_shared/port';
+import {UserEntity} from '#/domain/account/entity';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import jsonwebtoken from 'jsonwebtoken';
 import {TokenJwtConfig} from './jwt.config';
@@ -12,9 +13,16 @@ export class TokenJwtAdapter implements TokenPort {
 
   async create<T extends boolean>(
     sessionKey: string,
-    claims: TokenPort.Claims,
+    user: UserEntity,
     includeRefresh?: T
   ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization> {
+    const claims: TokenPort.Claims = {
+      subject: user.id,
+      email: user.email,
+      name: user.name,
+      language: user.language,
+      timezone: user.timezone,
+    };
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
       accessToken: jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
@@ -56,8 +64,7 @@ export class TokenJwtAdapter implements TokenPort {
       claims: {
         subject: payload.sub!,
         email: payload.email,
-        familyName: payload.family_name,
-        givenName: payload.given_name,
+        name: payload.name,
         language: payload.language,
         timezone: payload.timezone,
       } as TokenPort.Claims,
