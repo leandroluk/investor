@@ -19,10 +19,10 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, Headers, HttpCode, HttpStatus, Ip, Param, Patch, Post, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Patch, Post, Req, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {FastifyReply} from 'fastify';
+import {FastifyReply, FastifyRequest} from 'fastify';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
   ActivateUserBodyDTO,
@@ -172,9 +172,16 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: Authorize2FABodyDTO,
     @Ip() ip: string,
-    @Headers('user-agent') userAgent: string
+    @Req() request: FastifyRequest
   ): Promise<Authorize2FACommandResult> {
-    return this.commandBus.execute(new Authorize2FACommand({...envelope, ...body, ip, userAgent}));
+    return this.commandBus.execute(
+      new Authorize2FACommand({
+        ...envelope,
+        ...body,
+        ip,
+        userAgent: request.headers['user-agent']!,
+      })
+    );
   }
   // #endregion
 
@@ -192,11 +199,16 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingCredentialBodyDTO,
     @Ip() ip: string,
-    @Headers('user-agent') userAgent: string,
+    @Req() request: FastifyRequest,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
     const {otp, result} = await this.commandBus.execute(
-      new LoginUsingCredentialCommand({...envelope, ...body, ip, userAgent})
+      new LoginUsingCredentialCommand({
+        ...envelope,
+        ...body,
+        ip,
+        userAgent: request.headers['user-agent']!,
+      })
     );
     if (otp) {
       reply.status(HttpStatus.ACCEPTED).send();
@@ -220,11 +232,16 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingTokenBodyDTO,
     @Ip() ip: string,
-    @Headers('user-agent') userAgent: string,
+    @Req() request: FastifyRequest,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
     const {otp, result} = await this.commandBus.execute(
-      new LoginUsingTokenCommand({...envelope, ...body, ip, userAgent})
+      new LoginUsingTokenCommand({
+        ...envelope,
+        ...body,
+        ip,
+        userAgent: request.headers['user-agent']!,
+      })
     );
     if (otp) {
       reply.status(HttpStatus.ACCEPTED).send();
