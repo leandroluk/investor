@@ -1,10 +1,4 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {LoginUsingCredentialCommand} from '#/application/account/command';
+import {PickType} from '@nestjs/swagger';
 
-export class LoginUsingCredentialBodyDTO {
-  @ApiPropertyOf(LoginUsingCredentialCommand, 'email')
-  email!: string;
-
-  @ApiPropertyOf(LoginUsingCredentialCommand, 'password')
-  password!: string;
-}
+export class LoginUsingCredentialBodyDTO extends PickType(LoginUsingCredentialCommand, ['email', 'password']) {}

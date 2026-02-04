@@ -13,7 +13,7 @@ import {
 import {ApiResponse} from '@nestjs/swagger';
 import {FastifyReply, FastifyRequest} from 'fastify';
 import z, {ZodError} from 'zod';
-import {ErrorResult} from '../result';
+import {ErrorDTO} from '../dto';
 
 export type ErrorMapping = [errorClass: Type<Error> | Function, status: HttpStatus];
 
@@ -29,10 +29,11 @@ export function createDomainExceptionFilter(mappings: Record<string, number>): T
       const request = ctx.getRequest<FastifyRequest>();
       const {name: errorName} = exception.constructor;
 
-      const status: number =
-        exception instanceof ZodError
-          ? HttpStatus.UNPROCESSABLE_ENTITY
-          : (mappings[errorName] ?? HttpStatus.BAD_REQUEST);
+      const status = exception instanceof ZodError ? HttpStatus.UNPROCESSABLE_ENTITY : mappings[errorName];
+
+      if (!status) {
+        throw exception;
+      }
 
       if (status >= 500) {
         this.loggerPort.error(`[${errorName}] ${request.method} ${request.url}`, exception);
@@ -62,11 +63,22 @@ export function DomainException(...mappings: ErrorMapping[]): ClassDecorator & M
     {} as Record<string, number>
   );
 
-  const swaggerDecorators = mappings.map(([errorClass, status]) =>
+  const errorByStatus = mappings.reduce(
+    (acc, [errorClass, status]) => {
+      if (!acc[status]) {
+        acc[status] = [];
+      }
+      acc[status].push(`\`${errorClass.name}\``);
+      return acc;
+    },
+    {} as Record<number, string[]>
+  );
+
+  const swaggerDecorators = Object.entries(errorByStatus).map(([status, errors]) =>
     ApiResponse({
-      status,
-      description: `Domain Error: ${errorClass.name}`,
-      type: ErrorResult,
+      status: Number(status),
+      description: `Domain Error: ${errors.join(' ')}`,
+      type: ErrorDTO,
     })
   );
 
@@ -74,7 +86,7 @@ export function DomainException(...mappings: ErrorMapping[]): ClassDecorator & M
     ApiResponse({
       status: HttpStatus.UNPROCESSABLE_ENTITY,
       description: 'Validation Error',
-      type: ErrorResult,
+      type: ErrorDTO,
     })
   );
 

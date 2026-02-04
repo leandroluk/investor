@@ -1,7 +1,4 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {LoginUsingTokenCommand} from '#/application/account/command';
+import {PickType} from '@nestjs/swagger';
 
-export class LoginUsingTokenBodyDTO {
-  @ApiPropertyOf(LoginUsingTokenCommand, 'token')
-  token!: string;
-}
+export class LoginUsingTokenBodyDTO extends PickType(LoginUsingTokenCommand, ['token']) {}

@@ -1,7 +1,3 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {UserEntity} from '#/domain/account/entity';
+import {CheckEmailQuery} from '#/application/account/query';
 
-export class CheckEmailDTOParams {
-  @ApiPropertyOf(UserEntity, 'email')
-  email!: string;
-}
+export class CheckEmailParamsDTO extends CheckEmailQuery {}

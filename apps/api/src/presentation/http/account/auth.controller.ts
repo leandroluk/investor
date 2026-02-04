@@ -14,6 +14,8 @@ import {
 import {CheckEmailQuery} from '#/application/account/query';
 import {TokenPort} from '#/domain/_shared/port';
 import {
+  AuthSessionExpiredError,
+  AuthUnauthorizedError,
   UserEmailInUseError,
   UserInvalidCredentialsError,
   UserInvalidOtpError,
@@ -21,7 +23,7 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Patch, Post, Req, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, Req, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {FastifyReply, FastifyRequest} from 'fastify';
@@ -29,7 +31,8 @@ import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
-  CheckEmailDTOParams as CheckEmailParamsDTO,
+  Authorize2FAResultDTO,
+  CheckEmailParamsDTO,
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
   RefreshTokenBodyDTO,
@@ -96,8 +99,8 @@ export class AuthController {
   }
   // #endregion
 
-  // #region patchActivateUser
-  @Patch('activate')
+  // #region putActivateUser
+  @Put('activate')
   @HttpCode(HttpStatus.ACCEPTED)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND],
@@ -107,7 +110,7 @@ export class AuthController {
   @ApiAcceptedResponse({
     description: 'User activated successfully.',
   })
-  async patchActivateUser(
+  async putActivateUser(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: ActivateUserBodyDTO
   ): Promise<void> {
@@ -130,8 +133,8 @@ export class AuthController {
   }
   // #endregion
 
-  // #region patchResetPassword
-  @Patch('recover')
+  // #region putResetPassword
+  @Put('recover')
   @HttpCode(HttpStatus.OK)
   @DomainException(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
@@ -140,7 +143,7 @@ export class AuthController {
   @ApiOkResponse({
     description: 'Password reset successfully.',
   })
-  async patchResetPassword(
+  async putResetPassword(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: ResetPasswordBodyDTO
   ): Promise<void> {
@@ -163,15 +166,15 @@ export class AuthController {
   }
   // #endregion
 
-  // #region patchAuthorize2FA
-  @Patch('2fa')
+  // #region putAuthorize2FA
+  @Put('2fa')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
   @ApiOkResponse({
     description: 'User authenticated successfully.',
-    type: Authorize2FACommandResult,
+    type: Authorize2FAResultDTO,
   })
-  async patchAuthorize2FA(
+  async putAuthorize2FA(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: Authorize2FABodyDTO,
     @Ip() ip: string,
@@ -257,7 +260,11 @@ export class AuthController {
   // #region postRefreshToken
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @DomainException(
+    [UserNotFoundError, HttpStatus.UNAUTHORIZED],
+    [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
+    [AuthSessionExpiredError, HttpStatus.UNAUTHORIZED]
+  )
   @ApiOkResponse({
     description: 'Returns the new authorization tokens.',
   })

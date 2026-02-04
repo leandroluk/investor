@@ -1,9 +1,3 @@
-import {ApiProperty} from '@nestjs/swagger';
+import {RefreshTokenCommand} from '#/application/account/command';
 
-export class RefreshTokenBodyDTO {
-  @ApiProperty({
-    description: 'Refresh token',
-    example: 'ey...',
-  })
-  readonly refreshToken!: string;
-}
+export class RefreshTokenBodyDTO extends RefreshTokenCommand {}

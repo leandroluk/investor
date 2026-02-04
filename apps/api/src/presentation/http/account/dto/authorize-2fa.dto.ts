@@ -1,11 +1,6 @@
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {Authorize2FACommand} from '#/application/account/command';
-import {UserEntity} from '#/domain/account/entity';
+import {Authorize2FACommand, Authorize2FACommandResult} from '#/application/account/command';
+import {PickType} from '@nestjs/swagger';
 
-export class Authorize2FABodyDTO {
-  @ApiPropertyOf(UserEntity, 'email')
-  email!: string;
+export class Authorize2FABodyDTO extends PickType(Authorize2FACommand, ['email', 'otp']) {}
 
-  @ApiPropertyOf(Authorize2FACommand, 'otp')
-  otp!: string;
-}
+export class Authorize2FAResultDTO extends Authorize2FACommandResult {}
