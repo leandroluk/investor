@@ -4,6 +4,7 @@ export abstract class DatabasePort {
   abstract close(): Promise<void>;
   abstract query<TType = any>(sql: string, params?: any[]): Promise<TType[]>;
   abstract exec(sql: string, params?: any[]): Promise<DatabasePort.Result>;
+  abstract transaction<TResult = any>(handler: (tx: DatabasePort.Transaction) => Promise<TResult>): Promise<TResult>;
 }
 export namespace DatabasePort {
   export interface Result {
