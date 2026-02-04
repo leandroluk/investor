@@ -14,5 +14,4 @@ def get_variables():
     Uses dotenv_values to ensure $VAR interpolation is resolved.
     """
     # dotenv_values returns a dict with all variables already interpolated
-    print(ENV_PATH)
     return dict(dotenv.dotenv_values(dotenv_path=ENV_PATH, interpolate=True))

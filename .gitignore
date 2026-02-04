@@ -67,3 +67,7 @@ infra/local/.terraform
 infra/local/.terraform*
 infra/local/terraform.tfstate
 infra/local/terraform.tfstate.backup
+
+# Python
+.venv
+__pycache__
