@@ -54,7 +54,11 @@ export async function bootstrap(): Promise<void> {
   );
 
   SwaggerModule.setup(config.prefix, app, document, {
-    swaggerOptions: {persistAuthorization: true},
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'none',
+      defaultModelExpandDepth: 0,
+    },
     customCss: '.topbar{display:none}',
   });
 
