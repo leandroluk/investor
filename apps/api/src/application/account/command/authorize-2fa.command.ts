@@ -1,10 +1,10 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {TokenPort} from '#/domain/_shared/port';
-import {UserEntity} from '#/domain/account/entity';
+import {ChallengeEntity, UserEntity} from '#/domain/account/entity';
+import {ChallengeStatusEnum, UserStatusEnum} from '#/domain/account/enum';
 import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/error';
-import {UserRepository} from '#/domain/account/repository';
-import {OtpStore, SessionStore} from '#/domain/account/store';
+import {ChallengeRepository, UserRepository} from '#/domain/account/repository';
+import {ChallengeStore, SessionStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
@@ -12,8 +12,8 @@ import z from 'zod';
 const commandSchema = z.object({
   ip: z.string(),
   userAgent: z.string(),
-  email: z.email(),
-  otp: z.string().min(1),
+  challengeId: z.string().uuid(),
+  code: z.string().min(1),
 });
 
 type CommandSchema = z.infer<typeof commandSchema>;
@@ -27,14 +27,17 @@ export class Authorize2FACommand extends Command<CommandSchema> {
 
   readonly userAgent!: string;
 
-  @ApiPropertyOf(UserEntity, 'email')
-  readonly email!: string;
+  @ApiProperty({
+    description: 'Challenge ID',
+    format: 'uuid',
+  })
+  readonly challengeId!: string;
 
   @ApiProperty({
     description: '2FA Code',
     example: '123456',
   })
-  readonly otp!: string;
+  readonly code!: string;
 
   constructor(payload: Authorize2FACommand) {
     super(payload, commandSchema);
@@ -45,37 +48,59 @@ export class Authorize2FACommandResult implements TokenPort.Authorization {
   @ApiProperty({example: 'Bearer', description: 'Token type'})
   tokenType!: string;
 
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
+  @ApiProperty({example: 'eyJ...', description: 'Access token'})
   accessToken!: string;
 
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
+  @ApiProperty({example: 3600, description: 'Expires in'})
   expiresIn!: number;
 
-  @ApiProperty({example: 'Bearer', description: 'Access token'})
-  refreshToken!: string;
+  @ApiProperty({example: 'eyJ...', description: 'Refresh token'})
+  refreshToken?: string;
 }
 
 @CommandHandler(Authorize2FACommand)
 export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand, Authorize2FACommandResult> {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly otpStore: OtpStore,
+    private readonly challengeRepository: ChallengeRepository,
+    private readonly challengeStore: ChallengeStore,
     private readonly sessionStore: SessionStore,
     private readonly tokenPort: TokenPort
   ) {}
 
-  private async verifyOtp(otp: string): Promise<UserEntity['email']> {
-    try {
-      const result = await this.otpStore.verify(otp);
-      return result;
-    } catch {
+  private async verifyChallenge(challengeId: string, code: string): Promise<ChallengeEntity> {
+    const challenge = await this.challengeRepository.findById(challengeId);
+    if (!challenge) {
       throw new UserInvalidOtpError();
     }
+    if (challenge.status !== ChallengeStatusEnum.PENDING) {
+      throw new UserInvalidOtpError();
+    }
+    if (challenge.expiresAt < new Date()) {
+      challenge.status = ChallengeStatusEnum.EXPIRED;
+      challenge.updatedAt = new Date();
+      await this.challengeRepository.update(challenge);
+      throw new UserInvalidOtpError();
+    }
+    if (challenge.code !== code) {
+      // TODO: Increment failure count?
+      throw new UserInvalidOtpError();
+    }
+
+    challenge.status = ChallengeStatusEnum.COMPLETED;
+    challenge.updatedAt = new Date();
+    await this.challengeRepository.update(challenge);
+    await this.challengeStore.delete(challenge.userId);
+
+    return challenge;
   }
 
-  private async getUserByEmail(email: string): Promise<UserEntity> {
-    const user = await this.userRepository.findByEmail(email);
+  private async getUser(userId: string): Promise<UserEntity> {
+    const user = await this.userRepository.findById(userId);
     if (!user) {
+      throw new UserNotFoundError();
+    }
+    if (user.status !== UserStatusEnum.ACTIVE) {
       throw new UserNotFoundError();
     }
     return user;
@@ -92,13 +117,8 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
   }
 
   async execute(command: Authorize2FACommand): Promise<Authorize2FACommandResult> {
-    const email = await this.verifyOtp(command.otp);
-    if (email !== command.email) {
-      throw new UserInvalidOtpError();
-    }
-
-    const user = await this.getUserByEmail(email);
-
+    const challenge = await this.verifyChallenge(command.challengeId, command.code);
+    const user = await this.getUser(challenge.userId);
     const result = await this.createToken(command.ip, command.userAgent, user);
     return result;
   }

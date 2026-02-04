@@ -3,10 +3,17 @@ import {ApiProperty} from '@nestjs/swagger';
 
 export class AssetEntity implements Indexable, Creatable {
   @ApiProperty({
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the asset entry (UUIDv7)',
+    format: 'uuid',
+  })
+  id!: string;
+
+  @ApiProperty({
     example: 'usdc-polygon',
     description: 'Unique identifier for the asset (slug)',
   })
-  id!: string;
+  slug!: string;
 
   @ApiProperty({
     example: 'USDC',

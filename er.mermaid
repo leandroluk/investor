@@ -1,22 +1,23 @@
  erDiagram
     %% MODULE: account
     device {
-        uuidv7    id          PK
-        uuidv7    user_id     FK
-        varchar   platform    ""
-        varchar   fingerprint ""
-        boolean   is_active   ""
-        varchar   brand       ""
-        varchar   model       ""
-        timestamp created_at  ""
-        timestamp updated_at  ""
+        uuidv7       id          PK
+        uuidv7       user_id     FK
+        varchar[20]  platform    ""
+        varchar[255] fingerprint ""
+        boolean      is_active   ""
+        varchar[50]  brand       ""
+        varchar[50]  name        ""
+        varchar[50]  model       ""
+        timestamp[3] created_at  ""
+        timestamp[3] updated_at  ""
     }
     login {
         uuidv7    id         PK
         uuidv7    user_id    FK
         inet      ip         ""
         boolean   success    ""
-        timestamp created_at ""
+        timestamp[3] created_at ""
     }
     challenge {
         uuidv7    id         PK
@@ -24,26 +25,26 @@
         varchar   type       ""
         varchar   code       ""
         varchar   status     ""
-        timestamp expires_at ""
-        timestamp created_at ""
-        timestamp updated_at ""
+        timestamp[3] expires_at ""
+        timestamp[3] created_at ""
+        timestamp[3] updated_at ""
     }
     user {
-        uuidv7          id                    PK
-        varchar         email                 UK
-        text            password_hash         ""
-        varchar         name                  ""
-        varchar         status                ""
-        null[char]      wallet_address        UK
-        null[timestamp] wallet_verified_at    ""
-        null[text]      wallet_seed_encrypted ""
-        varchar         kyc_status            ""
-        null[timestamp] kyc_verified_at       ""
-        boolean         two_factor_enabled    ""
-        varchar         language              ""
-        varchar         timezone              ""  
-        timestamp       created_at            ""
-        timestamp       updated_at            ""
+        uuidv7             id                    PK
+        varchar            email                 UK
+        text               password_hash         ""
+        varchar            name                  ""
+        varchar[20]        status                ""
+        null[char[42]]     wallet_address        UK
+        null[timestamp[3]] wallet_verified_at    ""
+        null[text]         wallet_seed_encrypted ""
+        varchar[20]        kyc_status            ""
+        null[timestamp[3]] kyc_verified_at       ""
+        boolean            two_factor_enabled    ""
+        varchar[10]        language              ""
+        varchar[100]       timezone              ""  
+        timestamp[3]       created_at            ""
+        timestamp[3]       updated_at            ""
     }
     document {
         uuidv7     id            PK
@@ -52,94 +53,96 @@
         varchar    storage_key   ""
         varchar    status        ""
         null[text] reject_reason ""
-        timestamp  created_at    ""
-        timestamp  updated_at    ""
+        timestamp[3]  created_at    ""
+        timestamp[3]  updated_at    ""
     }
 
     %% MODULE: audit
     ledger {
-        uuidv7    id           PK
-        uuidv7    user_id      FK
-        varchar   type         "" 
-        decimal   amount_usd   ""
-        uuidv7    reference_id ""
-        timestamp created_at   ""
+        uuidv7       id           PK
+        uuidv7       user_id      FK
+        varchar[50]  type         "" 
+        decimal      amount_usd   ""
+        uuidv7       reference_id ""
+        timestamp[3] created_at   ""
     }
 
     %% MODULE: catalog
     asset {
-        varchar   id         PK
-        varchar   symbol     ""
-        varchar   network    ""
-        boolean   is_active  ""
-        timestamp created_at ""
+        uuidv7       id         PK
+        varchar[50]  slug       ""
+        varchar[10]  symbol     ""
+        varchar[50]  network    ""
+        boolean      is_active  ""
+        timestamp[3] created_at ""
     }
     strategy {
-        varchar   id                      PK
-        text      description             ""
-        decimal   expected_apy_range_low  ""
-        decimal   expected_apy_range_high ""
-        timestamp created_at              ""
-        timestamp updated_at              ""
+        uuidv7       id                      PK
+        varchar[50]  alias                   ""
+        text         description             ""
+        decimal      expected_apy_range_low  ""
+        decimal      expected_apy_range_high ""
+        timestamp[3] created_at              ""
+        timestamp[3] updated_at              ""
     }
 
     %% MODULE: portfolio
     earning {
-        uuidv7    id            PK
-        uuidv7    investment_id FK
-        decimal   amount_token  ""
-        decimal   amount_usd    ""
-        timestamp created_at    ""
+        uuidv7       id            PK
+        uuidv7       investment_id FK
+        decimal      amount_token  ""
+        decimal      amount_usd    ""
+        timestamp[3] created_at    ""
     }
     investment {
-        uuidv7    id          PK
-        varchar   strategy_id FK
-        varchar   asset_id    FK
-        uuidv7    user_id     FK
-        decimal   amount_usd  ""
-        varchar   status      ""
-        timestamp created_at  ""
-        timestamp updated_at  ""
+        uuidv7       id          PK
+        uuidv7       strategy_id FK
+        uuidv7       asset_id    FK
+        uuidv7       user_id     FK
+        decimal      amount_usd  ""
+        varchar[20]  status      ""
+        timestamp[3] created_at  ""
+        timestamp[3] updated_at  ""
     }
 
     %% MODULE: signal
     notice {
-        uuidv7    id         PK
-        uuidv7    user_id    FK
-        varchar   title      ""
-        boolean   is_read    ""
-        timestamp created_at ""
+        uuidv7       id         PK
+        uuidv7       user_id    FK
+        varchar[150] title      ""
+        boolean      is_read    ""
+        timestamp[3] created_at ""
     }
 
     %% MODULE: support
     ticket {
-        uuidv7    id         PK
-        uuidv7    user_id    FK
-        varchar   subject    ""
-        text      message    ""
-        varchar   status     ""
-        timestamp created_at ""
-        timestamp updated_at ""
+        uuidv7       id         PK
+        uuidv7       user_id    FK
+        varchar[150] subject    ""
+        text         message    ""
+        varchar[20]  status     ""
+        timestamp[3] created_at ""
+        timestamp[3] updated_at ""
     }
 
     %% MODULE: system
     config {
-        uuidv7    id           PK
-        varchar   key          UK
-        text      value        ""
-        timestamp created_at   ""
-        timestamp updated_at   ""
+        uuidv7       id           PK
+        varchar[100] key          UK
+        text         value        ""
+        timestamp[3] created_at   ""
+        timestamp[3] updated_at   ""
     }
 
     %% MODULE: treasury
     withdrawal {
-        uuidv7    id               PK
-        uuidv7    user_id          FK
-        decimal   amount_usd       ""
-        varchar   status           ""
-        char      transaction_hash ""
-        timestamp created_at       ""
-        timestamp updated_at       ""
+        uuidv7       id               PK
+        uuidv7       user_id          FK
+        decimal      amount_usd       ""
+        varchar[20]  status           ""
+        char[66]     transaction_hash ""
+        timestamp[3] created_at       ""
+        timestamp[3] updated_at       ""
     }
 
     user       ||--o{ device     : "has"

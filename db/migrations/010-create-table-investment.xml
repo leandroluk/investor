@@ -10,8 +10,8 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "investment" (
         "id"          UUID           NOT NULL,
-        "strategy_id" VARCHAR(50)    NOT NULL,
-        "asset_id"    VARCHAR(50)    NOT NULL,
+        "strategy_id" UUID           NOT NULL,
+        "asset_id"    UUID           NOT NULL,
         "user_id"     UUID           NOT NULL,
         "amount_usd"  DECIMAL        NOT NULL,
         "status"      VARCHAR(20)    NOT NULL,

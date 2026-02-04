@@ -10,7 +10,7 @@ export abstract class CachePort {
   ): Promise<void>;
   abstract get<TType = any>(pattern: string): Promise<{key: string; value: TType | null}>;
   abstract delete(...matches: string[]): Promise<void>;
-  abstract exists(...matches: string[]): Promise<number>;
+  abstract exists(key: string): Promise<boolean>;
   abstract expire(key: string, ttl: number): Promise<void>;
   abstract increment(key: string): Promise<number>;
   abstract decrement(key: string): Promise<number>;

@@ -54,14 +54,8 @@ export class CacheFakeAdapter extends CachePort {
     keys.forEach(k => this.storage.delete(k));
   }
 
-  async exists(...keys: string[]): Promise<number> {
-    let count = 0;
-    for (const key of keys) {
-      if (await this.get(key)) {
-        count++;
-      }
-    }
-    return count;
+  async exists(key: string): Promise<boolean> {
+    return this.storage.has(key);
   }
 
   async expire(key: string, ttl: number): Promise<void> {

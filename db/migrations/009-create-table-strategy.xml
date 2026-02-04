@@ -9,14 +9,16 @@
   <changeSet id="create-table-strategy" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "strategy" (
-        "id"                      VARCHAR(50)    NOT NULL,
+        "id"                      UUID           NOT NULL,
+        "alias"                   VARCHAR(50)    NOT NULL,
         "description"             TEXT           NOT NULL,
         "expected_apy_range_low"  DECIMAL        NOT NULL,
         "expected_apy_range_high" DECIMAL        NOT NULL,
         "created_at"              TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"              TIMESTAMPTZ(3)     NULL,
         ---
-        PRIMARY KEY ("id")
+        PRIMARY KEY ("id"),
+        UNIQUE      ("alias")
       );
     ]]></sql>
 

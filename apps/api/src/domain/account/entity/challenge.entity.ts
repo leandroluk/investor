@@ -51,6 +51,8 @@ export class ChallengeEntity implements Indexable, Creatable, Updatable {
   @ApiProperty({
     example: new Date(),
     description: 'Timestamp of the last update',
+    required: false,
+    nullable: false,
   })
   updatedAt!: Date;
 }

@@ -3,10 +3,17 @@ import {ApiProperty} from '@nestjs/swagger';
 
 export class StrategyEntity implements Indexable, Updatable {
   @ApiProperty({
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the strategy entry (UUIDv7)',
+    format: 'uuid',
+  })
+  id!: string;
+
+  @ApiProperty({
     example: 'stable-yield-v1',
     description: 'Unique slug for the investment strategy',
   })
-  id!: string;
+  alias!: string;
 
   @ApiProperty({
     example: 'Conservative strategy focused on stablecoins lending.',

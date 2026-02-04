@@ -15,6 +15,7 @@ const findByFingerprint = `
     "is_active",
     "brand",
     "model",
+    "name",
     "created_at",
     "updated_at"
   FROM "device"
@@ -30,6 +31,7 @@ const create = `
     "is_active",
     "brand",
     "model",
+    "name",
     "created_at",
     "updated_at"
   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -40,8 +42,9 @@ const update = `
     "is_active" = $1,
     "brand" = $2,
     "model" = $3,
-    "updated_at" = $4
-  WHERE "id" = $5
+    "name" = $4,
+    "updated_at" = $5
+  WHERE "id" = $6
 `;
 
 const findById = `
@@ -53,6 +56,7 @@ const findById = `
     "is_active",
     "brand",
     "model",
+    "name",
     "created_at",
     "updated_at"
   FROM "device"
@@ -68,8 +72,15 @@ const listActiveByUserId = `
     "is_active",
     "brand",
     "model",
+    "name",
     "created_at",
     "updated_at"
+  FROM "device"
+  WHERE "user_id" = $1 AND "is_active" = true
+`;
+
+const listFingerprintByUserId = `
+  SELECT "fingerprint"
   FROM "device"
   WHERE "user_id" = $1 AND "is_active" = true
 `;
@@ -92,6 +103,7 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       isActive: row.is_active,
       brand: row.brand,
       model: row.model,
+      name: row.name,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -106,6 +118,7 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       device.isActive,
       device.brand,
       device.model,
+      device.name,
       device.createdAt,
       device.updatedAt,
     ]);
@@ -116,6 +129,7 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       device.isActive, //
       device.brand,
       device.model,
+      device.name,
       device.updatedAt,
       device.id,
     ]);
@@ -134,6 +148,7 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       isActive: row.is_active,
       brand: row.brand,
       model: row.model,
+      name: row.name,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -149,8 +164,14 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       isActive: row.is_active,
       brand: row.brand,
       model: row.model,
+      name: row.name,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     }));
+  }
+
+  async listFingerprintByUserId(userId: string): Promise<Array<DeviceEntity['fingerprint']>> {
+    const rows = await this.database.query<any>(listFingerprintByUserId, [userId]);
+    return rows.map(row => row.fingerprint);
   }
 }

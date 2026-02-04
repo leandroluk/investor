@@ -1,13 +1,13 @@
 ---
 title: List Active Devices
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
 - 🔒 Requires authentication.
 - Lists all devices associated with the user where the session is still valid (`is_active=true`).
-- Returns metadata about the device (platform, brand, model, fingerprint).
+- Returns metadata about the device (platform, brand, model, fingerprint, name).
 
 ## Request
 
@@ -35,16 +35,19 @@ flowchart TD
 - **Status**: `200 OK`
 - **Body**:
     ```json
-    [
-      {
-        "id": "018b6f3c-8c7a-7c9e-8a1d-2b3c4d5e6f7g",
-        "platform": "ios",
-        "brand": "Apple",
-        "model": "iPhone 15",
-        "createdAt": "2023-11-20T10:00:00Z"
-      },
-      ...
-    ]
+    {
+      "items": [
+        {
+          "id": "018b6f3c-8c7a-7c9e-8a1d-2b3c4d5e6f7g",
+          "platform": "ios",
+          "brand": "Apple",
+          "name": "My iPhone",
+          "model": "iPhone 15",
+          "createdAt": "2023-11-20T10:00:00Z"
+        },
+        ...
+      ]
+    }
     ```
 
 ## Error Case

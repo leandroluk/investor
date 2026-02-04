@@ -8,7 +8,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 - 🔒 Requires authentication.
 - Registers a user's device for anti-fraud and session monitoring.
 - Identification is based on the `fingerprint` and `userId`.
-- If a device with the same fingerprint already exists for the user, update the `updatedAt` timestamp and metadata (brand, model).
+- If a device with the same fingerprint already exists for the user, update the `updatedAt` timestamp and metadata (brand, model, name).
 - If it works, create a new active device record.
 
 ## Request
@@ -21,6 +21,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
   - `platform`: Enum (`ios`, `android`, `web`)
   - `fingerprint`: String (unique hash from client)
   - `brand`: String (e.g., Apple, Samsung)
+  - `name`: String (e.g., My iPhone, Work Laptop)
   - `model`: String (e.g., iPhone 15, Galaxy S24)
 
 ## Diagram

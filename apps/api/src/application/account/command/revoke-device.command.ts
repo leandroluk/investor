@@ -3,6 +3,7 @@ import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {DeviceEntity} from '#/domain/account/entity';
 import {DeviceNotFoundError, DeviceNotOwnedError} from '#/domain/account/error';
 import {DeviceRepository} from '#/domain/account/repository';
+import {DeviceStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
@@ -27,7 +28,10 @@ export class RevokeDeviceCommand extends Command<CommandSchema> {
 
 @CommandHandler(RevokeDeviceCommand)
 export class RevokeDeviceHandler implements ICommandHandler<RevokeDeviceCommand, void> {
-  constructor(private readonly deviceRepository: DeviceRepository) {}
+  constructor(
+    private readonly deviceRepository: DeviceRepository,
+    private readonly deviceStore: DeviceStore
+  ) {}
 
   private async getDevice(id: string, userId: string): Promise<DeviceEntity> {
     const device = await this.deviceRepository.findById(id);
@@ -54,5 +58,8 @@ export class RevokeDeviceHandler implements ICommandHandler<RevokeDeviceCommand,
     device.updatedAt = new Date();
 
     await this.deviceRepository.update(device);
+    if (device.fingerprint) {
+      await this.deviceStore.delete(device.userId, device.fingerprint);
+    }
   }
 }

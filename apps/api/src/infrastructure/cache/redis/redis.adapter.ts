@@ -77,9 +77,9 @@ export class CacheRedisAdapter implements CachePort {
     }
   }
 
-  async exists(...keys: string[]): Promise<number> {
-    const result = await this.redis.exists(...keys);
-    return result;
+  async exists(key: string): Promise<boolean> {
+    const count = await this.redis.exists(key);
+    return count > 0;
   }
 
   async expire(key: string, ttl: number): Promise<void> {

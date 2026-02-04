@@ -5,6 +5,7 @@ import {ChallengeEntity, UserEntity} from '#/domain/account/entity';
 import {ChallengeStatusEnum, UserStatusEnum} from '#/domain/account/enum';
 import {UserNotFoundError} from '#/domain/account/error';
 import {ChallengeRepository, UserRepository} from '#/domain/account/repository';
+import {ChallengeStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import crypto from 'node:crypto';
 import uuid from 'uuid';
@@ -30,6 +31,7 @@ export class Send2FACommandHandler implements ICommandHandler<Send2FAEmailComman
   constructor(
     private readonly userRepository: UserRepository,
     private readonly challengeRepository: ChallengeRepository,
+    private readonly challengeStore: ChallengeStore,
     private readonly mailerPort: MailerPort,
     private readonly templatePort: TemplatePort
   ) {}
@@ -58,6 +60,7 @@ export class Send2FACommandHandler implements ICommandHandler<Send2FAEmailComman
     challenge.updatedAt = new Date();
 
     await this.challengeRepository.create(challenge);
+    await this.challengeStore.save(challenge);
     return code;
   }
 

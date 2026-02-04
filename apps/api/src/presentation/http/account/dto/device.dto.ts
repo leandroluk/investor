@@ -8,6 +8,7 @@ export class RegisterDeviceBodyDTO extends PickType(RegisterDeviceCommand, [
   'fingerprint',
   'brand',
   'model',
+  'name',
 ]) {}
 // #endregion
 

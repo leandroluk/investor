@@ -44,6 +44,12 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
   brand!: string;
 
   @ApiProperty({
+    example: 'My iPhone',
+    description: 'User-friendly name for the device',
+  })
+  name!: string;
+
+  @ApiProperty({
     example: 'iPhone 15 Pro',
     description: 'Specific hardware model for device fingerprinting and anti-fraud analysis',
   })

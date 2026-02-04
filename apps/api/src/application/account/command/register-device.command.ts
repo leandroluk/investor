@@ -3,15 +3,17 @@ import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {DeviceEntity} from '#/domain/account/entity';
 import {DeviceTypeEnum} from '#/domain/account/enum';
 import {DeviceRepository} from '#/domain/account/repository';
+import {DeviceStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import uuid from 'uuid';
 import z from 'zod';
 
 const commandSchema = z.object({
-  userId: z.string().uuid(),
-  platform: z.nativeEnum(DeviceTypeEnum),
+  userId: z.uuid(),
+  platform: z.enum(DeviceTypeEnum),
   fingerprint: z.string().min(1),
   brand: z.string().min(1),
+  name: z.string().min(1),
   model: z.string().min(1),
 });
 
@@ -30,6 +32,9 @@ export class RegisterDeviceCommand extends Command<CommandSchema> {
   @ApiPropertyOf(DeviceEntity, 'brand')
   readonly brand!: string;
 
+  @ApiPropertyOf(DeviceEntity, 'name')
+  readonly name!: string;
+
   @ApiPropertyOf(DeviceEntity, 'model')
   readonly model!: string;
 
@@ -40,7 +45,10 @@ export class RegisterDeviceCommand extends Command<CommandSchema> {
 
 @CommandHandler(RegisterDeviceCommand)
 export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceCommand, void> {
-  constructor(private readonly deviceRepository: DeviceRepository) {}
+  constructor(
+    private readonly deviceRepository: DeviceRepository,
+    private readonly deviceStore: DeviceStore
+  ) {}
 
   async execute(command: RegisterDeviceCommand): Promise<void> {
     const oldDevice = await this.deviceRepository.findByFingerprint(command.userId, command.fingerprint);
@@ -49,23 +57,30 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
       oldDevice.isActive = true;
       oldDevice.brand = command.brand;
       oldDevice.model = command.model;
+      oldDevice.name = command.name;
       oldDevice.updatedAt = new Date();
-      const result = await this.deviceRepository.update(oldDevice);
-      return result;
+      await this.deviceRepository.update(oldDevice);
+      if (oldDevice.fingerprint) {
+        await this.deviceStore.save(oldDevice.userId, oldDevice.fingerprint);
+      }
+      return; // Explicit return to match void
     }
 
-    const newDevice: DeviceEntity = {
-      id: uuid.v7(),
-      userId: command.userId,
-      platform: command.platform,
-      fingerprint: command.fingerprint,
-      isActive: true,
-      brand: command.brand,
-      model: command.model,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const newDevice = new DeviceEntity();
+    newDevice.id = uuid.v7();
+    newDevice.userId = command.userId;
+    newDevice.platform = command.platform;
+    newDevice.fingerprint = command.fingerprint;
+    newDevice.isActive = true;
+    newDevice.brand = command.brand;
+    newDevice.model = command.model;
+    newDevice.name = command.name;
+    newDevice.createdAt = new Date();
+    newDevice.updatedAt = new Date();
 
     await this.deviceRepository.create(newDevice);
+    if (newDevice.fingerprint) {
+      await this.deviceStore.save(newDevice.userId, newDevice.fingerprint);
+    }
   }
 }
