@@ -1,7 +1,6 @@
 import {
   ActivateUserCommand,
   Authorize2FACommand,
-  Authorize2FACommandResult,
   LoginUsingCredentialCommand,
   LoginUsingTokenCommand,
   RefreshTokenCommand,
@@ -23,15 +22,13 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, Req} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {FastifyRequest} from 'fastify';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
-  Authorize2FAResultDTO,
   CheckEmailParamsDTO,
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
@@ -62,7 +59,8 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Param() params: CheckEmailParamsDTO
   ): Promise<void> {
-    return this.queryBus.execute(new CheckEmailQuery({...envelope, ...params}));
+    const result = await this.queryBus.execute(new CheckEmailQuery({...envelope, ...params}));
+    return result;
   }
   // #endregion
 
@@ -170,24 +168,12 @@ export class AuthController {
   @Put('2fa')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
-  @ApiOkResponse({
-    description: 'User authenticated successfully.',
-    type: Authorize2FAResultDTO,
-  })
+  @ApiOkResponse({description: 'User authenticated successfully.'})
   async putAuthorize2FA(
     @GetEnvelope() envelope: GetEnvelope, //
-    @Body() body: Authorize2FABodyDTO,
-    @Ip() ip: string,
-    @Req() request: FastifyRequest
-  ): Promise<Authorize2FACommandResult> {
-    return this.commandBus.execute(
-      new Authorize2FACommand({
-        ...envelope,
-        ...body,
-        ip,
-        userAgent: request.headers['user-agent']!,
-      })
-    );
+    @Body() body: Authorize2FABodyDTO
+  ): Promise<void> {
+    await this.commandBus.execute(new Authorize2FACommand({...envelope, ...body}));
   }
   // #endregion
 
@@ -199,19 +185,11 @@ export class AuthController {
     description: 'Returns the final authorization token.',
   })
   async postLoginUsingCredential(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetEnvelope() envelope: GetEnvelope,
     @Body() body: LoginUsingCredentialBodyDTO,
-    @Ip() ip: string,
-    @Req() request: FastifyRequest
+    @Ip() ip: string
   ): Promise<void> {
-    const result = await this.commandBus.execute(
-      new LoginUsingCredentialCommand({
-        ...envelope,
-        ...body,
-        ip,
-        userAgent: request.headers['user-agent']!,
-      })
-    );
+    const result = await this.commandBus.execute(new LoginUsingCredentialCommand({...envelope, ...body, ip}));
     return result;
   }
   // #endregion
@@ -226,17 +204,9 @@ export class AuthController {
   async postLoginUsingToken(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingTokenBodyDTO,
-    @Ip() ip: string,
-    @Req() request: FastifyRequest
+    @Ip() ip: string
   ): Promise<void> {
-    const result = await this.commandBus.execute(
-      new LoginUsingTokenCommand({
-        ...envelope,
-        ...body,
-        ip,
-        userAgent: request.headers['user-agent']!,
-      })
-    );
+    const result = await this.commandBus.execute(new LoginUsingTokenCommand({...envelope, ...body, ip}));
     return result;
   }
   // #endregion
@@ -254,18 +224,9 @@ export class AuthController {
   })
   async postRefreshToken(
     @GetEnvelope() envelope: GetEnvelope, //
-    @Body() body: RefreshTokenBodyDTO,
-    @Ip() ip: string,
-    @Req() request: FastifyRequest
+    @Body() body: RefreshTokenBodyDTO
   ): Promise<TokenPort.Authorization> {
-    const result = await this.commandBus.execute(
-      new RefreshTokenCommand({
-        ...envelope,
-        ...body,
-        ip,
-        userAgent: request.headers['user-agent']!,
-      })
-    );
+    const result = await this.commandBus.execute(new RefreshTokenCommand({...envelope, ...body}));
     return result;
   }
   // #endregion

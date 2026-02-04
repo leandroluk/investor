@@ -1,7 +1,11 @@
-import {type UserEntity} from '../entity';
+import {type DeviceEntity, type UserEntity} from '../entity';
 
 export abstract class SessionStore {
-  abstract create(userId: UserEntity['id'], ip: string, userAgent: string): Promise<string>;
-  abstract refresh(userId: UserEntity['id'], sessionKey: string, ip: string, userAgent: string): Promise<void>;
+  abstract create(user: UserEntity, device: DeviceEntity): Promise<string>;
+  abstract refresh(
+    userId: UserEntity['id'],
+    sessionKey: string,
+    deviceFingerprint: DeviceEntity['fingerprint']
+  ): Promise<void>;
   abstract revoke(userId: UserEntity['id'], sessionKey: string): Promise<void>;
 }

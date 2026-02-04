@@ -1,6 +1,6 @@
 import {Command} from '#/application/_shared/bus';
-import {TokenPort} from '#/domain/_shared/port';
-import {UserEntity} from '#/domain/account/entity';
+import {HasherPort, TokenPort} from '#/domain/_shared/port';
+import {DeviceEntity, UserEntity} from '#/domain/account/entity';
 import {UserStatusEnum} from '#/domain/account/enum';
 import {AuthSessionExpiredError, AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
@@ -11,8 +11,7 @@ import z from 'zod';
 
 const commandSchema = z.object({
   refreshToken: z.string().min(1),
-  ip: z.string(),
-  userAgent: z.string(),
+  fingerprint: z.string(),
 });
 
 type CommandSchema = z.infer<typeof commandSchema>;
@@ -24,8 +23,7 @@ export class RefreshTokenCommand extends Command<CommandSchema> {
   })
   readonly refreshToken!: string;
 
-  readonly ip!: string;
-  readonly userAgent!: string;
+  readonly fingerprint!: string;
 
   constructor(payload: RefreshTokenCommand) {
     super(payload, commandSchema);
@@ -37,7 +35,8 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
   constructor(
     private readonly userRepository: UserRepository,
     private readonly sessionStore: SessionStore,
-    private readonly tokenPort: TokenPort
+    private readonly tokenPort: TokenPort,
+    private readonly hasherPort: HasherPort
   ) {}
 
   private async decodeToken(refreshToken: string): Promise<TokenPort.Decoded> {
@@ -67,21 +66,30 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
   private async refreshSession(
     userId: UserEntity['id'],
     sessionKey: string,
-    ip: string,
-    userAgent: string
+    fingerprint: DeviceEntity['fingerprint']
   ): Promise<void> {
     try {
-      await this.sessionStore.refresh(userId, sessionKey, ip, userAgent);
+      await this.sessionStore.refresh(userId, sessionKey, fingerprint);
     } catch {
       throw new AuthSessionExpiredError();
     }
   }
 
+  private async createToken(
+    sessionKey: string,
+    user: UserEntity,
+    fingerprint: string
+  ): Promise<TokenPort.Authorization> {
+    const deviceFingerprintHash = await this.hasherPort.hash(fingerprint);
+    const result = await this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
+    return result;
+  }
+
   async execute(command: RefreshTokenCommand): Promise<TokenPort.Authorization> {
     const decoded = await this.decodeToken(command.refreshToken);
     const user = await this.getUser(decoded.claims.subject);
-    await this.refreshSession(user.id, decoded.sessionKey, command.ip, command.userAgent);
-    const result = await this.tokenPort.create<true>(decoded.sessionKey, user, true);
+    await this.refreshSession(user.id, decoded.sessionKey, command.fingerprint);
+    const result = await this.createToken(decoded.sessionKey, user, command.fingerprint);
     return result;
   }
 }

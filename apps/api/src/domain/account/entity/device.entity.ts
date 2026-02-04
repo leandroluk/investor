@@ -27,9 +27,8 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
   @ApiProperty({
     example: 'fingerprint_82h1...',
     description: 'Unique fingerprint for device identification',
-    nullable: true,
   })
-  fingerprint!: string | null;
+  fingerprint!: string;
 
   @ApiProperty({
     example: true,

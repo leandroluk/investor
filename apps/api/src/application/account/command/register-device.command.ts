@@ -51,32 +51,33 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
   ) {}
 
   async execute(command: RegisterDeviceCommand): Promise<void> {
-    const oldDevice = await this.deviceRepository.findByFingerprint(command.userId, command.fingerprint);
+    const existingDevice = await this.deviceRepository.findByFingerprint(command.userId, command.fingerprint);
 
-    if (oldDevice) {
-      oldDevice.isActive = true;
-      oldDevice.brand = command.brand;
-      oldDevice.model = command.model;
-      oldDevice.name = command.name;
-      oldDevice.updatedAt = new Date();
-      await this.deviceRepository.update(oldDevice);
-      if (oldDevice.fingerprint) {
-        await this.deviceStore.save(oldDevice.userId, oldDevice.fingerprint);
+    if (existingDevice) {
+      existingDevice.isActive = true;
+      existingDevice.brand = command.brand;
+      existingDevice.model = command.model;
+      existingDevice.name = command.name;
+      existingDevice.updatedAt = new Date();
+      await this.deviceRepository.update(existingDevice);
+      if (existingDevice.fingerprint) {
+        await this.deviceStore.save(existingDevice.userId, existingDevice.fingerprint);
       }
       return; // Explicit return to match void
     }
 
-    const newDevice = new DeviceEntity();
-    newDevice.id = uuid.v7();
-    newDevice.userId = command.userId;
-    newDevice.platform = command.platform;
-    newDevice.fingerprint = command.fingerprint;
-    newDevice.isActive = true;
-    newDevice.brand = command.brand;
-    newDevice.model = command.model;
-    newDevice.name = command.name;
-    newDevice.createdAt = new Date();
-    newDevice.updatedAt = new Date();
+    const newDevice: DeviceEntity = {
+      id: uuid.v7(),
+      userId: command.userId,
+      platform: command.platform,
+      fingerprint: command.fingerprint,
+      isActive: true,
+      brand: command.brand,
+      model: command.model,
+      name: command.name,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
     await this.deviceRepository.create(newDevice);
     if (newDevice.fingerprint) {

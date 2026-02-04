@@ -1,10 +1,10 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {BrokerPort, CipherPort, TokenPort} from '#/domain/_shared/port';
-import {LoginEntity, UserEntity} from '#/domain/account/entity';
+import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/port';
+import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entity';
+import {DeviceTypeEnum} from '#/domain/account/enum';
 import {UserInvalidCredentialsError} from '#/domain/account/error';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
-import {LoginRepository, UserRepository} from '#/domain/account/repository';
+import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repository';
 import {SessionStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
@@ -12,18 +12,16 @@ import uuid from 'uuid';
 import z from 'zod';
 
 const commandSchema = z.object({
-  ip: z.string(),
-  userAgent: z.string(),
+  ip: z.string().min(1),
+  fingerprint: z.string().min(1),
   token: z.string().min(1),
 });
 
 type CommandSchema = z.infer<typeof commandSchema>;
 
 export class LoginUsingTokenCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(LoginEntity, 'ip')
   readonly ip!: string;
-
-  readonly userAgent!: string;
+  readonly fingerprint!: string;
 
   @ApiProperty({
     description: 'Encrypted temporary token',
@@ -37,28 +35,16 @@ export class LoginUsingTokenCommand extends Command<CommandSchema> {
 }
 
 export class LoginUsingTokenCommandResult implements TokenPort.Authorization {
-  @ApiProperty({
-    description: 'Token type',
-    example: 'Bearer',
-  })
+  @ApiProperty({description: 'Token type', example: 'Bearer'})
   tokenType!: string;
 
-  @ApiProperty({
-    description: 'Access token',
-    example: 'eyJhbGci...',
-  })
+  @ApiProperty({description: 'Access token', example: 'eyJhbGci...'})
   accessToken!: string;
 
-  @ApiProperty({
-    description: 'Expires in',
-    example: 3600,
-  })
+  @ApiProperty({description: 'Expires in', example: 3600})
   expiresIn!: number;
 
-  @ApiProperty({
-    description: 'Refresh token',
-    example: 'eyJhbGci...',
-  })
+  @ApiProperty({description: 'Refresh token', example: 'eyJhbGci...'})
   refreshToken?: string;
 }
 
@@ -67,8 +53,10 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
   constructor(
     private readonly userRepository: UserRepository,
     private readonly loginRepository: LoginRepository,
+    private readonly deviceRepository: DeviceRepository,
     private readonly cipherPort: CipherPort,
     private readonly tokenPort: TokenPort,
+    private readonly hasherPort: HasherPort,
     private readonly sessionStore: SessionStore,
     private readonly brokerPort: BrokerPort
   ) {}
@@ -97,6 +85,31 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     return user;
   }
 
+  private async upsertDevice(user: UserEntity, fingerprint: DeviceEntity['fingerprint']): Promise<DeviceEntity> {
+    const existingDevice = await this.deviceRepository.findByFingerprint(user.id, fingerprint);
+    if (existingDevice) {
+      existingDevice.isActive = true;
+      existingDevice.updatedAt = new Date();
+      await this.deviceRepository.update(existingDevice);
+      return existingDevice;
+    } else {
+      const newDevice: DeviceEntity = {
+        id: uuid.v7(),
+        userId: user.id,
+        platform: DeviceTypeEnum.UNKNOWN,
+        fingerprint,
+        isActive: true,
+        brand: 'unknown',
+        model: 'unknown',
+        name: 'unknown',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      await this.deviceRepository.create(newDevice);
+      return newDevice;
+    }
+  }
+
   private async createLogin(ip: string, user: UserEntity, success: boolean): Promise<void> {
     const login: LoginEntity = {
       id: uuid.v7(),
@@ -108,13 +121,10 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     await this.loginRepository.create(login);
   }
 
-  private async createToken(
-    ip: string,
-    userAgent: string,
-    user: UserEntity
-  ): Promise<Required<TokenPort.Authorization>> {
-    const sessionKey = await this.sessionStore.create(user.id, ip, userAgent);
-    const result = await this.tokenPort.create<true>(sessionKey, user, true);
+  private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
+    const sessionKey = await this.sessionStore.create(user, device);
+    const deviceFingerprintHash = await this.hasherPort.hash(device.fingerprint);
+    const result = await this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
     return result;
   }
 
@@ -150,8 +160,8 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     const user = await this.getUserById(userId);
     try {
       await this.createLogin(command.ip, user, true);
-
-      const result: Required<TokenPort.Authorization> = await this.createToken(command.ip, command.userAgent, user);
+      const device = await this.upsertDevice(user, command.fingerprint);
+      const result = await this.createToken(user, device);
 
       if (user.twoFactorEnabled) {
         await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);

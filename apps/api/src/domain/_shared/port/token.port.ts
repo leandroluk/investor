@@ -4,6 +4,7 @@ export abstract class TokenPort {
   abstract create<T extends boolean>(
     sessionKey: string,
     user: UserEntity,
+    deviceFingerprintHash: string,
     complete?: true
   ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization>;
   abstract decode(token: string): Promise<TokenPort.Decoded>;
@@ -15,6 +16,7 @@ export namespace TokenPort {
     name: UserEntity['name'];
     language: UserEntity['language'];
     timezone: UserEntity['timezone'];
+    hash: string;
   }
   export interface Authorization {
     tokenType: string;

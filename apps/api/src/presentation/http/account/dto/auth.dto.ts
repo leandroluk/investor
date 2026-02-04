@@ -1,7 +1,6 @@
 import {
   ActivateUserCommand,
   Authorize2FACommand,
-  Authorize2FACommandResult,
   LoginUsingCredentialCommand,
   LoginUsingTokenCommand,
   RefreshTokenCommand,
@@ -20,8 +19,6 @@ export class ActivateUserBodyDTO extends ActivateUserCommand {}
 
 // #region Authorize2FA
 export class Authorize2FABodyDTO extends PickType(Authorize2FACommand, ['challengeId', 'code']) {}
-
-export class Authorize2FAResultDTO extends Authorize2FACommandResult {}
 // #endregion
 
 // #region CheckEmail

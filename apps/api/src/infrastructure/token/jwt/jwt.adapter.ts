@@ -14,6 +14,7 @@ export class TokenJwtAdapter implements TokenPort {
   async create<T extends boolean>(
     sessionKey: string,
     user: UserEntity,
+    deviceFingerprintHash: string,
     includeRefresh?: T
   ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization> {
     const claims: TokenPort.Claims = {
@@ -22,6 +23,7 @@ export class TokenJwtAdapter implements TokenPort {
       name: user.name,
       language: user.language,
       timezone: user.timezone,
+      hash: deviceFingerprintHash,
     };
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',

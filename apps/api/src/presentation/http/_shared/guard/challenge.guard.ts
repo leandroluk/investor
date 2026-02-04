@@ -1,3 +1,4 @@
+import {TokenPort} from '#/domain/_shared/port';
 import {ChallengeStore, DeviceStore} from '#/domain/account/store';
 import {
   CanActivate,
@@ -7,12 +8,10 @@ import {
   PreconditionFailedException,
 } from '@nestjs/common';
 import {FastifyReply, FastifyRequest} from 'fastify';
+import {HEADER_CHALLENGE_KEY, HEADER_FINGERPRINT_KEY} from '../contant';
 
 @Injectable()
-export class SecurityGuard implements CanActivate {
-  private readonly headerDeviceKey = 'x-device-id';
-  private readonly headerChallengeKey = 'x-challenge-id';
-
+export class DeviceGuard implements CanActivate {
   constructor(
     private readonly challengeStore: ChallengeStore,
     private readonly deviceStore: DeviceStore
@@ -21,24 +20,16 @@ export class SecurityGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
     const reply = context.switchToHttp().getRequest<FastifyReply>();
-    const user = request['user'] as {id: string} | undefined;
-    const fingerprint = request.headers[this.headerDeviceKey] as string | undefined;
+    const user = request['user'] as TokenPort.Decoded;
+    const fingerprint = request.headers[HEADER_FINGERPRINT_KEY] as string;
 
-    if (!user || !user.id) {
-      return true;
-    }
-
-    const challenge = await this.challengeStore.get(user.id);
+    const challenge = await this.challengeStore.get(user.claims.subject);
     if (challenge) {
-      reply.header(this.headerChallengeKey, challenge.id);
+      reply.header(HEADER_CHALLENGE_KEY, challenge.id);
       throw new PreconditionFailedException('Precondition Required');
     }
 
-    if (!fingerprint) {
-      throw new ForbiddenException('Device Fingerprint Required');
-    }
-
-    const isDeviceAuthorized = await this.deviceStore.has(user.id, fingerprint);
+    const isDeviceAuthorized = await this.deviceStore.has(user.claims.subject, fingerprint).catch(() => false);
     if (!isDeviceAuthorized) {
       throw new ForbiddenException('Device Not Authorized');
     }

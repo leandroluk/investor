@@ -8,7 +8,7 @@ export class CacheRedisConfig {
     url: z.url().default('redis://localhost:6379/0'),
     otpTokenTTL: z.coerce.number().default(ms('10m')),
     accessTokenTTL: z.coerce.number().default(ms('15m')),
-    refreshTokenTTL: z.coerce.number().default(ms('7d')),
+    refreshTokenTTL: z.coerce.number().default(ms('1d')),
   });
 
   constructor() {
