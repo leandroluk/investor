@@ -4,6 +4,7 @@
   "private": true,
   "bin": {
     "dev-gen-deps-graph": "./bin/gen-deps-graph.js",
+    "dev-gen-env": "./bin/gen-env.js",
     "dev-watch": "./bin/watch.js",
     "dev-k3d-build": "./bin/k3d-build.js"
   },

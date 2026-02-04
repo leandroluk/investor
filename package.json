@@ -9,16 +9,12 @@
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
     "clear": "pnpm dlx rimraf --glob \"**/{.turbo,.next,.coverage,dist,node_modules,pnpm-lock.yaml}\"",
-    "watch": "dev-watch \"./apps/src/**/*.{ts,tsx,json,css}\" \"./libs/**/src/**/*.{ts,tsx,json,css}\"",
+    "dev:watch": "dev-watch \"./apps/src/**/*.{ts,tsx,json,css}\" \"./libs/**/src/**/*.{ts,tsx,json,css}\"",
+    "dev:env": "dev-gen-env",
     "docker:down": "docker compose down --remove-orphans",
     "docker:up": "docker compose up --build",
     "docker": "pnpm docker:down && pnpm docker:up",
-    "docker:d": "npm run docker -- -d",
-    "k3d:build": "dev-k3d-build",
-    "k3d:apply": "terraform -chdir=infra/local apply -auto-approve",
-    "k3d:plan": "terraform -chdir=infra/local plan",
-    "k3d:destroy": "terraform -chdir=infra/local destroy -auto-approve",
-    "readme:deps": "dev-gen-deps-graph"
+    "docker:d": "npm run docker -- -d"
   },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",
