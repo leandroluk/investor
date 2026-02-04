@@ -211,7 +211,7 @@ export class AuthController {
       })
     );
     if (otp) {
-      reply.status(HttpStatus.ACCEPTED).send();
+      reply.code(HttpStatus.ACCEPTED);
     } else {
       reply.status(HttpStatus.OK).send(result);
     }
@@ -244,7 +244,7 @@ export class AuthController {
       })
     );
     if (otp) {
-      reply.status(HttpStatus.ACCEPTED).send();
+      reply.code(HttpStatus.ACCEPTED);
     } else {
       reply.status(HttpStatus.OK).send(result);
     }

@@ -10,40 +10,40 @@ legend:
 
 - account (Identity & Access Management)
   - application/command
-    - ✅ [auth] register user using email and password (1)
+    - ✔️ [auth] register user using email and password (1)
       - Para acessar a aplicação o usuário precisa se registrar. Para isso ele precisa informar seu nome, e-mail e senha.
       - O sistema irá verificar se se o email é único na base. Caso contrário, ele irá retornar um erro de conflito. Também irá ver se a senha atende aos requisitos mínimos de complexidade.
       - Se não houverem problemas, o sistema irá criar o usuário com o status "PENDING" e enviar um e-mail de ativação.
       - A senha deve ser processada com hashing (bcrypt ou argon2) antes de persistir no banco.
-    - ✅ [auth] send activation email (2)
+    - ✔️ [auth] send activation email (2)
       - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
       - O sistema irá gerar um novo código de ativação e enviar para o email do usuário. 
       - O código OTP deve ter validade de 15 minutos.      
-    - ✅ [auth] activate user using email and code (3)
+    - ✔️ [auth] activate user using email and otp (3)
       - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
       - Ao acessar o link, o usuário será direcionado a uma tela de ativação onde ele irá capturar as informações do searchParam e iniciar a ativação.
       - Se o email + o código de ativação estiverem ok então o sistema irá alterar o status do usuário para "ACTIVE". E redirecionar para a tela de login.
-    - ✅ [auth] request password reset (4)
+    - ✔️ [auth] request password reset (4)
       - Usuário informa seu email para recuperar senha.
       - Sistema gera código OTP (15 minutos de validade) e armazena em cache.
       - Envia email com link contendo o código.
       - Não revela se o email existe ou não (segurança contra enumeração).
-    - ✅ [auth] reset password (5)
+    - ✔️ [auth] reset password (5)
       - Usuário informa: email, código OTP e nova senha.
       - Sistema valida código OTP e sua validade.
       - Valida complexidade da nova senha (mesmo padrão do registro).
       - Atualiza hash da senha no banco.
       - Invalida todas as sessões ativas do usuário (logout forçado).
-    - ✅ [auth] login using credential (6)
+    - ✔️ [auth] login using credential (6)
       - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
       - O sistema irá verificar as credenciais e se o 2FA estiver ativo, emite um desafio de segurança em vez do token final.
       - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
       - Se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
       - Após a autenticação, o sistema irá emitir um token de acesso e um token de refresh.
-    - ✅ [auth] authorize 2fa code (7)
+    - ✔️ [auth] authorize 2fa code (7)
       - O usuário irá fornecer o código de 2FA (OTP além do challengeId).
       - O sistema irá validar o código e caso seja válido, emitir o token de acesso final.
-    - ✅ [auth] send 2fa code (8)
+    - ✔️ [auth] send 2fa code (8)
       - O usuário solicita o reenvio do código de 2FA fornecendo o challengeId.
       - O sistema irá gerar um novo código de 2FA e enviar para o email do usuário.
     - ⛔ 🔒 [auth] link wallet address (web3 signature) (9)
@@ -81,7 +81,7 @@ legend:
       - Se algum rejeitado, permite re-envio.
 
   - application/query
-    - ✅ [auth] check if email is available (18)
+    - ✔️ [auth] check if email is available (18)
       - Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
     - ✅ [sso] get sso redirect url (19)
       - Para fazer a autenticação via SSO deve ser passado o callback_url e o provider. O provider pode ser "google", "microsoft", etc. O callback_url é a url para onde o usuário será redirecionado após a autenticação.
