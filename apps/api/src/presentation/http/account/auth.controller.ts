@@ -23,10 +23,10 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, Req, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, Req} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {FastifyReply, FastifyRequest} from 'fastify';
+import {FastifyRequest} from 'fastify';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
 import {
   ActivateUserBodyDTO,
@@ -195,9 +195,6 @@ export class AuthController {
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
-  @ApiAcceptedResponse({
-    description: 'Requires 2FA verification. OTP sent to email.',
-  })
   @ApiOkResponse({
     description: 'Returns the final authorization token.',
   })
@@ -205,10 +202,9 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingCredentialBodyDTO,
     @Ip() ip: string,
-    @Req() request: FastifyRequest,
-    @Res({passthrough: true}) reply: FastifyReply
+    @Req() request: FastifyRequest
   ): Promise<void> {
-    const {otp, result} = await this.commandBus.execute(
+    const result = await this.commandBus.execute(
       new LoginUsingCredentialCommand({
         ...envelope,
         ...body,
@@ -216,11 +212,7 @@ export class AuthController {
         userAgent: request.headers['user-agent']!,
       })
     );
-    if (otp) {
-      reply.code(HttpStatus.ACCEPTED);
-    } else {
-      reply.status(HttpStatus.OK).send(result);
-    }
+    return result;
   }
   // #endregion
 
@@ -228,9 +220,6 @@ export class AuthController {
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
-  @ApiAcceptedResponse({
-    description: 'Requires 2FA verification. OTP sent to email.',
-  })
   @ApiOkResponse({
     description: 'Returns the final authorization token.',
   })
@@ -238,10 +227,9 @@ export class AuthController {
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingTokenBodyDTO,
     @Ip() ip: string,
-    @Req() request: FastifyRequest,
-    @Res({passthrough: true}) reply: FastifyReply
+    @Req() request: FastifyRequest
   ): Promise<void> {
-    const {otp, result} = await this.commandBus.execute(
+    const result = await this.commandBus.execute(
       new LoginUsingTokenCommand({
         ...envelope,
         ...body,
@@ -249,11 +237,7 @@ export class AuthController {
         userAgent: request.headers['user-agent']!,
       })
     );
-    if (otp) {
-      reply.code(HttpStatus.ACCEPTED);
-    } else {
-      reply.status(HttpStatus.OK).send(result);
-    }
+    return result;
   }
   // #endregion
 

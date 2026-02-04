@@ -4,7 +4,7 @@ import {Controller, Get, HttpStatus} from '@nestjs/common';
 import {QueryBus} from '@nestjs/cqrs';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
-import {HealthResultDTO} from './dto/health.dto';
+import {HealthResultDTO} from './dto';
 
 @ApiTags('system')
 @Controller('system')
