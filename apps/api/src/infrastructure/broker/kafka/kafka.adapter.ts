@@ -15,6 +15,8 @@ export class BrokerKafkaAdapter implements BrokerPort {
     /SyncGroup\(/,
     /GroupCoordinator\(/,
     /Connection closed/,
+    /Restarting the consumer/,
+    /Consumer rebalanced/,
   ];
   private readonly kafka: Kafka;
   private readonly producer: Producer;
