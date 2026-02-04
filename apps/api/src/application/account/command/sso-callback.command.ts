@@ -49,7 +49,8 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
 
   private decryptState(encodedState: string): OidcPort.State {
     try {
-      return this.oidcPort.decodeState(encodedState);
+      const result = this.oidcPort.decodeState(encodedState);
+      return result;
     } catch {
       throw new SsoInvalidStateError();
     }

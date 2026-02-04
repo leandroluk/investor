@@ -18,7 +18,8 @@ export class SystemController {
   async getHealth(
     @GetEnvelope() envelope: GetEnvelope //
   ): Promise<HealthResultDTO> {
-    return this.queryBus.execute(new HealthQuery(envelope));
+    const result = await this.queryBus.execute(new HealthQuery(envelope));
+    return result;
   }
   // #endregion
 }
