@@ -17,14 +17,14 @@ ${REGEX_EMAIL_OTP} =    id="otp"[^>]*>\\s*([a-zA-Z0-9]{6})\\s*</span>
 Connect To Mailbox
     [Documentation]    Centralizes the mailbox opening
     Open Mailbox
-    ...    host=${API_MAILER_IMAP_HOST}
-    ...    port=${API_MAILER_IMAP_PORT}
-    ...    user=${API_MAILER_IMAP_USERNAME}
-    ...    password=${API_MAILER_IMAP_PASSWORD}
+    ...    host=${ROBOT_MAILER_IMAP_HOST}
+    ...    port=${ROBOT_MAILER_IMAP_PORT}
+    ...    user=${ROBOT_MAILER_IMAP_USERNAME}
+    ...    password=${ROBOT_MAILER_IMAP_PASSWORD}
 
 Connect To Postgres
     [Documentation]    Centralizes the database connection by parsing the URL
-    VAR    ${p} =    ${{__import__('urllib.parse').parse.urlparse($API_DATABASE_POSTGRES_URL)}}
+    VAR    ${p} =    ${{__import__('urllib.parse').parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)}}
     Connect To Database
     ...    db_module=psycopg2
     ...    db_name=${{$p.path[1:]}}
@@ -71,7 +71,7 @@ Open Mailbox And Wait For Email
     [Arguments]    ${recipient_email}
     Connect To Mailbox
     ${emails} =    Wait For Email
-    ...    sender=${API_MAILER_SMTP_FROM}
+    ...    sender=${ROBOT_MAILER_SMTP_FROM}
     ...    recipient=${recipient_email}
     ...    timeout=10
     RETURN    ${emails}

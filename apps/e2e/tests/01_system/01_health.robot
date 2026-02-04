@@ -22,7 +22,7 @@ Verify API System Health Status
 *** Keywords ***
 Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Delete All Emails From Mailbox
 
 Teardown Test Suite
@@ -31,7 +31,7 @@ Teardown Test Suite
 
 Do Health Request
     [Documentation]    Performs the health check request and returns the JSON body
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     ${response}=    GET On Session    api_session    ${HEALTH_PATH}    expected_status=200
     RETURN    ${response.json()}
 

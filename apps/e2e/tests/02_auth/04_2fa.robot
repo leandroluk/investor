@@ -27,7 +27,7 @@ Complete 2FA Authentication Flow
 *** Keywords ***
 Setup Test Suite
     [Documentation]    Initializes API session and prepares the environment
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Connect To Postgres
     Delete All Emails From Mailbox
 

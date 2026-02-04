@@ -25,7 +25,7 @@ Complete Token Refresh Flow
 *** Keywords ***
 Setup Refresh Suite
     [Documentation]    Initializes API session and prepares the environment
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Delete All Emails From Mailbox
 
 Teardown Refresh Suite

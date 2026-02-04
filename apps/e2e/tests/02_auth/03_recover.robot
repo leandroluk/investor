@@ -25,7 +25,7 @@ Complete Recovery Flow
 *** Keywords ***
 Setup Recovery Suite
     [Documentation]    Initializes API session and cleans the mailbox
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Delete All Emails From Mailbox
 
 Teardown Recovery Suite

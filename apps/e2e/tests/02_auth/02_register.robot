@@ -21,7 +21,7 @@ Complete Registration Flow
 *** Keywords ***
 Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Delete All Emails From Mailbox
 
 Teardown Test Suite

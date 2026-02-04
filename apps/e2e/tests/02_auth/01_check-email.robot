@@ -28,7 +28,7 @@ Should Return When Email Not In Use
 *** Keywords ***
 Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
-    Create Session    api_session    ${API_URL}    verify=True
+    Create Session    api_session    ${ROBOT_URL}    verify=True
     Connect To Postgres
     Execute Postgres    TRUNCATE TABLE "user" CASCADE;
     Delete All Emails From Mailbox
