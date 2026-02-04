@@ -1,25 +1,21 @@
 import {Throws} from '#/application/_shared/decorator';
+import {DatabasePort} from '#/domain/_shared/port';
 import {type DomainUOW} from '#/domain/_shared/uow';
-import {DatabasePostgresAdapter} from './postgres.adapter';
 import {DatabasePostgresError} from './postgres.error';
 
+type Session<TDomain extends DomainUOW<any>> = Parameters<Parameters<TDomain['transaction']>[0]>[0];
+
 @Throws(DatabasePostgresError)
-export abstract class DatabasePostgresUOW<TSession extends object> implements DomainUOW<TSession> {
+export abstract class DatabasePostgresUOW<TDomain extends DomainUOW<any>> implements DomainUOW<Session<TDomain>> {
   constructor(
-    private readonly database: DatabasePostgresAdapter,
-    private readonly session: TSession
+    private readonly database: DatabasePort,
+    private readonly createSession: (tx: DatabasePort.Transaction) => Session<TDomain>
   ) {}
 
-  async transaction<TResult = any>(handler: (session: TSession) => Promise<TResult>): Promise<TResult> {
-    const session = await this.database.pool.connect();
-    try {
-      await session.query('BEGIN');
-      const result = await handler(this.session);
-      await session.query('COMMIT');
-      return result;
-    } catch (error) {
-      await session.query('ROLLBACK');
-      throw error;
-    }
+  async transaction<TResult = any>(handler: (session: Session<TDomain>) => Promise<TResult>): Promise<TResult> {
+    return this.database.transaction(async tx => {
+      const session = this.createSession(tx);
+      return handler(session);
+    });
   }
 }

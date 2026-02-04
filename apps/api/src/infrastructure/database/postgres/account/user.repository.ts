@@ -1,8 +1,9 @@
 import {Throws} from '#/application/_shared/decorator';
+import {DatabasePort} from '#/domain/_shared/port';
 import {UserEntity} from '#/domain/account/entity';
 import {UserRepository} from '#/domain/account/repository';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
-import {DatabasePostgresAdapter} from '../postgres.adapter';
+import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';
 
 const existsByEmail = `
@@ -95,7 +96,7 @@ const update = `
 @Throws(DatabasePostgresError)
 @InjectableExisting(UserRepository)
 export class DatabasePostgresUserRepository implements UserRepository {
-  constructor(private readonly database: DatabasePostgresAdapter) {}
+  constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
   async existsByEmail(email: string): Promise<boolean> {
     const [{count}] = await this.database.query(existsByEmail, [email]);

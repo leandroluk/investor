@@ -25,7 +25,8 @@ export class DatabasePostgresAdapter implements DatabasePort {
   }
 
   async connect(): Promise<void> {
-    await this.pool.connect();
+    const connection = await this.pool.connect();
+    connection.release();
   }
 
   async close(): Promise<void> {
@@ -46,5 +47,39 @@ export class DatabasePostgresAdapter implements DatabasePort {
       rowsAffected: res.rowCount || 0,
       lastInsertId: res.rows[0]?.id || null,
     };
+  }
+
+  async transaction<TResult>(handler: (tx: DatabasePort.Transaction) => Promise<TResult>): Promise<TResult> {
+    const client = await this.pool.connect();
+
+    const tx: DatabasePort.Transaction = {
+      query: async <TType = any>(sql: string, params?: any[]) => {
+        const res = await client.query(sql, params);
+        return res.rows as TType[];
+      },
+      exec: async (sql: string, params?: any[]) => {
+        const res = await client.query(sql, params);
+        return {
+          rowsAffected: res.rowCount || 0,
+          lastInsertId: res.rows[0]?.id || null,
+        };
+      },
+    };
+
+    try {
+      await client.query('BEGIN');
+      const result = await handler(tx);
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {
+        // ignore rollback error
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 }

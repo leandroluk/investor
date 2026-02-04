@@ -1,9 +1,7 @@
-import {StoragePort} from '#/domain/_shared/port';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {StorageFakeAdapter} from './fake.adapter';
 
-@EnhancedModule({
-  providers: [StorageFakeAdapter],
-  exports: [StoragePort],
-})
+const providers = [StorageFakeAdapter];
+
+@EnhancedModule({providers, exports: providers})
 export class StorageFakeModule {}

@@ -19,10 +19,6 @@ export class DatabaseFakeAdapter extends DatabasePort {
     return [];
   }
 
-  async queryOne<TType = any>(): Promise<TType | null> {
-    return null;
-  }
-
   async exec(): Promise<DatabasePort.Result> {
     return {rowsAffected: 0};
   }

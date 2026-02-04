@@ -1,8 +1,9 @@
 import {Throws} from '#/application/_shared/decorator';
+import {DatabasePort} from '#/domain/_shared/port';
 import {DeviceEntity} from '#/domain/account/entity';
 import {DeviceRepository} from '#/domain/account/repository';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
-import {DatabasePostgresAdapter} from '../postgres.adapter';
+import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';
 
 const findByFingerprint = `
@@ -76,7 +77,7 @@ const listActiveByUserId = `
 @Throws(DatabasePostgresError)
 @InjectableExisting(DeviceRepository)
 export class DatabasePostgresDeviceRepository implements DeviceRepository {
-  constructor(private readonly database: DatabasePostgresAdapter) {}
+  constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
   async findByFingerprint(userId: string, fingerprint: string): Promise<DeviceEntity | null> {
     const [row] = await this.database.query<any>(findByFingerprint, [userId, fingerprint]);

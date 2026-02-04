@@ -1,8 +1,9 @@
 import {Throws} from '#/application/_shared/decorator';
+import {DatabasePort} from '#/domain/_shared/port';
 import {LoginEntity} from '#/domain/account/entity';
 import {LoginRepository} from '#/domain/account/repository';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
-import {DatabasePostgresAdapter} from '../postgres.adapter';
+import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';
 
 const create = `
@@ -18,7 +19,7 @@ const create = `
 @Throws(DatabasePostgresError)
 @InjectableExisting(LoginRepository)
 export class DatabasePostgresLoginRepository implements LoginRepository {
-  constructor(private readonly database: DatabasePostgresAdapter) {}
+  constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
   async create(login: LoginEntity): Promise<void> {
     await this.database.exec(create, [

@@ -1,9 +1,7 @@
-import {BlockchainPort} from '#/domain/_shared/port';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {BlockchainFakeAdapter} from './fake.adapter';
 
-@EnhancedModule({
-  providers: [BlockchainFakeAdapter],
-  exports: [BlockchainPort],
-})
+const providers = [BlockchainFakeAdapter];
+
+@EnhancedModule({providers, exports: providers})
 export class BlockchainFakeModule {}

@@ -1,9 +1,7 @@
-import {BrokerPort} from '#/domain/_shared/port';
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
 import {BrokerFakeAdapter} from './fake.adapter';
 
-@EnhancedModule({
-  providers: [BrokerFakeAdapter],
-  exports: [BrokerPort],
-})
+const providers = [BrokerFakeAdapter];
+
+@EnhancedModule({providers, exports: providers})
 export class BrokerFakeModule {}
