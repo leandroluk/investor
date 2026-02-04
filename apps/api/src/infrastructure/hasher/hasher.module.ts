@@ -1,6 +1,5 @@
 import {DynamicModule, Module} from '@nestjs/common';
 import {makeDynamicEnvModule} from '../_shared/factory';
-import {HasherFakeModule} from './fake';
 import {HasherStdModule} from './std';
 
 @Module({})
@@ -9,7 +8,7 @@ export class HasherModule {
     return makeDynamicEnvModule(HasherModule, {
       envVar: 'API_HASHER_PROVIDER',
       envSelectedProvider: 'std',
-      envProviderMap: {std: HasherStdModule, fake: HasherFakeModule},
+      envProviderMap: {std: HasherStdModule},
       global: true,
     });
   }

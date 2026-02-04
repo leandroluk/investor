@@ -1,6 +1,5 @@
 import {DynamicModule, Module} from '@nestjs/common';
 import {makeDynamicEnvModule} from '../_shared/factory';
-import {CipherFakeModule} from './fake';
 import {CipherStdModule} from './std';
 
 @Module({})
@@ -9,7 +8,7 @@ export class CipherModule {
     return makeDynamicEnvModule(CipherModule, {
       envVar: 'API_CIPHER_PROVIDER',
       envSelectedProvider: 'std',
-      envProviderMap: {std: CipherStdModule, fake: CipherFakeModule},
+      envProviderMap: {std: CipherStdModule},
       global: true,
     });
   }

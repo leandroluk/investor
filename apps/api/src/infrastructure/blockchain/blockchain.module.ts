@@ -1,7 +1,6 @@
 import {DynamicModule, Module} from '@nestjs/common';
 import {makeDynamicEnvModule} from '../_shared/factory';
 import {BlockchainEthersModule} from './ethers';
-import {BlockchainFakeModule} from './fake';
 
 @Module({})
 export class BlockchainModule {
@@ -9,7 +8,7 @@ export class BlockchainModule {
     return makeDynamicEnvModule(BlockchainModule, {
       envVar: 'API_BLOCKCHAIN_PROVIDER',
       envSelectedProvider: 'ethers',
-      envProviderMap: {ethers: BlockchainEthersModule, fake: BlockchainFakeModule},
+      envProviderMap: {ethers: BlockchainEthersModule},
       global: true,
     });
   }

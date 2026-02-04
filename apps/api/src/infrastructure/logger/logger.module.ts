@@ -1,6 +1,5 @@
 import {DynamicModule, Module} from '@nestjs/common';
 import {makeDynamicEnvModule} from '../_shared/factory';
-import {LoggerFakeModule} from './fake';
 import {LoggerWinstonModule} from './winston';
 
 @Module({})
@@ -9,7 +8,7 @@ export class LoggerModule {
     return makeDynamicEnvModule(LoggerModule, {
       envVar: 'API_LOGGER_PROVIDER',
       envSelectedProvider: 'winston',
-      envProviderMap: {winston: LoggerWinstonModule, fake: LoggerFakeModule},
+      envProviderMap: {winston: LoggerWinstonModule},
       global: true,
     });
   }

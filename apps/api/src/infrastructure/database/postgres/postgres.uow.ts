@@ -13,9 +13,10 @@ export abstract class DatabasePostgresUOW<TDomain extends DomainUOW<any>> implem
   ) {}
 
   async transaction<TResult = any>(handler: (session: Session<TDomain>) => Promise<TResult>): Promise<TResult> {
-    return this.database.transaction(async tx => {
+    const result = await this.database.transaction(async tx => {
       const session = this.createSession(tx);
       return handler(session);
     });
+    return result;
   }
 }
