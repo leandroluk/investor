@@ -12,7 +12,7 @@ import z from 'zod';
 import {AccountConfig} from '../account.config';
 
 const commandSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 type CommandSchema = z.infer<typeof commandSchema>;
