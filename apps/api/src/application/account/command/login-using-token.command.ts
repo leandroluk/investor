@@ -36,15 +36,30 @@ export class LoginUsingTokenCommand extends Command<CommandSchema> {
   }
 }
 
-export class LoginUsingTokenCommandResult {
-  @ApiProperty()
-  otp!: boolean;
+export class LoginUsingTokenCommandResult implements TokenPort.Authorization {
+  @ApiProperty({
+    description: 'Token type',
+    example: 'Bearer',
+  })
+  tokenType!: string;
 
   @ApiProperty({
-    description: 'Authorization token if OTP is false, otherwise null',
-    nullable: true,
+    description: 'Access token',
+    example: 'eyJhbGci...',
   })
-  result!: TokenPort.Authorization | null;
+  accessToken!: string;
+
+  @ApiProperty({
+    description: 'Expires in',
+    example: 3600,
+  })
+  expiresIn!: number;
+
+  @ApiProperty({
+    description: 'Refresh token',
+    example: 'eyJhbGci...',
+  })
+  refreshToken?: string;
 }
 
 @CommandHandler(LoginUsingTokenCommand)
@@ -136,15 +151,15 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     try {
       await this.createLogin(command.ip, user, true);
 
+      const result: Required<TokenPort.Authorization> = await this.createToken(command.ip, command.userAgent, user);
+
       if (user.twoFactorEnabled) {
         await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
-
-        return {otp: true, result: null};
       }
 
-      const token = await this.createToken(command.ip, command.userAgent, user);
       await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, provider, user.id);
-      return {otp: false, result: token};
+
+      return result;
     } catch (error) {
       void this.createLogin(command.ip, user, false);
       throw error;

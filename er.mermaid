@@ -18,6 +18,16 @@
         boolean   success    ""
         timestamp created_at ""
     }
+    challenge {
+        uuidv7    id         PK
+        uuidv7    user_id    FK
+        varchar   type       ""
+        varchar   code       ""
+        varchar   status     ""
+        timestamp expires_at ""
+        timestamp created_at ""
+        timestamp updated_at ""
+    }
     user {
         uuidv7          id                    PK
         varchar         email                 UK
@@ -35,8 +45,6 @@
         timestamp       created_at            ""
         timestamp       updated_at            ""
     }
-
-    %% MODULE: account (documents)
     document {
         uuidv7     id            PK
         uuidv7     user_id       FK
@@ -135,6 +143,7 @@
     }
 
     user       ||--o{ device     : "has"
+    user       ||--o{ challenge  : "has"
     user       ||--o{ login      : "logs"
     user       ||--o{ notice     : "receives"
     user       ||--o{ document   : "uploads"

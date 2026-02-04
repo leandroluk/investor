@@ -40,13 +40,14 @@
 - Invalida todas as sessões ativas do usuário (logout forçado).
 ##### 01.06.⚡✔️🌎`[auth]` login using credential
 - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
-- O sistema irá verificar as credenciais e se o 2FA estiver ativo, emite um desafio de segurança em vez do token final.
+- O sistema irá verificar as credenciais. Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
+- Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
 - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
-- Se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
-- Após a autenticação, o sistema irá emitir um token de acesso e um token de refresh.
 ##### 01.07.⚡✔️🌎`[auth]` authorize 2fa code
-- O usuário irá fornecer o código de 2FA (OTP além do challengeId).
-- O sistema irá validar o código e caso seja válido, emitir o token de acesso final.
+- O usuário irá fornecer o código de 2FA e o ID do desafio (Challenge).
+- O sistema irá buscar o desafio pelo ID e validar o código.
+- Se válido, marca o desafio como COMPLETED e emite o token de acesso final.
+- Se inválido, incrementa contadores de erro (se houver) e retorna erro.
 ##### 01.08.⚡✔️🌎`[auth]` send 2fa code
 - O usuário solicita o reenvio do código de 2FA fornecendo o challengeId.
 - O sistema irá gerar um novo código de 2FA e enviar para o email do usuário.
@@ -56,11 +57,10 @@
 - Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
 - A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
 ##### 01.11.⚡✅🌎`[auth]` login using token
-- Após a autenticação via token, o sistema irá validar o token e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
-- O frontend então irá pegar esse token e enviar para o backend para prosseguir com a autenticação. Assim como no login using email and password, se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
-- Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
-- Se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
-- Após a autenticação, o sistema irá emitir um token de acesso e um token de refresh.
+- Após a autenticação via token (ex: link mágico), o sistema valida o token.
+- Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
+- Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
+- Registra a tentativa (sucesso/falha).
 ##### 01.12.⚡✅🌎`[auth]` refresh token
 - O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
 - O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
@@ -103,18 +103,17 @@
 ##### 01.24.🔍⛔🔒`[kyc]` list user documents
 - Lista documentos enviados pelo usuário com status.
 - Retorna presigned URLs do S3 com validade de 5 minutos.
-##### 01.25.🔄⛔🌎`[auth]` send email after register
+##### 01.25.🔄✅🌎`[auth]` dispatch send email after register
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
 - Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.
-##### 01.26.🔄⛔🌎`[auth]` send password reset email
+##### 01.26.🔄✅🌎`[auth]` dispatch send password reset email
 - Após evento de solicitação de reset de senha.
 - Gera código OTP (15 minutos) e envia email com template de recuperação.
 - Email contém link com código como searchParam.      
-##### 01.27.🔄⛔🌎`[onboarding]` coordination between registration, welcome email and initial notice
-- Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
-- Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
-- O código OTP deve ter validade de 15 minutos.
+##### 01.27.🔄⛔🌎`[onboarding]` dispatch coordination between registration, welcome email and initial notice
+- Coordena o fluxo de registro, garantindo a criação do usuário, envio do email de boas-vindas e registro da notificação inicial.
+- Garante a consistência eventual entre os serviços de identidade, notificação e perfil.
 ### 02. Catalog (Market Data & Public Info)
 ##### 02.01. 🔍⛔🌎`[assets]` list supported assets
 - Lista apenas ativos que estão habilitados para negociação no sistema.
@@ -137,7 +136,7 @@
 - Lista todos os rendimentos do usuário.
 ##### 03.07. 🔍⛔🔒`[audit]` get global transaction timeline
 - Visão unificada e cronológica de todos os eventos financeiros (depósitos, saques e lucros).
-##### 03.08. 🔄⛔🌎`[investment]` coordinates strategy snapshot, wallet signature and balance update
+##### 03.08. 🔄⛔🌎`[investment]` dispatch coordinates strategy snapshot, wallet signature and balance update
 - Coordena a captura do snapshot da estratégia, a assinatura da carteira e a atualização do saldo.
 ### 04. Treasury (Financial Operations)
 ##### 04.01. ⚡⛔🔒`[withdrawal]` create withdrawal request
@@ -148,7 +147,7 @@
 - Exige autenticação de dois fatores para autorizar a saída de fundos.
 ##### 04.04. 🔍⛔🔒`[withdrawal]` list withdrawals
 - Lista todos os saques do usuário.
-##### 04.05. 🔄⛔🌎`[withdrawal]` coordinates 2fa verification, balance locking and blockchain execution
+##### 04.05. 🔄⛔🌎`[withdrawal]` dispatch coordinates 2fa verification, balance locking and blockchain execution
 - Coordena a verificação de 2FA, o bloqueio de saldo e a execução na blockchain.
 ### 05. Signal (Alerts & Communication)
 ##### 05.01. ⚡⛔🔒`[notice]` send notice (push/in-app)
