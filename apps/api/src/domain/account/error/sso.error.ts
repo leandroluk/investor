@@ -1,8 +1,8 @@
 import {DomainError} from '#/domain/_shared/error';
 
 export class SsoInvalidProviderError extends DomainError {
-  constructor(provider: string) {
-    super(`Invalid provider: ${provider}. Must be one of: google, microsoft.`, 'sso.invalid_provider');
+  constructor(provider: string, message = `Invalid provider: ${provider}. Must be one of: google, microsoft.`) {
+    super(message, 'sso.invalid_provider');
   }
 }
 

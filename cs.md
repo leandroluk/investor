@@ -61,53 +61,57 @@
 - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
 - Se o 2FA estiver ativo, o sistema irá emitir um desafio de segurança em vez do token final.
 - Após a autenticação, o sistema irá emitir um token de acesso e um token de refresh.
-##### 01.12.⚡⛔🔒`[profile]` update user profile
+##### 01.12.⚡✅🌎`[auth]` refresh token
+- O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
+- O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
+- O refresh de token não tem nada a ver com permissões de device ou algo do tipo
+##### 01.13.⚡⛔🔒`[profile]` update user profile
 - Permite editar o nome; impede a alteração direta de email e endereço de carteira por segurança.
-##### 01.13.⚡⛔🔒`[device]` register device (fingerprint)
+##### 01.14.⚡✅🔒`[device]` register device (fingerprint)
 - O sistema identifica unicamente o dispositivo do usuário através de um fingerprint gerado pela compilação de múltiplos fatores de hardware e software (web ou mobile).
 - Esse identificador é utilizado para monitorar sessões ativas, prevenir fraudes e permitir o logout remoto.
 - Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
-##### 01.14.⚡⛔🔒`[device]` revoke device (remote logout)
+##### 01.15.⚡✅🔒`[device]` revoke device (remote logout)
 - Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
-##### 01.15.⚡⛔🔒`[wallet]` generate wallet
+##### 01.16.⚡⛔🔒`[wallet]` generate wallet
 - Gera uma carteira HD usando BIP39 (12 palavras).
 - Deriva a chave privada e endereço Ethereum (path m/44'/60'/0'/0/0).
 - Criptografa o mnemonic com AES-256-GCM usando chave derivada da senha do usuário.
 - Armazena apenas o endereço público e seed criptografada no banco.
-##### 01.16.⚡⛔🔒`[kyc]` upload document
+##### 01.17.⚡⛔🔒`[kyc]` upload document
 - Permite upload de documentos para verificação de identidade.
 - Tipos aceitos: RG frente/verso, selfie, comprovante de endereço.
 - Armazena no S3 e cria registro com status PENDING.
 - Atualiza user.kyc_status para PENDING se era NONE.
-##### 01.17.⚡⛔🔒`[kyc]` approve/reject document (admin)
+##### 01.18.⚡⛔🔒`[kyc]` approve/reject document (admin)
 - Administrador aprova ou rejeita documento enviado.
 - Se todos documentos aprovados, muda user.kyc_status para APPROVED.
 - Se algum rejeitado, permite re-envio.
-##### 01.18.🔍✔️🌎`[auth]` check if email is available
+##### 01.19.🔍✔️🌎`[auth]` check if email is available
 - Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
-##### 01.19.🔍✅🌎`[sso]` get sso redirect url
+##### 01.20.🔍✅🌎`[sso]` get sso redirect url
 - Para fazer a autenticação via SSO deve ser passado o callback_url e o provider. O provider pode ser "google", "microsoft", etc. O callback_url é a url para onde o usuário será redirecionado após a autenticação.
 - O sistema então vai gerar a url de redirecionamento para o provider de autenticação colocando o callback_url no state de forma encriptada, executando o redirecionamento.
-##### 01.20.🔍⛔🔒`[profile]` get user profile
+##### 01.21.🔍⛔🔒`[profile]` get user profile
 - Retorna dados básicos, status de segurança e carteira vinculada.
-##### 01.21.🔍⛔🔒`[device]` list active devices
+##### 01.22.🔍✅🔒`[device]` list active devices
 - Lista todos os dispositivos onde a sessão ainda é válida.
-##### 01.22.🔍⛔🔒`[wallet]` reveal seed phrase
+##### 01.23.🔍⛔🔒`[wallet]` reveal seed phrase
 - Retorna as 12 palavras do mnemonic BIP39.
 - Requer re-autenticação obrigatória (senha + 2FA se ativo).
 - Registra evento na auditoria (ledger) para compliance.
-##### 01.23.🔍⛔🔒`[kyc]` list user documents
+##### 01.24.🔍⛔🔒`[kyc]` list user documents
 - Lista documentos enviados pelo usuário com status.
 - Retorna presigned URLs do S3 com validade de 5 minutos.
-##### 01.24.🔄⛔🌎`[auth]` send email after register
+##### 01.25.🔄⛔🌎`[auth]` send email after register
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
 - Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.
-##### 01.25.🔄⛔🌎`[auth]` send password reset email
+##### 01.26.🔄⛔🌎`[auth]` send password reset email
 - Após evento de solicitação de reset de senha.
 - Gera código OTP (15 minutos) e envia email com template de recuperação.
 - Email contém link com código como searchParam.      
-##### 01.26.🔄⛔🌎`[onboarding]` coordination between registration, welcome email and initial notice
+##### 01.27.🔄⛔🌎`[onboarding]` coordination between registration, welcome email and initial notice
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
 - Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.

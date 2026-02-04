@@ -7,6 +7,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
+- 🌎 Public endpoint.
 - Provider redirects user back to this endpoint with `code` and `state`.
 - System decrypts `state` to retrieve the original `callback_url`.
 - System exchanges `code` for tokens (id_token, access_token) via OidcPort.

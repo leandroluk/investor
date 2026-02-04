@@ -4,7 +4,8 @@ import {createHandlerDecorator} from '../factory';
 export function Throws(errorConstructor: new (...args: any[]) => Error): ReturnType<typeof applyDecorators> {
   return createHandlerDecorator(async (originalMethod, _methodName, ...args) => {
     try {
-      return await originalMethod(...args);
+      const result = await originalMethod(...args);
+      return result;
     } catch (error: any) {
       const namedError = new errorConstructor(error.message);
       (namedError as any).cause = error;

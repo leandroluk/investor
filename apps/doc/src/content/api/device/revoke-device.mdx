@@ -1,0 +1,46 @@
+---
+title: Revoke Device
+---
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- 🔒 Requires authentication.
+- Inactivates a specific device, preventing new notifications and invalidating its current session.
+- Users can only revoke devices that belong to their account.
+- Once revoked, the device state is set to `is_active=false`.
+
+## Request
+
+- **Method**: `DELETE`
+- **Path**: `/device/:id`
+- **Headers**:
+  - `Authorization`: Bearer `<access_token>`
+- **Params**:
+  - `id`: UUIDv7 (Device ID)
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["Client"] -- "DELETE /device/:id" --> B["API"]
+    B --> C{"Validate Token"}
+    C -- "Invalid" --> D["401 Unauthorized"]
+    C -- "Valid" --> E["Find device by ID + User ID"]
+    E --> F{"Found & Belongs to User?"}
+    F -- "No" --> G["404 Not Found"]
+    F -- "Yes" --> H["Update Device (is_active=false)"]
+    H --> I["204 No Content"]
+```
+</MermaidZoom>
+
+## Success Case
+
+- **Status**: `204 No Content`
+- **Body**: (Empty)
+
+## Error Case
+
+- **Status**: `401 Unauthorized` (Invalid token)
+- **Status**: `404 Not Found` (Device not found or does not belong to user)

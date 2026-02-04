@@ -3,10 +3,11 @@ title: Activate User
 description: Activates a pending user account using email and OTP code.
 ---
 
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
+- 🌎 Public endpoint.
 - The user must exist in the system.
 - The user must have status `PENDING` (not already active).
 - The OTP code must be valid and not expired (15-minute TTL).

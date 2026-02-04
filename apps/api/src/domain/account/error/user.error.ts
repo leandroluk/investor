@@ -1,8 +1,8 @@
 import {DomainError} from '#/domain/_shared/error';
 
 export class UserEmailInUseError extends DomainError {
-  constructor(email: string) {
-    super(`The provided email "${email}" is already in use.`, 'user.email_in_use');
+  constructor(email: string, message = `The provided email "${email}" is already in use.`) {
+    super(message, 'user.email_in_use');
   }
 }
 

@@ -99,7 +99,8 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     user: UserEntity
   ): Promise<Required<TokenPort.Authorization>> {
     const sessionKey = await this.sessionStore.create(user.id, ip, userAgent);
-    return await this.tokenPort.create<true>(sessionKey, user, true);
+    const result = await this.tokenPort.create<true>(sessionKey, user, true);
+    return result;
   }
 
   private async publishUserRequestChallengeEvent(

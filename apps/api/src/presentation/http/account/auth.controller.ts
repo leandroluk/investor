@@ -4,6 +4,7 @@ import {
   Authorize2FACommandResult,
   LoginUsingCredentialCommand,
   LoginUsingTokenCommand,
+  RefreshTokenCommand,
   RegisterUserCommand,
   ResetPasswordCommand,
   Send2FAEmailCommand,
@@ -11,6 +12,7 @@ import {
   SendRecoverCommand,
 } from '#/application/account/command';
 import {CheckEmailQuery} from '#/application/account/query';
+import {TokenPort} from '#/domain/_shared/port';
 import {
   UserEmailInUseError,
   UserInvalidCredentialsError,
@@ -30,6 +32,7 @@ import {
   CheckEmailDTOParams as CheckEmailParamsDTO,
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
+  RefreshTokenBodyDTO,
   RegisterUserBodyDTO,
   ResetPasswordBodyDTO,
   Send2FABodyDTO,
@@ -248,6 +251,31 @@ export class AuthController {
     } else {
       reply.status(HttpStatus.OK).send(result);
     }
+  }
+  // #endregion
+
+  // #region postRefreshToken
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @ApiOkResponse({
+    description: 'Returns the new authorization tokens.',
+  })
+  async postRefreshToken(
+    @GetEnvelope() envelope: GetEnvelope, //
+    @Body() body: RefreshTokenBodyDTO,
+    @Ip() ip: string,
+    @Req() request: FastifyRequest
+  ): Promise<TokenPort.Authorization> {
+    const result = await this.commandBus.execute(
+      new RefreshTokenCommand({
+        ...envelope,
+        ...body,
+        ip,
+        userAgent: request.headers['user-agent']!,
+      })
+    );
+    return result;
   }
   // #endregion
 }

@@ -45,10 +45,11 @@ export class Send2FACommandHandler implements ICommandHandler<Send2FAEmailComman
   }
 
   private async renderTemplate(otp: string): Promise<{html: string; text: string}> {
-    return await Promise.all([
+    const [html, text] = await Promise.all([
       this.templatePort.render('2fa.html', {otp}),
       this.templatePort.render('2fa.text', {otp}),
-    ]).then(([html, text]) => ({html, text}));
+    ]);
+    return {html, text};
   }
 
   async execute(command: Send2FAEmailCommand): Promise<void> {

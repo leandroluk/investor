@@ -78,7 +78,8 @@ export class CacheRedisAdapter implements CachePort {
   }
 
   async exists(...keys: string[]): Promise<number> {
-    return await this.redis.exists(...keys);
+    const result = await this.redis.exists(...keys);
+    return result;
   }
 
   async expire(key: string, ttl: number): Promise<void> {
@@ -86,11 +87,13 @@ export class CacheRedisAdapter implements CachePort {
   }
 
   async increment(key: string): Promise<number> {
-    return await this.redis.incr(key);
+    const result = await this.redis.incr(key);
+    return result;
   }
 
   async decrement(key: string): Promise<number> {
-    return await this.redis.decr(key);
+    const result = await this.redis.decr(key);
+    return result;
   }
 
   async acquire(key: string, ttl: number): Promise<void> {

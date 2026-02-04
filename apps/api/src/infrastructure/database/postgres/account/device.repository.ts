@@ -43,6 +43,36 @@ const update = `
   WHERE "id" = $5
 `;
 
+const findById = `
+  SELECT
+    "id",
+    "user_id",
+    "platform",
+    "fingerprint",
+    "is_active",
+    "brand",
+    "model",
+    "created_at",
+    "updated_at"
+  FROM "device"
+  WHERE "id" = $1
+`;
+
+const listActiveByUserId = `
+  SELECT
+    "id",
+    "user_id",
+    "platform",
+    "fingerprint",
+    "is_active",
+    "brand",
+    "model",
+    "created_at",
+    "updated_at"
+  FROM "device"
+  WHERE "user_id" = $1 AND "is_active" = true
+`;
+
 @Throws(DatabasePostgresError)
 @InjectableExisting(DeviceRepository)
 export class DatabasePostgresDeviceRepository implements DeviceRepository {
@@ -88,5 +118,38 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       device.updatedAt,
       device.id,
     ]);
+  }
+
+  async findById(id: string): Promise<DeviceEntity | null> {
+    const [row] = await this.database.query<any>(findById, [id]);
+    if (!row) {
+      return null;
+    }
+    return {
+      id: row.id,
+      userId: row.user_id,
+      platform: row.platform,
+      fingerprint: row.fingerprint,
+      isActive: row.is_active,
+      brand: row.brand,
+      model: row.model,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  async listActiveByUserId(userId: string): Promise<DeviceEntity[]> {
+    const rows = await this.database.query<any>(listActiveByUserId, [userId]);
+    return rows.map(row => ({
+      id: row.id,
+      userId: row.user_id,
+      platform: row.platform,
+      fingerprint: row.fingerprint,
+      isActive: row.is_active,
+      brand: row.brand,
+      model: row.model,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
   }
 }

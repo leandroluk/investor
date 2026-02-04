@@ -4,6 +4,7 @@ export * from './check-email.dto';
 export * from './get-sso-redirect.dto';
 export * from './login-using-credential.dto';
 export * from './login-using-token.dto';
+export * from './refresh-token.dto';
 export * from './register-device.dto';
 export * from './register-user.dto';
 export * from './request-password-reset.dto';

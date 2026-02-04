@@ -6,7 +6,8 @@ export function Trace(sufix?: string): ClassDecorator & MethodDecorator {
     const start = performance.now();
 
     try {
-      return await originalMethod(...args);
+      const result = await originalMethod(...args);
+      return result;
     } finally {
       const eventEmitter = (global as any).eventEmitter as EventEmitter2;
 

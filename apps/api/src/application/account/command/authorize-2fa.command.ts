@@ -66,7 +66,8 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
 
   private async verifyOtp(otp: string): Promise<UserEntity['email']> {
     try {
-      return await this.otpStore.verify(otp);
+      const result = await this.otpStore.verify(otp);
+      return result;
     } catch {
       throw new UserInvalidOtpError();
     }
@@ -86,18 +87,19 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
     user: UserEntity
   ): Promise<Required<TokenPort.Authorization>> {
     const sessionKey = await this.sessionStore.create(user.id, ip, userAgent);
-    return await this.tokenPort.create<true>(sessionKey, user, true);
+    const result = await this.tokenPort.create<true>(sessionKey, user, true);
+    return result;
   }
 
   async execute(command: Authorize2FACommand): Promise<Authorize2FACommandResult> {
     const email = await this.verifyOtp(command.otp);
     if (email !== command.email) {
-      // Possible if multiple users have same OTP? (Hash collision or global scan).
-      // If scan finds WRONG user, we reject.
       throw new UserInvalidOtpError();
     }
 
     const user = await this.getUserByEmail(email);
-    return await this.createToken(command.ip, command.userAgent, user);
+
+    const result = await this.createToken(command.ip, command.userAgent, user);
+    return result;
   }
 }

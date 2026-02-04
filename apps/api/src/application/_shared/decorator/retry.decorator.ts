@@ -5,7 +5,8 @@ export function Retry({attempts, delay = 1000}: {attempts: number; delay?: numbe
     let lastError: any;
     for (let i = 0; i < attempts; i++) {
       try {
-        return await originalMethod(...args);
+        const result = await originalMethod(...args);
+        return result;
       } catch (error) {
         lastError = error;
         if (i < attempts - 1) {

@@ -50,7 +50,8 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
       oldDevice.brand = command.brand;
       oldDevice.model = command.model;
       oldDevice.updatedAt = new Date();
-      return await this.deviceRepository.update(oldDevice);
+      const result = await this.deviceRepository.update(oldDevice);
+      return result;
     }
 
     const newDevice: DeviceEntity = {

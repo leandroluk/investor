@@ -32,7 +32,8 @@ export class BlockchainEthersAdapter implements BlockchainPort {
   @Trace()
   @Retry({attempts: 3, delay: 500})
   async getBalance(address: string): Promise<bigint> {
-    return await this.provider.getBalance(address);
+    const result = await this.provider.getBalance(address);
+    return result;
   }
 
   @Trace()
@@ -79,7 +80,8 @@ export class BlockchainEthersAdapter implements BlockchainPort {
   @Trace()
   @Retry({attempts: 3, delay: 500})
   async getBlockNumber(): Promise<number> {
-    return await this.provider.getBlockNumber();
+    const result = await this.provider.getBlockNumber();
+    return result;
   }
 
   watchEvent(address: string, eventName: string, callback: (event: any) => void): void {

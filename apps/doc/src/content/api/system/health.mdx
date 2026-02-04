@@ -6,6 +6,7 @@ description: Verifies the health of the system and its connections.
 import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
+- 🌎 Public endpoint.
 - The system checks all registered `ConnectableContract` implementations.
 - Returns `up` and uptime if all connections are healthy.
 - Throws `UnhealthyError` (503 Service Unavailable) if any critical connection fails.

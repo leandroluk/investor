@@ -57,7 +57,8 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
 
   private async exchangeCode(adapter: OidcPort.Adapter, code: string): Promise<OidcPort.Tokens> {
     try {
-      return await adapter.exchange(code);
+      const result = await adapter.exchange(code);
+      return result;
     } catch {
       throw new SsoInvalidOAuthCodeError();
     }
@@ -94,7 +95,8 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, S
 
   private async generateLoginToken(provider: 'google' | 'microsoft', userId: UserEntity['id']): Promise<string> {
     const payload = {provider, userId, exp: Date.now() + this.addOneMinute};
-    return await this.cipherPort.encrypt(JSON.stringify(payload));
+    const result = await this.cipherPort.encrypt(JSON.stringify(payload));
+    return result;
   }
 
   async execute(command: SsoCallbackCommand): Promise<SsoCallbackCommandResult> {

@@ -35,7 +35,8 @@ export class CacheRedisSessionStore implements SessionStore {
   async refresh(userId: string, sessionKey: string, ip: string, userAgent: string): Promise<void> {
     const {key, value} = await this.cacheRedisAdapter.get<Payload>(`user:${userId}:session:${sessionKey}`);
     if (value && value.ip === ip && value.userAgent === userAgent && new Date() < new Date(value.maxAge)) {
-      return await this.cacheRedisAdapter.set<Payload>(key, value, this.cacheRedisConfig.refreshTokenTTL);
+      const result = await this.cacheRedisAdapter.set<Payload>(key, value, this.cacheRedisConfig.refreshTokenTTL);
+      return result;
     }
     throw new CacheRedisError('Invalid session');
   }
