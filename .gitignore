@@ -71,3 +71,6 @@ infra/local/terraform.tfstate.backup
 # Python
 .venv
 __pycache__
+
+# Robot
+.robot
