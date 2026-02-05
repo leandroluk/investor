@@ -2,16 +2,19 @@
 title: Login using token
 description: Authenticate user with a temporary token (e.g. from SSO)
 ---
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
 - 🌎 Public endpoint.
 - User provides a temporary encrypted token (typically from SSO callback).
 - System validates and decrypts the token to extract user ID.
-- Checks 2FA status for the user.
-- If 2FA is enabled, returns challenge token.
-- If 2FA is disabled, returns access and refresh tokens.
+- System always creates access and refresh tokens.
+- **2FA Flow**:
+  - If 2FA is enabled, system emits `UserRequestChallengeEvent`.
+  - The client must subsequently handle the challenge verification using the `ChallengeGuard` on protected routes.
+- **Device Registration**:
+  - Device is registered with `unknown` platform/brand if not already present.
 - Logs the login attempt.
 
 ## Request
@@ -20,6 +23,8 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 - Path: `/auth/login/token`
 - Body:
   - `token`: Encrypted temporary token (required, string)
+  - `ip`: User's IP address (required, string)
+  - `fingerprint`: Device fingerprint (required, string)
 
 ## Diagram
 
@@ -29,30 +34,27 @@ flowchart TD
   A["Client"] -- "POST /auth/login/token" --> B["API"]
   B --> C{"Valid Token?"}
   C -- "No" --> D["Return 401 Unauthorized"]
-  C -- "Yes" --> E{"2FA Enabled?"}
-  E -- "Yes" --> F["Publish UserRequestChallengeEvent"]
-  F --> G["Return 202 Accepted"]
-  E -- "No" --> H["Log Success (Full)"]
-  H --> I["Return 200 OK (AccessToken, RefreshToken)"]
+  C -- "Yes" --> E["Upsert Device (Unknown)"]
+  E --> F["Create Tokens"]
+  F --> G{"2FA Enabled?"}
+  G -- "Yes" --> H["Publish UserRequestChallengeEvent"]
+  H --> I["Return 200 OK (Tokens)"]
+  G -- "No" --> I
 ```
 </MermaidZoom>
 
-## Success Case (2FA Disabled)
+## Success Case
 
 - Status: `200 OK`
 - Body:
 ```json
 {
+  "tokenType": "Bearer",
   "accessToken": "ey...",
   "refreshToken": "ey...",
   "expiresIn": 3600
 }
 ```
-
-## Success Case (2FA Enabled)
-
-- Status: `202 Accepted`
-- Body: _Empty_
 
 ## Error Case
 

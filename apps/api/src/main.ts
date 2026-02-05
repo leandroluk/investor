@@ -38,8 +38,17 @@ export async function bootstrap(): Promise<void> {
   app
     .getHttpAdapter()
     .getInstance()
-    .addHook('onRequest', (req, _, done) => [((req as any).startTime = new Date()), done()])
-    .addHook('onSend', (req, rpl, value, done) => [rpl.header('x-request-id', req.id), done(null, value)]);
+    .addHook('onRequest', (req, _, done) => {
+      Object.assign(req, {
+        startTime: new Date(),
+        fingerprint: req.headers['x-fingerprint'] ?? 'unknown',
+      });
+      done();
+    })
+    .addHook('onSend', (req, rpl, value, done) => {
+      rpl.header('x-request-id', req.id);
+      done(null, value);
+    });
 
   const document = SwaggerModule.createDocument(
     app,

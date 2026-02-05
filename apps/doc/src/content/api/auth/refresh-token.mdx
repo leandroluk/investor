@@ -2,7 +2,7 @@
 title: Refresh Token
 description: Obtain a new access token using a refresh token
 ---
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -18,6 +18,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 - **Path**: `/auth/refresh`
 - **Body**:
   - `refreshToken`: String (The refresh token)
+  - `fingerprint`: String (Device fingerprint)
 
 ## Diagram
 
@@ -39,6 +40,7 @@ flowchart TD
 - **Body**:
     ```json
     {
+      "tokenType": "Bearer",
       "accessToken": "ey...",
       "refreshToken": "ey...",
       "expiresIn": 3600

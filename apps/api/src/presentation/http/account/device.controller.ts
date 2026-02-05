@@ -12,13 +12,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {DomainException, GetEnvelope, GetUser} from '../_shared/decorator';
-import {AuthGuard} from '../_shared/guard';
+import {AuthGuard, ChallengeGuard} from '../_shared/guard';
 import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from './dto';
 
 @ApiTags('device')
 @Controller('device')
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, ChallengeGuard)
 @DomainException([AuthUnauthorizedError, HttpStatus.UNAUTHORIZED])
 export class DeviceController {
   constructor(

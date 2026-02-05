@@ -1,36 +1,60 @@
-import {TokenPort} from '#/domain/_shared/port';
-import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import {BrokerPort, HasherPort, TokenPort} from '#/domain/_shared/port';
+import {AuthUnauthorizedError} from '#/domain/account/error';
+import {UserRequestChallengeEvent} from '#/domain/account/event';
+import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common';
 import {FastifyRequest} from 'fastify';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly tokenPort: TokenPort) {}
+  constructor(
+    private readonly hasherPort: HasherPort,
+    private readonly brokerPort: BrokerPort,
+    private readonly tokenPort: TokenPort
+  ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<FastifyRequest>();
-    const authorization = request.headers.authorization;
-
+  private getToken(request: FastifyRequest): string {
+    const {authorization} = request.headers;
     if (!authorization) {
-      throw new UnauthorizedException('Missing authorization header');
+      throw new AuthUnauthorizedError('Missing authorization header');
     }
 
     const [type, token] = authorization.split(' ');
 
     if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Invalid authorization header format');
+      throw new AuthUnauthorizedError('Invalid authorization header format');
+    }
+    return token;
+  }
+
+  private async decodeUser(token: string): Promise<TokenPort.Decoded> {
+    const decoded = await this.tokenPort.decode(token);
+
+    if (decoded.kind !== 'access') {
+      throw new AuthUnauthorizedError('Invalid token usage');
     }
 
-    try {
-      const decoded = await this.tokenPort.decode(token);
+    return decoded;
+  }
 
-      if (decoded.kind !== 'access') {
-        throw new UnauthorizedException('Invalid token usage');
-      }
-
-      request['user'] = decoded;
-      return true;
-    } catch {
-      throw new UnauthorizedException('Invalid or expired token');
+  private async compareFingerprint(request: FastifyRequest, claims: TokenPort.Claims): Promise<void> {
+    const sameHash = await this.hasherPort.compare(request.fingerprint, claims.hash);
+    if (!sameHash) {
+      void this.brokerPort.publish(
+        new UserRequestChallengeEvent(request.id, request.startTime, {
+          userId: claims.subject,
+          userEmail: claims.email,
+        })
+      );
+      throw new AuthUnauthorizedError('Fingerprint mismatch');
     }
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
+    const token = this.getToken(request);
+    const decoded = await this.decodeUser(token);
+    await this.compareFingerprint(request, decoded.claims);
+    request['user'] = decoded;
+    return true;
   }
 }

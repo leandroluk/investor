@@ -22,10 +22,11 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/error';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {DomainException, GetEnvelope} from '../_shared/decorator';
+import {ChallengeGuard} from '../_shared/guard';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
@@ -181,9 +182,7 @@ export class AuthController {
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
-  @ApiOkResponse({
-    description: 'Returns the final authorization token.',
-  })
+  @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingCredential(
     @GetEnvelope() envelope: GetEnvelope,
     @Body() body: LoginUsingCredentialBodyDTO,
@@ -198,9 +197,7 @@ export class AuthController {
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
   @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
-  @ApiOkResponse({
-    description: 'Returns the final authorization token.',
-  })
+  @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingToken(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: LoginUsingTokenBodyDTO,
@@ -219,9 +216,8 @@ export class AuthController {
     [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
     [AuthSessionExpiredError, HttpStatus.UNAUTHORIZED]
   )
-  @ApiOkResponse({
-    description: 'Returns the new authorization tokens.',
-  })
+  @ApiOkResponse({description: 'Returns the new authorization tokens.'})
+  @UseGuards(ChallengeGuard)
   async postRefreshToken(
     @GetEnvelope() envelope: GetEnvelope, //
     @Body() body: RefreshTokenBodyDTO
