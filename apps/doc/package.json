@@ -7,7 +7,11 @@
     "dev": "next dev",
     "lint": "eslint . --fix",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest",
+    "docker:down": "pnpm -w docker:down",
+    "docker:up": "pnpm -w docker:up",
+    "docker:d": "pnpm -w docker:d",
+    "docker": "pnpm -w docker"
   },
   "dependencies": {
     "@theguild/remark-mermaid": "0.3.0",
