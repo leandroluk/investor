@@ -11,7 +11,10 @@ export class CacheRedisAdapter implements CachePort {
   private readonly redis: Redis;
 
   constructor(private readonly cacheRedisConfig: CacheRedisConfig) {
-    this.redis = new Redis(this.cacheRedisConfig.url, {lazyConnect: true});
+    this.redis = new Redis(this.cacheRedisConfig.url, {
+      lazyConnect: true,
+      connectTimeout: 3000,
+    });
   }
 
   async ping(): Promise<void> {

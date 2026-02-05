@@ -17,6 +17,7 @@ export class DatabasePostgresAdapter implements DatabasePort {
       connectionString: this.databasePostgresConfig.url,
       max: this.databasePostgresConfig.maxConnections,
       idleTimeoutMillis: this.databasePostgresConfig.idleTimeoutMillis,
+      connectionTimeoutMillis: 3000,
     });
   }
 

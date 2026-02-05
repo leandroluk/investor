@@ -33,6 +33,7 @@ export class BrokerKafkaAdapter implements BrokerPort {
       clientId: this.brokerKafkaConfig.clientId,
       requestTimeout: this.brokerKafkaConfig.requestTimeout,
       enforceRequestTimeout: this.brokerKafkaConfig.enforceRequestTimeout,
+      connectionTimeout: 3000,
       retry: {initialRetryTime: 300, retries: 8, factor: 0.2, multiplier: 2},
       logCreator: () => {
         return ({level, log}): void => {
