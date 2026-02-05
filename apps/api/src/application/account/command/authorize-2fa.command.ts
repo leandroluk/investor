@@ -10,7 +10,7 @@ import z from 'zod';
 
 const commandSchema = z.object({
   challengeId: z.string().uuid(),
-  code: z.string().min(1),
+  otp: z.string().min(1),
 });
 
 type CommandSchema = z.infer<typeof commandSchema>;
@@ -26,7 +26,7 @@ export class Authorize2FACommand extends Command<CommandSchema> {
     description: '2FA Code',
     example: '123456',
   })
-  readonly code!: string;
+  readonly otp!: string;
 
   constructor(payload: Authorize2FACommand) {
     super(payload, commandSchema);
@@ -44,20 +44,19 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
   private async verifyChallenge(challengeId: string, code: string): Promise<ChallengeEntity> {
     const challenge = await this.challengeRepository.findById(challengeId);
     if (!challenge) {
-      throw new UserInvalidOtpError();
+      throw new UserInvalidOtpError('Challenge not found');
     }
     if (challenge.status !== ChallengeStatusEnum.PENDING) {
-      throw new UserInvalidOtpError();
+      throw new UserInvalidOtpError('Challenge already used');
     }
     if (challenge.expiresAt < new Date()) {
       challenge.status = ChallengeStatusEnum.EXPIRED;
       challenge.updatedAt = new Date();
       await this.challengeRepository.update(challenge);
-      throw new UserInvalidOtpError();
+      throw new UserInvalidOtpError('Challenge expired');
     }
     if (challenge.code !== code) {
-      // TODO: Increment failure count?
-      throw new UserInvalidOtpError();
+      throw new UserInvalidOtpError('Invalid OTP');
     }
 
     challenge.status = ChallengeStatusEnum.COMPLETED;
@@ -80,7 +79,7 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
   }
 
   async execute(command: Authorize2FACommand): Promise<void> {
-    const challenge = await this.verifyChallenge(command.challengeId, command.code);
+    const challenge = await this.verifyChallenge(command.challengeId, command.otp);
     await this.checkUser(challenge.userId);
   }
 }

@@ -25,20 +25,14 @@ export class SsoController {
     description: 'Redirects to identity provider.',
   })
   async getRedirect(
-    @GetMeta() envelope: GetMeta,
+    @GetMeta() meta: GetMeta, //
     @Param() params: GetSsoRedirectParamsDTO,
-    @Query() query: GetSsoRedirectQueryDTO,
+    @Query() {callback_url: callbackURL}: GetSsoRedirectQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const result = await this.queryBus.execute(
-      new GetSsoRedirectQuery({
-        ...envelope,
-        ...params,
-        callbackUrl: query.callback_url,
-      })
-    );
+    const url = await this.queryBus.execute(new GetSsoRedirectQuery({...meta, ...params, callbackURL}));
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    reply.redirect(result.redirectUrl, HttpStatus.TEMPORARY_REDIRECT);
+    reply.redirect(url, HttpStatus.TEMPORARY_REDIRECT);
   }
   // #endregion
 
@@ -55,20 +49,14 @@ export class SsoController {
     description: 'Redirects to frontend with token.',
   })
   async getCallback(
-    @GetMeta() envelope: GetMeta, //
+    @GetMeta() meta: GetMeta, //
     @Param() params: GetSsoRedirectParamsDTO,
     @Query() query: SsoCallbackQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const result = await this.commandBus.execute(
-      new SsoCallbackCommand({
-        ...envelope,
-        ...params,
-        ...query,
-      })
-    );
+    const callbackURL = await this.commandBus.execute(new SsoCallbackCommand({...meta, ...params, ...query}));
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    reply.redirect(result.redirectUrl, HttpStatus.TEMPORARY_REDIRECT);
+    reply.redirect(callbackURL, HttpStatus.TEMPORARY_REDIRECT);
   }
   // #endregion
 }

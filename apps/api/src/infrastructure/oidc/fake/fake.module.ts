@@ -1,8 +1,9 @@
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
-import {OidcFakeAdapter} from './fake.adapter';
 import {OidcFakeConfig} from './fake.config';
+import {OidcFakeLifecycle} from './fake.lifecycle';
+import {OidcFakeResolver} from './fake.resolver';
 
-const providers = [OidcFakeAdapter, OidcFakeConfig];
+const providers = [OidcFakeResolver, OidcFakeConfig, OidcFakeLifecycle];
 
 @EnhancedModule({providers, exports: providers})
 export class OidcFakeModule {}

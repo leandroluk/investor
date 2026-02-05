@@ -60,6 +60,27 @@ const update = `
 export class DatabasePostgresChallengeRepository implements ChallengeRepository {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
+  async create(challenge: ChallengeEntity): Promise<void> {
+    await this.database.exec(create, [
+      challenge.id,
+      challenge.userId,
+      challenge.type,
+      challenge.code,
+      challenge.status,
+      challenge.expiresAt,
+      challenge.createdAt,
+      challenge.updatedAt,
+    ]);
+  }
+
+  async update(challenge: ChallengeEntity): Promise<void> {
+    await this.database.exec(update, [
+      challenge.id, //
+      challenge.status,
+      challenge.updatedAt,
+    ]);
+  }
+
   async findById(id: string): Promise<ChallengeEntity | null> {
     const [row] = await this.database.query(findById, [id]);
     let result: ChallengeEntity | null = null;
@@ -91,26 +112,5 @@ export class DatabasePostgresChallengeRepository implements ChallengeRepository 
       updatedAt: row.updated_at,
     }));
     return result;
-  }
-
-  async create(challenge: ChallengeEntity): Promise<void> {
-    await this.database.exec(create, [
-      challenge.id,
-      challenge.userId,
-      challenge.type,
-      challenge.code,
-      challenge.status,
-      challenge.expiresAt,
-      challenge.createdAt,
-      challenge.updatedAt,
-    ]);
-  }
-
-  async update(challenge: ChallengeEntity): Promise<void> {
-    await this.database.exec(update, [
-      challenge.id, //
-      challenge.status,
-      challenge.updatedAt,
-    ]);
   }
 }

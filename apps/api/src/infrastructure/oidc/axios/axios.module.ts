@@ -1,6 +1,6 @@
 import {EnhancedModule} from '#/infrastructure/_shared/decorator';
-import {OidcAxiosResolver} from './axios.adapter';
 import {OidcAxiosConfig} from './axios.config';
+import {OidcAxiosResolver} from './axios.resolver';
 
 const providers = [OidcAxiosResolver, OidcAxiosConfig];
 

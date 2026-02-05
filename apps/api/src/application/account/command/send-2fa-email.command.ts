@@ -3,7 +3,7 @@ import {ApiPropertyOf} from '#/application/_shared/decorator';
 import {MailerPort, TemplatePort} from '#/domain/_shared/port';
 import {ChallengeEntity, UserEntity} from '#/domain/account/entity';
 import {ChallengeStatusEnum, UserStatusEnum} from '#/domain/account/enum';
-import {UserNotFoundError} from '#/domain/account/error';
+import {UserNotFoundError, UserStatusError} from '#/domain/account/error';
 import {ChallengeRepository, UserRepository} from '#/domain/account/repository';
 import {ChallengeStore} from '#/domain/account/store';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -42,7 +42,7 @@ export class Send2FACommandHandler implements ICommandHandler<Send2FAEmailComman
       throw new UserNotFoundError();
     }
     if (user.status !== UserStatusEnum.ACTIVE) {
-      throw new UserNotFoundError();
+      throw new UserStatusError();
     }
     return user;
   }

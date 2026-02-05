@@ -63,13 +63,16 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
 
   private async decryptToken(token: string): Promise<{userId: UserEntity['id']; provider: 'google' | 'microsoft'}> {
     try {
-      const {userId, provider, exp} = await this.cipherPort.decrypt<{
+      const value = this.cipherPort.decrypt<{
         userId: string;
         provider: 'google' | 'microsoft';
         exp: number;
       }>(token);
-      if (exp >= Date.now()) {
-        return {userId, provider};
+      if (value.exp >= Date.now()) {
+        return {
+          userId: value.userId,
+          provider: value.provider,
+        };
       }
     } catch {
       // no need catch

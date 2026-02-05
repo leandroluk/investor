@@ -90,6 +90,32 @@ const listFingerprintByUserId = `
 export class DatabasePostgresDeviceRepository implements DeviceRepository {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
+  async create(device: DeviceEntity): Promise<void> {
+    await this.database.exec(create, [
+      device.id,
+      device.userId,
+      device.platform,
+      device.fingerprint,
+      device.isActive,
+      device.brand,
+      device.model,
+      device.name,
+      device.createdAt,
+      device.updatedAt,
+    ]);
+  }
+
+  async update(device: DeviceEntity): Promise<void> {
+    await this.database.exec(update, [
+      device.isActive, //
+      device.brand,
+      device.model,
+      device.name,
+      device.updatedAt,
+      device.id,
+    ]);
+  }
+
   async findByFingerprint(userId: string, fingerprint: string): Promise<DeviceEntity | null> {
     const [row] = await this.database.query<any>(findByFingerprint, [userId, fingerprint]);
     if (!row) {
@@ -107,32 +133,6 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
-  }
-
-  async create(device: DeviceEntity): Promise<void> {
-    await this.database.query(create, [
-      device.id,
-      device.userId,
-      device.platform,
-      device.fingerprint,
-      device.isActive,
-      device.brand,
-      device.model,
-      device.name,
-      device.createdAt,
-      device.updatedAt,
-    ]);
-  }
-
-  async update(device: DeviceEntity): Promise<void> {
-    await this.database.query(update, [
-      device.isActive, //
-      device.brand,
-      device.model,
-      device.name,
-      device.updatedAt,
-      device.id,
-    ]);
   }
 
   async findById(id: string): Promise<DeviceEntity | null> {

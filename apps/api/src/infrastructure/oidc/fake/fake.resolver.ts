@@ -4,7 +4,7 @@ import axios from 'axios';
 import {OidcFakeConfig} from './fake.config';
 
 @InjectableExisting(OidcPort)
-export class OidcFakeAdapter extends OidcPort {
+export class OidcFakeResolver extends OidcPort {
   constructor(private readonly oidcFakeConfig: OidcFakeConfig) {
     super();
   }

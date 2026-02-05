@@ -19,7 +19,7 @@ export class CipherStdAdapter implements CipherPort {
     return crypto.createHash('sha256').update(plainText).digest(this.cipherEncoding);
   }
 
-  async encrypt<T = any>(plain: T, iv = crypto.randomBytes(12).toString(this.cipherEncoding)): Promise<string> {
+  encrypt<T = any>(plain: T, iv = crypto.randomBytes(12).toString(this.cipherEncoding)): string {
     const plainText = JSON.stringify(plain);
     const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
     let encrypted = cipher.update(plainText, this.plainEncoding, this.cipherEncoding);
@@ -28,7 +28,7 @@ export class CipherStdAdapter implements CipherPort {
     return [iv, encrypted, tag].join('.');
   }
 
-  async decrypt<T = any>(cipherText: string): Promise<T> {
+  decrypt<T = any>(cipherText: string): T {
     const [iv, encrypted, tag] = cipherText.split('.');
     const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv as string);
     decipher.setAuthTag(Buffer.from(tag as string, this.cipherEncoding));

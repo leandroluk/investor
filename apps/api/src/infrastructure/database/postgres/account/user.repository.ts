@@ -98,6 +98,45 @@ const update = `
 export class DatabasePostgresUserRepository implements UserRepository {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
 
+  async create(user: UserEntity): Promise<void> {
+    await this.database.exec(create, [
+      user.id,
+      user.email,
+      user.name,
+      user.passwordHash,
+      user.walletAddress,
+      user.walletVerifiedAt,
+      user.walletSeedEncrypted,
+      user.kycStatus,
+      user.kycVerifiedAt,
+      user.status,
+      user.twoFactorEnabled,
+      user.language,
+      user.timezone,
+      user.createdAt,
+      user.updatedAt,
+    ]);
+  }
+
+  async update(user: UserEntity): Promise<void> {
+    await this.database.exec(update, [
+      user.id,
+      user.email,
+      user.name,
+      user.passwordHash,
+      user.walletAddress,
+      user.walletVerifiedAt,
+      user.walletSeedEncrypted,
+      user.kycStatus,
+      user.kycVerifiedAt,
+      user.status,
+      user.twoFactorEnabled,
+      user.language,
+      user.timezone,
+      user.updatedAt,
+    ]);
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const [{count}] = await this.database.query(existsByEmail, [email]);
     return count !== 0;
@@ -149,44 +188,5 @@ export class DatabasePostgresUserRepository implements UserRepository {
       };
     }
     return null;
-  }
-
-  async create(user: UserEntity): Promise<void> {
-    await this.database.exec(create, [
-      user.id,
-      user.email,
-      user.name,
-      user.passwordHash,
-      user.walletAddress,
-      user.walletVerifiedAt,
-      user.walletSeedEncrypted,
-      user.kycStatus,
-      user.kycVerifiedAt,
-      user.status,
-      user.twoFactorEnabled,
-      user.language,
-      user.timezone,
-      user.createdAt,
-      user.updatedAt,
-    ]);
-  }
-
-  async update(user: UserEntity): Promise<void> {
-    await this.database.exec(update, [
-      user.id,
-      user.email,
-      user.name,
-      user.passwordHash,
-      user.walletAddress,
-      user.walletVerifiedAt,
-      user.walletSeedEncrypted,
-      user.kycStatus,
-      user.kycVerifiedAt,
-      user.status,
-      user.twoFactorEnabled,
-      user.language,
-      user.timezone,
-      user.updatedAt,
-    ]);
   }
 }

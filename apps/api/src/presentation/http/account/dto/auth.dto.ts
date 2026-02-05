@@ -18,7 +18,7 @@ export class ActivateUserBodyDTO extends ActivateUserCommand {}
 // #endregion
 
 // #region Authorize2FA
-export class Authorize2FABodyDTO extends PickType(Authorize2FACommand, ['challengeId', 'code']) {}
+export class Authorize2FABodyDTO extends PickType(Authorize2FACommand, ['challengeId', 'otp']) {}
 // #endregion
 
 // #region CheckEmail

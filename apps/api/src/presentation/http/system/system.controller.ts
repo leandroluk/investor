@@ -16,9 +16,9 @@ export class SystemController {
   @ApiOkResponse({type: HealthResultDTO})
   @MapDomainError([UnhealthyError, HttpStatus.SERVICE_UNAVAILABLE])
   async getHealth(
-    @GetMeta() envelope: GetMeta //
+    @GetMeta() meta: GetMeta //
   ): Promise<HealthResultDTO> {
-    const result = await this.queryBus.execute(new HealthQuery(envelope));
+    const result = await this.queryBus.execute(new HealthQuery(meta));
     return result;
   }
   // #endregion

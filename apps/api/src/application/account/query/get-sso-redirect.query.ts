@@ -6,7 +6,7 @@ import z from 'zod';
 
 const querySchema = z.object({
   provider: z.enum(['google', 'microsoft']),
-  callbackUrl: z.string().url(),
+  callbackURL: z.string().url(),
 });
 
 type QuerySchema = z.infer<typeof querySchema>;
@@ -16,27 +16,23 @@ export class GetSsoRedirectQuery extends Query<QuerySchema> {
   readonly provider!: 'google' | 'microsoft';
 
   @ApiProperty({description: 'Callback URL after authentication', example: 'https://app.com/auth/callback'})
-  readonly callbackUrl!: string;
+  readonly callbackURL!: string;
 
   constructor(payload: GetSsoRedirectQuery) {
     super(payload, querySchema);
   }
 }
 
-export interface GetSsoRedirectQueryResult {
-  redirectUrl: string;
-}
-
 @QueryHandler(GetSsoRedirectQuery)
-export class GetSsoRedirectQueryHandler implements IQueryHandler<GetSsoRedirectQuery, GetSsoRedirectQueryResult> {
+export class GetSsoRedirectQueryHandler implements IQueryHandler<GetSsoRedirectQuery, string> {
   constructor(private readonly oidcPort: OidcPort) {}
 
-  async execute(query: GetSsoRedirectQuery): Promise<GetSsoRedirectQueryResult> {
-    const state: OidcPort.State = {callbackURL: query.callbackUrl, provider: query.provider};
+  async execute(query: GetSsoRedirectQuery): Promise<string> {
+    const state: OidcPort.State = {callbackURL: query.callbackURL, provider: query.provider};
     const encodedState = this.oidcPort.encodeState(state);
     const adapter = this.oidcPort.getAdapter(query.provider);
     const redirectUrl = adapter.getAuthURL(encodedState);
 
-    return {redirectUrl};
+    return redirectUrl;
   }
 }

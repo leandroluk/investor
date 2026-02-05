@@ -1,4 +1,5 @@
-import {Injectable, Logger, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
+import {TokenPort} from '#/domain/_shared/port';
+import {HttpStatus, Injectable, Logger, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
 import * as http from 'node:http';
 import {OidcFakeConfig} from './fake.config';
 
@@ -14,12 +15,13 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
       refreshToken: 'fake_refresh',
     },
     info: {
-      subject: 'sub_123',
-      email: 'dev@todo4dev.io',
-      givenName: 'Leandro',
-      familyName: 'Luk',
-      custom: {},
-    },
+      subject: '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+      email: 'ada.lovelace@email.com',
+      name: 'Ada Lovelace',
+      language: 'en-US',
+      timezone: 'UTC',
+      cnf: {jkt: 'jkt'},
+    } satisfies TokenPort.Claims,
     picture: Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
       'base64'
@@ -31,15 +33,20 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     this.server = http.createServer(async (req, res) => {
       const {method, url} = req;
-      const fullUrl = new URL(url || '', `http://localhost:${this.oidcFakeConfig.port}`);
+      const fullURL = new URL(url || '', `http://localhost:${this.oidcFakeConfig.port}`);
 
       // --- REDIRECT (Simulates Provider Auth) ---
-      if (fullUrl.pathname === '/auth') {
-        const base64State = fullUrl.searchParams.get('state');
+      if (fullURL.pathname === '/auth') {
+        const base64State = fullURL.searchParams.get('state');
         if (base64State) {
-          const decoded = JSON.parse(Buffer.from(base64State, 'base64url').toString('utf8'));
-          res.statusCode = 302;
-          res.setHeader('Location', `${decoded.callbackURL}?code=fake_code&state=${base64State}`);
+          const {provider} = JSON.parse(Buffer.from(base64State, 'base64url').toString('utf8'));
+          const redirectPath = {
+            google: this.oidcFakeConfig.googleCallback,
+            microsoft: this.oidcFakeConfig.microsoftCallback,
+          }[provider];
+          const redirectURL = `http://localhost:${this.oidcFakeConfig.serverPort}/${redirectPath}?code=fake_code&state=${base64State}`;
+          res.statusCode = HttpStatus.TEMPORARY_REDIRECT;
+          res.setHeader('Location', redirectURL);
           return res.end();
         }
       }
@@ -47,24 +54,24 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
       // --- CONFIGURATION ROUTES (POST) ---
       if (method === 'POST') {
         const body = await this.getRequestBody(req);
-        if (fullUrl.pathname === '/token') {
+        if (fullURL.pathname === '/token') {
           this.state.tokens = {...this.state.tokens, ...JSON.parse(body)};
           return this.jsonResponse(res, {message: 'Tokens updated'});
         }
-        if (fullUrl.pathname === '/info') {
+        if (fullURL.pathname === '/info') {
           this.state.info = {...this.state.info, ...JSON.parse(body)};
           return this.jsonResponse(res, {message: 'Info updated'});
         }
       }
 
       // --- CONSUMPTION ROUTES (GET) ---
-      if (fullUrl.pathname === '/token') {
+      if (fullURL.pathname === '/token') {
         return this.jsonResponse(res, this.state.tokens);
       }
-      if (fullUrl.pathname === '/info') {
+      if (fullURL.pathname === '/info') {
         return this.jsonResponse(res, this.state.info);
       }
-      if (fullUrl.pathname === '/picture') {
+      if (fullURL.pathname === '/picture') {
         res.setHeader('Content-Type', 'image/png');
         return res.end(this.state.picture);
       }

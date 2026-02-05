@@ -31,11 +31,11 @@ export class DeviceController {
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({description: 'Device registered successfully'})
   async postRegisterDevice(
-    @GetMeta() envelope: GetMeta,
+    @GetMeta() meta: GetMeta,
     @GetUser() user: GetUser,
     @Body() body: RegisterDeviceBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RegisterDeviceCommand({...envelope, userId: user.claims.subject, ...body}));
+    await this.commandBus.execute(new RegisterDeviceCommand({...meta, userId: user.claims.subject, ...body}));
   }
   // #endregion
 
@@ -46,11 +46,11 @@ export class DeviceController {
   @ApiOperation({summary: 'Revoke device'})
   @ApiNoContentResponse({description: 'Device revoked successfully'})
   async deleteRevokeDevice(
-    @GetMeta() envelope: GetMeta,
+    @GetMeta() meta: GetMeta, //
     @GetUser() user: GetUser,
     @Param('id') id: string
   ): Promise<void> {
-    await this.commandBus.execute(new RevokeDeviceCommand({...envelope, userId: user.claims.subject, id}));
+    await this.commandBus.execute(new RevokeDeviceCommand({...meta, userId: user.claims.subject, id}));
   }
   // #endregion
 
@@ -60,10 +60,10 @@ export class DeviceController {
   @ApiOperation({summary: 'List active devices'})
   @ApiOkResponse({type: ListActiveDeviceResultDTO})
   async getListActiveDevice(
-    @GetMeta() envelope: GetMeta, //
+    @GetMeta() meta: GetMeta, //
     @GetUser() user: GetUser
   ): Promise<ListActiveDeviceResultDTO> {
-    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...envelope, userId: user.claims.subject}));
+    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta, userId: user.claims.subject}));
     return {items: result};
   }
   // #endregion
