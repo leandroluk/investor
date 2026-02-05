@@ -98,7 +98,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
         userId: user.id,
         platform: DeviceTypeEnum.UNKNOWN,
         fingerprint,
-        isActive: true,
+        isActive: false,
         brand: 'unknown',
         model: 'unknown',
         name: 'unknown',
@@ -123,8 +123,8 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
 
   private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
     const sessionKey = await this.sessionStore.create(user, device);
-    const deviceFingerprintHash = await this.hasherPort.hash(device.fingerprint);
-    const result = await this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
+    const deviceFingerprintHash = this.hasherPort.hash(device.fingerprint);
+    const result = this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
     return result;
   }
 

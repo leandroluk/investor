@@ -60,7 +60,7 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
     const user: UserEntity = {
       id: uuid.v7(),
       email,
-      passwordHash: await this.hasherPort.hash(password),
+      passwordHash: this.hasherPort.hash(password),
       name,
       walletAddress: null,
       walletVerifiedAt: null,

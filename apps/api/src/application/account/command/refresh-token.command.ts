@@ -40,7 +40,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
   ) {}
 
   private async decodeToken(refreshToken: string): Promise<TokenPort.Decoded> {
-    const decoded = await this.tokenPort.decode(refreshToken);
+    const decoded = this.tokenPort.decode(refreshToken);
 
     if (decoded.kind !== 'refresh') {
       throw new AuthUnauthorizedError();
@@ -80,8 +80,8 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
     user: UserEntity,
     fingerprint: string
   ): Promise<TokenPort.Authorization> {
-    const deviceFingerprintHash = await this.hasherPort.hash(fingerprint);
-    const result = await this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
+    const deviceFingerprintHash = this.hasherPort.hash(fingerprint);
+    const result = this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
     return result;
   }
 

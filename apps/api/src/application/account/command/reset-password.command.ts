@@ -59,7 +59,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
   }
 
   private async updatePassword(user: UserEntity, newPassword: string): Promise<UserEntity> {
-    user.passwordHash = await this.hasherPort.hash(newPassword);
+    user.passwordHash = this.hasherPort.hash(newPassword);
     user.updatedAt = new Date();
     await this.userRepository.update(user);
     return user;

@@ -78,7 +78,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   }
 
   private async validatePassword(plain: string, hash: string): Promise<void> {
-    const isValid = await this.hasherPort.compare(plain, hash);
+    const isValid = this.hasherPort.compare(plain, hash);
     if (!isValid) {
       throw new UserInvalidCredentialsError();
     }
@@ -97,7 +97,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
         userId: user.id,
         platform: DeviceTypeEnum.UNKNOWN,
         fingerprint,
-        isActive: true,
+        isActive: false,
         brand: 'unknown',
         model: 'unknown',
         name: 'unknown',
@@ -122,8 +122,8 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
 
   private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
     const sessionKey = await this.sessionStore.create(user, device);
-    const deviceFingerprintHash = await this.hasherPort.hash(device.fingerprint);
-    const result = await this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
+    const deviceFingerprintHash = this.hasherPort.hash(device.fingerprint);
+    const result = this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
     return result;
   }
 
