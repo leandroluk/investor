@@ -11,19 +11,19 @@ import {TokenJwtError} from './jwt.error';
 export class TokenJwtAdapter implements TokenPort {
   constructor(private readonly tokenJwtConfig: TokenJwtConfig) {}
 
-  async create<T extends boolean>(
+  create<T extends boolean>(
     sessionKey: string,
     user: UserEntity,
     deviceFingerprintHash: string,
     includeRefresh?: T
-  ): Promise<T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization> {
+  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
     const claims: TokenPort.Claims = {
       subject: user.id,
       email: user.email,
       name: user.name,
       language: user.language,
       timezone: user.timezone,
-      hash: deviceFingerprintHash,
+      cnf: {jkt: deviceFingerprintHash},
     };
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
@@ -52,7 +52,7 @@ export class TokenJwtAdapter implements TokenPort {
     return token as any;
   }
 
-  async decode(token: string): Promise<TokenPort.Decoded> {
+  decode(token: string): TokenPort.Decoded {
     const {header, payload} = jsonwebtoken.verify(token, this.tokenJwtConfig.publicKey, {
       algorithms: [this.tokenJwtConfig.algorithm],
       audience: this.tokenJwtConfig.audience,
@@ -69,6 +69,7 @@ export class TokenJwtAdapter implements TokenPort {
         name: payload.name,
         language: payload.language,
         timezone: payload.timezone,
+        cnf: {jkt: payload.cnf?.jkt},
       } as TokenPort.Claims,
     };
   }

@@ -9,11 +9,11 @@ import {HasherStdError} from './std.error';
 export class HasherStdAdapter implements HasherPort {
   private readonly cipherEncoding = 'base64url';
 
-  async hash(plainText: string): Promise<string> {
+  hash(plainText: string): string {
     return crypto.createHash('sha256').update(plainText).digest(this.cipherEncoding);
   }
 
-  async compare(plain: string, hash: string): Promise<boolean> {
-    return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(await this.hash(plain)));
+  compare(plain: string, hash: string): boolean {
+    return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(this.hash(plain)));
   }
 }
