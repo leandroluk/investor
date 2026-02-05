@@ -26,8 +26,8 @@ export class AuthGuard implements CanActivate {
     return token;
   }
 
-  private async decodeUser(token: string): Promise<TokenPort.Decoded> {
-    const decoded = await this.tokenPort.decode(token);
+  private decodeUser(token: string): TokenPort.Decoded {
+    const decoded = this.tokenPort.decode(token);
 
     if (decoded.kind !== 'access') {
       throw new AuthUnauthorizedError('Invalid token usage');
@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private async compareFingerprint(request: FastifyRequest, claims: TokenPort.Claims): Promise<void> {
-    const sameHash = await this.hasherPort.compare(request.fingerprint, claims.hash);
+    const sameHash = this.hasherPort.compare(request.fingerprint, claims.cnf.jkt);
     if (!sameHash) {
       void this.brokerPort.publish(
         new UserRequestChallengeEvent(request.id, request.startTime, {
@@ -52,7 +52,7 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
     const token = this.getToken(request);
-    const decoded = await this.decodeUser(token);
+    const decoded = this.decodeUser(token);
     await this.compareFingerprint(request, decoded.claims);
     request['user'] = decoded;
     return true;
