@@ -16,7 +16,7 @@
         "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
       );
     ]]></sql>
 

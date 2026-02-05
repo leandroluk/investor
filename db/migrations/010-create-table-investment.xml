@@ -21,7 +21,7 @@
         PRIMARY KEY ("id"),
         FOREIGN KEY ("strategy_id") REFERENCES "strategy" ("id"),
         FOREIGN KEY ("asset_id")    REFERENCES "asset" ("id"),
-        FOREIGN KEY ("user_id")     REFERENCES "user" ("id")
+        FOREIGN KEY ("user_id")     REFERENCES "user" ("id") ON DELETE CASCADE
       );
     ]]></sql>
 

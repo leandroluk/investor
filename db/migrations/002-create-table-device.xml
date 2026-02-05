@@ -21,7 +21,7 @@
         "updated_at"  TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
       );
     ]]></sql>
 
