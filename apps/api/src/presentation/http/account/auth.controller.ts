@@ -25,7 +25,7 @@ import {
 import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiAcceptedResponse, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {DomainException, GetEnvelope} from '../_shared/decorator';
+import {GetMeta, MapDomainError} from '../_shared/decorator';
 import {ChallengeGuard} from '../_shared/guard';
 import {
   ActivateUserBodyDTO,
@@ -52,12 +52,12 @@ export class AuthController {
   // #region getCheckEmail
   @Get('check/email/:email')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
+  @MapDomainError([UserEmailInUseError, HttpStatus.CONFLICT])
   @ApiNoContentResponse({
     description: 'Email is available.',
   })
   async getCheckEmail(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Param() params: CheckEmailParamsDTO
   ): Promise<void> {
     const result = await this.queryBus.execute(new CheckEmailQuery({...envelope, ...params}));
@@ -68,12 +68,12 @@ export class AuthController {
   // #region postRegisterUser
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @DomainException([UserEmailInUseError, HttpStatus.CONFLICT])
+  @MapDomainError([UserEmailInUseError, HttpStatus.CONFLICT])
   @ApiCreatedResponse({
     description: 'User registered successfully.',
   })
   async postRegisterUser(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: RegisterUserBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new RegisterUserCommand({...envelope, ...body}));
@@ -83,7 +83,7 @@ export class AuthController {
   // #region postSendActivationEmail
   @Post('activate')
   @HttpCode(HttpStatus.ACCEPTED)
-  @DomainException(
+  @MapDomainError(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserStatusError, HttpStatus.CONFLICT]
   )
@@ -91,7 +91,7 @@ export class AuthController {
     description: 'Activation email sent.',
   })
   async postSendActivationEmail(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: SendActivationEmailBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new SendActivateEmailCommand({...envelope, ...body}));
@@ -101,7 +101,7 @@ export class AuthController {
   // #region putActivateUser
   @Put('activate')
   @HttpCode(HttpStatus.ACCEPTED)
-  @DomainException(
+  @MapDomainError(
     [UserNotFoundError, HttpStatus.NOT_FOUND],
     [UserNotPendingError, HttpStatus.CONFLICT],
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
@@ -110,7 +110,7 @@ export class AuthController {
     description: 'User activated successfully.',
   })
   async putActivateUser(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: ActivateUserBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new ActivateUserCommand({...envelope, ...body}));
@@ -120,12 +120,12 @@ export class AuthController {
   // #region postSendRecover
   @Post('recover')
   @HttpCode(HttpStatus.ACCEPTED)
-  @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
+  @MapDomainError([UserNotFoundError, HttpStatus.NOT_FOUND])
   @ApiAcceptedResponse({
     description: 'Password reset email sent.',
   })
   async postSendRecover(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: SendRecoverBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new SendRecoverCommand({...envelope, ...body}));
@@ -135,7 +135,7 @@ export class AuthController {
   // #region putResetPassword
   @Put('recover')
   @HttpCode(HttpStatus.OK)
-  @DomainException(
+  @MapDomainError(
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
@@ -143,7 +143,7 @@ export class AuthController {
     description: 'Password reset successfully.',
   })
   async putResetPassword(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: ResetPasswordBodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new ResetPasswordCommand({...envelope, ...body}));
@@ -153,12 +153,12 @@ export class AuthController {
   // #region postSend2FA
   @Post('2fa')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserNotFoundError, HttpStatus.NOT_FOUND])
+  @MapDomainError([UserNotFoundError, HttpStatus.NOT_FOUND])
   @ApiOkResponse({
     description: '2FA email sent.',
   })
   async postSend2FA(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: Send2FABodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new Send2FAEmailCommand({...envelope, ...body}));
@@ -168,10 +168,10 @@ export class AuthController {
   // #region putAuthorize2FA
   @Put('2fa')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
+  @MapDomainError([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
   @ApiOkResponse({description: 'User authenticated successfully.'})
   async putAuthorize2FA(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: Authorize2FABodyDTO
   ): Promise<void> {
     await this.commandBus.execute(new Authorize2FACommand({...envelope, ...body}));
@@ -181,10 +181,10 @@ export class AuthController {
   // #region postLoginUsingCredential
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingCredential(
-    @GetEnvelope() envelope: GetEnvelope,
+    @GetMeta() envelope: GetMeta,
     @Body() body: LoginUsingCredentialBodyDTO,
     @Ip() ip: string
   ): Promise<void> {
@@ -196,10 +196,10 @@ export class AuthController {
   // #region postLoginUsingToken
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
-  @DomainException([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingToken(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: LoginUsingTokenBodyDTO,
     @Ip() ip: string
   ): Promise<void> {
@@ -211,7 +211,7 @@ export class AuthController {
   // #region postRefreshToken
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @DomainException(
+  @MapDomainError(
     [UserNotFoundError, HttpStatus.UNAUTHORIZED],
     [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
     [AuthSessionExpiredError, HttpStatus.UNAUTHORIZED]
@@ -219,7 +219,7 @@ export class AuthController {
   @ApiOkResponse({description: 'Returns the new authorization tokens.'})
   @UseGuards(ChallengeGuard)
   async postRefreshToken(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @Body() body: RefreshTokenBodyDTO
   ): Promise<TokenPort.Authorization> {
     const result = await this.commandBus.execute(new RefreshTokenCommand({...envelope, ...body}));

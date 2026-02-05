@@ -11,7 +11,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import {DomainException, GetEnvelope, GetUser} from '../_shared/decorator';
+import {GetMeta, GetUser, MapDomainError} from '../_shared/decorator';
 import {AuthGuard, ChallengeGuard} from '../_shared/guard';
 import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from './dto';
 
@@ -19,7 +19,7 @@ import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from './dto';
 @Controller('device')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, ChallengeGuard)
-@DomainException([AuthUnauthorizedError, HttpStatus.UNAUTHORIZED])
+@MapDomainError([AuthUnauthorizedError, HttpStatus.UNAUTHORIZED])
 export class DeviceController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -31,7 +31,7 @@ export class DeviceController {
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({description: 'Device registered successfully'})
   async postRegisterDevice(
-    @GetEnvelope() envelope: GetEnvelope,
+    @GetMeta() envelope: GetMeta,
     @GetUser() user: GetUser,
     @Body() body: RegisterDeviceBodyDTO
   ): Promise<void> {
@@ -42,11 +42,11 @@ export class DeviceController {
   // #region deleteRevokeDevice
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @DomainException([DeviceNotFoundError, HttpStatus.NOT_FOUND], [DeviceNotOwnedError, HttpStatus.FORBIDDEN])
+  @MapDomainError([DeviceNotFoundError, HttpStatus.NOT_FOUND], [DeviceNotOwnedError, HttpStatus.FORBIDDEN])
   @ApiOperation({summary: 'Revoke device'})
   @ApiNoContentResponse({description: 'Device revoked successfully'})
   async deleteRevokeDevice(
-    @GetEnvelope() envelope: GetEnvelope,
+    @GetMeta() envelope: GetMeta,
     @GetUser() user: GetUser,
     @Param('id') id: string
   ): Promise<void> {
@@ -60,7 +60,7 @@ export class DeviceController {
   @ApiOperation({summary: 'List active devices'})
   @ApiOkResponse({type: ListActiveDeviceResultDTO})
   async getListActiveDevice(
-    @GetEnvelope() envelope: GetEnvelope, //
+    @GetMeta() envelope: GetMeta, //
     @GetUser() user: GetUser
   ): Promise<ListActiveDeviceResultDTO> {
     const result = await this.queryBus.execute(new ListActiveDeviceQuery({...envelope, userId: user.claims.subject}));
