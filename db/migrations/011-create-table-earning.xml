@@ -10,10 +10,10 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "earning" (
         "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "investment_id" UUID           NOT NULL,
         "amount_token"  DECIMAL        NOT NULL,
         "amount_usd"    DECIMAL        NOT NULL,
-        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("investment_id") REFERENCES "investment" ("id")

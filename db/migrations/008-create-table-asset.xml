@@ -10,11 +10,12 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "asset" (
         "id"         UUID           NOT NULL,
+        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "deleted_at" TIMESTAMPTZ(3)     NULL,
         "slug"       VARCHAR(50)    NOT NULL,
         "symbol"     VARCHAR(10)    NOT NULL,
         "network"    VARCHAR(50)    NOT NULL,
         "is_active"  BOOLEAN        NOT NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),
         UNIQUE      ("slug")

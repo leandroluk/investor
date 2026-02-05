@@ -10,11 +10,11 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "ledger" (
         "id"           UUID           NOT NULL,
+        "created_at"   TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"      UUID           NOT NULL,
         "type"         VARCHAR(50)    NOT NULL,
         "amount_usd"   DECIMAL        NOT NULL,
         "reference_id" UUID           NOT NULL,
-        "created_at"   TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE

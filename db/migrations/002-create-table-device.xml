@@ -10,6 +10,8 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "device" (
         "id"          UUID           NOT NULL,
+        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"     UUID           NOT NULL,
         "platform"    VARCHAR(20)    NOT NULL,
         "fingerprint" VARCHAR(255)   NOT NULL,
@@ -17,8 +19,6 @@
         "brand"       VARCHAR(50)        NULL,
         "name"        VARCHAR(50)        NULL,
         "model"       VARCHAR(50)        NULL,
-        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"  TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE

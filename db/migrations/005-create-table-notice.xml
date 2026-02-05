@@ -10,10 +10,10 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "notice" (
         "id"         UUID           NOT NULL,
+        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"    UUID           NOT NULL,
         "title"      VARCHAR(150)   NOT NULL,
         "is_read"    BOOLEAN        NOT NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE

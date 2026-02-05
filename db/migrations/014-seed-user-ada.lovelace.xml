@@ -10,6 +10,8 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       INSERT INTO "user" (
         "id",
+        "created_at",
+        "updated_at",
         "email",
         "password_hash",
         "name",
@@ -21,11 +23,11 @@
         "kyc_verified_at",
         "two_factor_enabled",
         "language",
-        "timezone",
-        "created_at",
-        "updated_at"
+        "timezone"
       ) VALUES (
         /* id                    */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* created_at            */ NOW(),
+        /* updated_at            */ NOW(),
         /* email                 */ 'ada.lovelace@email.com',
         /* password_hash         */ 'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4',
         /* name                  */ 'Ada Lovelace', 
@@ -37,9 +39,7 @@
         /* kyc_verified_at       */ null,
         /* two_factor_enabled    */ false,
         /* language              */ 'en',
-        /* timezone              */ 'UTC',
-        /* created_at            */ NOW(),
-        /* updated_at            */ NOW()
+        /* timezone              */ 'UTC'
       );
     ]]></sql>
 

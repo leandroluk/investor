@@ -10,13 +10,13 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "investment" (
         "id"          UUID           NOT NULL,
+        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "strategy_id" UUID           NOT NULL,
         "asset_id"    UUID           NOT NULL,
         "user_id"     UUID           NOT NULL,
         "amount_usd"  DECIMAL        NOT NULL,
         "status"      VARCHAR(20)    NOT NULL,
-        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"  TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("strategy_id") REFERENCES "strategy" ("id"),

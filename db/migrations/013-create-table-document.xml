@@ -10,13 +10,13 @@
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
       CREATE TABLE "document" (
         "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"       UUID           NOT NULL,
         "type"          VARCHAR(50)    NOT NULL,
         "storage_key"   VARCHAR(255)   NOT NULL,
         "status"        VARCHAR(20)    NOT NULL,
         "reject_reason" TEXT               NULL,
-        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"    TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
         FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE
