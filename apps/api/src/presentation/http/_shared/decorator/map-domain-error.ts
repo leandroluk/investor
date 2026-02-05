@@ -17,7 +17,7 @@ import {ErrorDTO} from '../dto';
 
 export type ErrorMapping = [errorClass: Type<Error> | Function, status: HttpStatus];
 
-export function createDomainExceptionFilter(mappings: Record<string, number>): Type<ExceptionFilter> {
+function makeFilter(mappings: Record<string, number>): Type<ExceptionFilter> {
   @Injectable()
   @Catch(DomainError, ZodError)
   class GeneratedFilter implements ExceptionFilter {
@@ -54,7 +54,7 @@ export function createDomainExceptionFilter(mappings: Record<string, number>): T
   return GeneratedFilter;
 }
 
-export function DomainException(...mappings: ErrorMapping[]): ClassDecorator & MethodDecorator {
+export function MapDomainError(...mappings: ErrorMapping[]): ClassDecorator & MethodDecorator {
   const mappingMap = mappings.reduce(
     (acc, [errorClass, status]) => {
       acc[errorClass.name] = status;
@@ -90,5 +90,5 @@ export function DomainException(...mappings: ErrorMapping[]): ClassDecorator & M
     })
   );
 
-  return applyDecorators(UseFilters(createDomainExceptionFilter(mappingMap)), ...swaggerDecorators);
+  return applyDecorators(UseFilters(makeFilter(mappingMap)), ...swaggerDecorators);
 }
