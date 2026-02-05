@@ -3,13 +3,7 @@ import {DeviceEntity} from '#/domain/account/entity';
 import {ApiProperty, PickType} from '@nestjs/swagger';
 
 // #region RegisterDevice
-export class RegisterDeviceBodyDTO extends PickType(RegisterDeviceCommand, [
-  'platform',
-  'fingerprint',
-  'brand',
-  'model',
-  'name',
-]) {}
+export class RegisterDeviceBodyDTO extends PickType(RegisterDeviceCommand, ['platform', 'brand', 'model', 'name']) {}
 // #endregion
 
 // #region ListActiveDevice

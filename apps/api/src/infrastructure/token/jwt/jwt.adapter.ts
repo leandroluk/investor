@@ -15,15 +15,15 @@ export class TokenJwtAdapter implements TokenPort {
     sessionKey: string,
     user: UserEntity,
     deviceFingerprintHash: string,
-    includeRefresh?: T
+    complete?: T
   ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
     const claims: TokenPort.Claims = {
-      subject: user.id,
+      id: user.id,
       email: user.email,
       name: user.name,
       language: user.language,
       timezone: user.timezone,
-      cnf: {jkt: deviceFingerprintHash},
+      hash: deviceFingerprintHash,
     };
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
@@ -38,7 +38,7 @@ export class TokenJwtAdapter implements TokenPort {
       expiresIn: this.tokenJwtConfig.accessTTL,
     };
 
-    if (includeRefresh) {
+    if (complete) {
       token.refreshToken = jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
         algorithm: this.tokenJwtConfig.algorithm,
         audience: this.tokenJwtConfig.audience,
@@ -63,14 +63,7 @@ export class TokenJwtAdapter implements TokenPort {
     return {
       kind: header.typ as TokenPort.Decoded['kind'],
       sessionKey: payload.jti!,
-      claims: {
-        subject: payload.sub!,
-        email: payload.email,
-        name: payload.name,
-        language: payload.language,
-        timezone: payload.timezone,
-        cnf: {jkt: payload.cnf?.jkt},
-      } as TokenPort.Claims,
+      claims: payload as TokenPort.Claims,
     };
   }
 }

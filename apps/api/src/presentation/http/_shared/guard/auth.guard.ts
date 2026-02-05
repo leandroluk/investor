@@ -37,11 +37,11 @@ export class AuthGuard implements CanActivate {
   }
 
   private async compareFingerprint(request: FastifyRequest, claims: TokenPort.Claims): Promise<void> {
-    const sameHash = this.hasherPort.compare(request.fingerprint, claims.cnf.jkt);
+    const sameHash = this.hasherPort.compare(request.fingerprint, claims.hash);
     if (!sameHash) {
       void this.brokerPort.publish(
         new UserRequestChallengeEvent(request.id, request.startTime, {
-          userId: claims.subject,
+          userId: claims.id,
           userEmail: claims.email,
         })
       );

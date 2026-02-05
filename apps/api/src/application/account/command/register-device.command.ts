@@ -60,9 +60,7 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
       existingDevice.name = command.name;
       existingDevice.updatedAt = new Date();
       await this.deviceRepository.update(existingDevice);
-      if (existingDevice.fingerprint) {
-        await this.deviceStore.save(existingDevice.userId, existingDevice.fingerprint);
-      }
+      await this.deviceStore.save(existingDevice.userId, existingDevice.fingerprint);
       return; // Explicit return to match void
     }
 

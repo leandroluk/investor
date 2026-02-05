@@ -15,12 +15,12 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
       refreshToken: 'fake_refresh',
     },
     info: {
-      subject: '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+      id: '019c247b-93e1-76bb-9d0a-d13a572c8af8',
       email: 'ada.lovelace@email.com',
       name: 'Ada Lovelace',
       language: 'en-US',
       timezone: 'UTC',
-      cnf: {jkt: 'jkt'},
+      hash: 'hash',
     } satisfies TokenPort.Claims,
     picture: Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',

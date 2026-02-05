@@ -10,8 +10,12 @@ import {CacheRedisError} from '../redis.error';
 export class CacheRedisChallengeStore implements ChallengeStore {
   constructor(private readonly cacheRedisAdapter: CacheRedisAdapter) {}
 
+  private key(userId: string): string {
+    return `user.id:${userId}:challenge`;
+  }
+
   async save(challenge: ChallengeEntity): Promise<void> {
-    await this.cacheRedisAdapter.set(`user:${challenge.userId}:challenge`, {
+    await this.cacheRedisAdapter.set(this.key(challenge.userId), {
       id: challenge.id,
       code: challenge.code,
       expiresAt: challenge.expiresAt,
@@ -19,12 +23,11 @@ export class CacheRedisChallengeStore implements ChallengeStore {
   }
 
   async get(userId: string): Promise<Pick<ChallengeEntity, 'id' | 'code' | 'expiresAt'> | null> {
-    const key = `user:${userId}:challenge`;
-    const {value} = await this.cacheRedisAdapter.get<Pick<ChallengeEntity, 'id' | 'code' | 'expiresAt'>>(key);
+    const {value} = await this.cacheRedisAdapter.get(this.key(userId));
     return value ? value : null;
   }
 
   async delete(userId: string): Promise<void> {
-    await this.cacheRedisAdapter.delete(`user:${userId}:challenge`);
+    await this.cacheRedisAdapter.delete(this.key(userId));
   }
 }

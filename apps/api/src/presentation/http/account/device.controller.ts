@@ -6,6 +6,7 @@ import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiHeader,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -29,13 +30,14 @@ export class DeviceController {
   // #region postRegisterDevice
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiHeader({name: 'x-fingerprint', required: true, example: 'fingerprint...'})
   @ApiCreatedResponse({description: 'Device registered successfully'})
   async postRegisterDevice(
     @GetMeta() meta: GetMeta,
     @GetUser() user: GetUser,
     @Body() body: RegisterDeviceBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RegisterDeviceCommand({...meta, userId: user.claims.subject, ...body}));
+    await this.commandBus.execute(new RegisterDeviceCommand({...meta, userId: user.claims.id, ...body}));
   }
   // #endregion
 
@@ -50,7 +52,7 @@ export class DeviceController {
     @GetUser() user: GetUser,
     @Param('id') id: string
   ): Promise<void> {
-    await this.commandBus.execute(new RevokeDeviceCommand({...meta, userId: user.claims.subject, id}));
+    await this.commandBus.execute(new RevokeDeviceCommand({...meta, userId: user.claims.id, id}));
   }
   // #endregion
 
@@ -63,7 +65,7 @@ export class DeviceController {
     @GetMeta() meta: GetMeta, //
     @GetUser() user: GetUser
   ): Promise<ListActiveDeviceResultDTO> {
-    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta, userId: user.claims.subject}));
+    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta, userId: user.claims.id}));
     return {items: result};
   }
   // #endregion

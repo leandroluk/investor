@@ -14,16 +14,19 @@ export class CacheRedisOtpStore implements OtpStore {
     private readonly cacheRedisAdapter: CacheRedisAdapter
   ) {}
 
+  private key(userId: UserEntity['id'], code: string): string {
+    return `otp:userId:${userId}:code:${code}`;
+  }
+
   async create(userId: UserEntity['id']): Promise<string> {
-    await this.cacheRedisAdapter.delete(`user:${userId}:otp:*`);
+    await this.cacheRedisAdapter.delete(this.key(userId, '*'));
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const key = `user:${userId}:otp:${otp}`;
-    await this.cacheRedisAdapter.set(key, otp, this.cacheRedisConfig.otpTokenTTL);
+    await this.cacheRedisAdapter.set(this.key(userId, otp), 1, this.cacheRedisConfig.otpTokenTTL);
     return otp;
   }
 
   async verify(otp: string): Promise<UserEntity['id']> {
-    const {key, value} = await this.cacheRedisAdapter.get(`user:*:otp:${otp}`);
+    const {key, value} = await this.cacheRedisAdapter.get(this.key('*', otp));
     if (otp === value) {
       await this.cacheRedisAdapter.delete(key);
       return key.split(':')[1]!;

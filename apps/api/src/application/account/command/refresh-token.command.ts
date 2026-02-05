@@ -87,7 +87,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
 
   async execute(command: RefreshTokenCommand): Promise<TokenPort.Authorization> {
     const decoded = await this.decodeToken(command.refreshToken);
-    const user = await this.getUser(decoded.claims.subject);
+    const user = await this.getUser(decoded.claims.id);
     await this.refreshSession(user.id, decoded.sessionKey, command.fingerprint);
     const result = await this.createToken(decoded.sessionKey, user, command.fingerprint);
     return result;

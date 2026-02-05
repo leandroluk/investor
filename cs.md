@@ -59,15 +59,15 @@
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
 - Após a validação bem-sucedida, o endereço é persistido no perfil do usuário e o evento é registrado no log de auditoria.
-##### 01.10.⚡✅🌎`[sso]` callback from provider and upsert
+##### 01.10.⚡✔️🌎`[sso]` callback from provider and upsert
 - Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
 - A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
-##### 01.11.⚡✅🌎`[auth]` login using token
+##### 01.11.⚡✔️🌎`[auth]` login using token
 - Após a autenticação via token (ex: link mágico), o sistema valida o token.
 - Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
 - Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
 - Registra a tentativa (sucesso/falha).
-##### 01.12.⚡✅🌎`[auth]` refresh token
+##### 01.12.⚡✔️🌎`[auth]` refresh token
 - O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
 - O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
 - O refresh de token não tem nada a ver com permissões de device ou algo do tipo
@@ -100,7 +100,7 @@
 - Notificação de Feedback: O sistema dispara automaticamente um alerta (e-mail/push) informando o usuário sobre o resultado da análise e os passos necessários para correção, se houver rejeição.
 ##### 01.19.🔍✔️🌎`[auth]` check if email is available
 - Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
-##### 01.20.🔍✅🌎`[sso]` get sso redirect url
+##### 01.20.🔍✔️🌎`[sso]` get sso redirect url
 - Para fazer a autenticação via SSO deve ser passado o callback_url e o provider. O provider pode ser "google", "microsoft", etc. O callback_url é a url para onde o usuário será redirecionado após a autenticação.
 - O sistema então vai gerar a url de redirecionamento para o provider de autenticação colocando o callback_url no state de forma encriptada, executando o redirecionamento.
 ##### 01.21.🔍⛔🔒`[profile]` get user profile
@@ -116,11 +116,11 @@
 - Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
 - Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
 - Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
-##### 01.25.🔄✅🌎`[auth]` dispatch send email after register
+##### 01.25.🔄✔️🌎`[auth]` dispatch send email after register
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
 - Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.
-##### 01.26.🔄✅🌎`[auth]` dispatch send password reset email
+##### 01.26.🔄✔️🌎`[auth]` dispatch send password reset email
 - Após evento de solicitação de reset de senha.
 - Gera código OTP (15 minutos) e envia email com template de recuperação.
 - Email contém link com código como searchParam.      

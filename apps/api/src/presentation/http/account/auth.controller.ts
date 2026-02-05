@@ -24,7 +24,7 @@ import {
 } from '#/domain/account/error';
 import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
+import {ApiCreatedResponse, ApiHeader, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {GetMeta, MapDomainError} from '../_shared/decorator';
 import {ChallengeGuard} from '../_shared/guard';
 import {
@@ -180,6 +180,7 @@ export class AuthController {
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @ApiHeader({name: 'x-fingerprint', required: false})
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingCredential(
     @GetMeta() meta: GetMeta,
@@ -195,6 +196,7 @@ export class AuthController {
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @ApiHeader({name: 'x-fingerprint', required: false})
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingToken(
     @GetMeta() meta: GetMeta, //

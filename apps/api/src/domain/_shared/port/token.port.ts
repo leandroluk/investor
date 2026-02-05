@@ -11,12 +11,12 @@ export abstract class TokenPort {
 }
 export namespace TokenPort {
   export interface Claims {
-    subject: UserEntity['id'];
+    id: UserEntity['id'];
     email: UserEntity['email'];
     name: UserEntity['name'];
     language: UserEntity['language'];
     timezone: UserEntity['timezone'];
-    cnf: {jkt: string};
+    hash: string;
   }
   export interface Authorization {
     tokenType: string;

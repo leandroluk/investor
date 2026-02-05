@@ -121,7 +121,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   }
 
   private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
-    const sessionKey = await this.sessionStore.create(user, device);
+    const sessionKey = await this.sessionStore.create(user.id, device.fingerprint);
     const deviceFingerprintHash = this.hasherPort.hash(device.fingerprint);
     const result = this.tokenPort.create<true>(sessionKey, user, deviceFingerprintHash, true);
     return result;

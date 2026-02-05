@@ -9,10 +9,10 @@ export class ChallengeGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
-    const reply = context.switchToHttp().getRequest<FastifyReply>();
+    const reply = context.switchToHttp().getResponse<FastifyReply>();
     const user = request['user'] as TokenPort.Decoded;
 
-    const challenge = await this.challengeStore.get(user.claims.subject);
+    const challenge = await this.challengeStore.get(user.claims.id);
     if (challenge) {
       reply.header('x-challenge-id', challenge.id);
       throw new PreconditionFailedException('Precondition Required');
