@@ -2,13 +2,9 @@ import {type EventEmitter2} from '@nestjs/event-emitter';
 import {createHandlerDecorator} from '../factory';
 
 export function Trace(sufix?: string): ClassDecorator & MethodDecorator {
-  return createHandlerDecorator(async function (this: any, originalMethod, methodName, ...args) {
+  return createHandlerDecorator(function (this: any, originalMethod, methodName, ...args) {
     const start = performance.now();
-
-    try {
-      const result = await originalMethod(...args);
-      return result;
-    } finally {
+    const emit = (): void => {
       const eventEmitter = (global as any).eventEmitter as EventEmitter2;
 
       if (eventEmitter) {
@@ -19,6 +15,18 @@ export function Trace(sufix?: string): ClassDecorator & MethodDecorator {
           timestamp: new Date(),
         });
       }
+    };
+
+    try {
+      const result = originalMethod.apply(this, args);
+      if (result instanceof Promise) {
+        return result.finally(() => emit());
+      }
+      emit();
+      return result;
+    } catch (error) {
+      emit();
+      throw error;
     }
   });
 }

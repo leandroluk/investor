@@ -1,5 +1,5 @@
 export function createHandlerDecorator(
-  handler: (originalMethod: any, methodName: string, ...args: any[]) => Promise<any>
+  handler: (originalMethod: any, methodName: string, ...args: any[]) => any
 ): MethodDecorator & ClassDecorator {
   return (target: any, propertyKey?: string | symbol, descriptor?: PropertyDescriptor): any => {
     if (descriptor) {
