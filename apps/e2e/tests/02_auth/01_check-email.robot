@@ -13,13 +13,11 @@ ${CHECK_PATH}       auth/check/email
 *** Test Cases ***
 Should Throw When Email In Use
     [Documentation]    Complete registration and login flow
-    [Tags]    auth    registration_flow
     ${test_email} =    Register New Account
     Do Check    ${test_email}    409
 
 Should Return When Email Not In Use
     [Documentation]    Complete registration and login flow
-    [Tags]    auth    registration_flow
     ${random_str} =    Generate Random String    10    [LOWER]
     VAR    ${random_email} =    test_${random_str}@email.com
     Do Check    ${random_email}    204
@@ -29,14 +27,14 @@ Should Return When Email Not In Use
 Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
     Create Session    api_session    ${ROBOT_URL}    verify=True
-    Connect To Postgres
-    Execute Postgres    TRUNCATE TABLE "user" CASCADE;
-    Delete All Emails From Mailbox
+    Postgres Connect
+    Postgres Execute    TRUNCATE TABLE "user" CASCADE;
+    Mailbox Delete All Emails
 
 Teardown Test Suite
     [Documentation]    Closes all sessions
     Delete All Sessions
-    Disconnect From Postgres
+    Postgres Disconnect
 
 Register New Account
     [Documentation]    Registers user and returns random email

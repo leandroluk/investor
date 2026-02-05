@@ -3,34 +3,35 @@ Documentation       Password recovery and reset test suite
 
 Resource            ../../resources/util.resource
 
-Suite Setup         Setup Recovery Suite
-Suite Teardown      Teardown Recovery Suite
-
+Suite Setup       Setup Test Suite
+Suite Teardown    Teardown Test Suite
 
 *** Variables ***
-${RECOVER_PATH}     auth/recover
+${RECOVER_PATH}    auth/recover
 ${NEW_PASSWORD}     NewTest@123
+${TEST_EMAIL}      ${EMPTY}
 
 
 *** Test Cases ***
 Complete Recovery Flow
     [Documentation]    Complete password recovery and reset flow
-    [Tags]    auth    recovery_flow
-    ${test_email} =    Create Active User For Recovery
-    ${recovery_otp} =    Request Recovery And Get Code    ${test_email}
-    Perform Password Reset    ${test_email}    ${recovery_otp}    ${NEW_PASSWORD}
-    Login With New Password    ${test_email}    ${NEW_PASSWORD}
-
+    ${TEST_EMAIL} =    Create Active User For Recovery
+    ${recovery_otp} =    Request Recovery And Get Code    ${TEST_EMAIL}
+    Perform Password Reset    ${TEST_EMAIL}    ${recovery_otp}    ${NEW_PASSWORD}
+    Login With New Password    ${TEST_EMAIL}    ${NEW_PASSWORD}
 
 *** Keywords ***
-Setup Recovery Suite
+Setup Test Suite
     [Documentation]    Initializes API session and cleans the mailbox
     Create Session    api_session    ${ROBOT_URL}    verify=True
-    Delete All Emails From Mailbox
+    Postgres Connect
+    Mailbox Delete All Emails
 
-Teardown Recovery Suite
+Teardown Test Suite
     [Documentation]    Cleans up resources after tests
     Delete All Sessions
+    Postgres Delete User By Email    ${TEST_EMAIL}
+    Postgres Disconnect
 
 Create Active User For Recovery
     [Documentation]    Registers and activates a new user, returning the email
@@ -45,11 +46,11 @@ Create Active User For Recovery
     POST On Session    api_session    auth/register    json=&{reg_payload}    expected_status=201
 
     # 2. Activate User
-    ${activation_otp} =    Get OTP From Email    ${email}
+    ${activation_otp} =    Mailbox Get OTP From Email    ${email}
     VAR    &{act_payload} =
     ...    email=${email}
     ...    otp=${activation_otp}
-    PATCH On Session    api_session    auth/activate    json=&{act_payload}    expected_status=202
+    PUT On Session    api_session    auth/activate    json=&{act_payload}    expected_status=200
 
     Log    User created and activated: ${email}    level=INFO
     RETURN    ${email}
@@ -61,10 +62,10 @@ Request Recovery And Get Code
     # 1. POST request to initiate recovery
     VAR    &{payload} =
     ...    email=${email}
-    POST On Session    api_session    ${RECOVER_PATH}    json=&{payload}    expected_status=202
+    POST On Session    api_session    ${RECOVER_PATH}    json=&{payload}    expected_status=200
 
     # 2. Get OTP
-    ${otp} =    Get OTP From Email    ${email}
+    ${otp} =    Mailbox Get OTP From Email    ${email}
     RETURN    ${otp}
 
 Perform Password Reset
@@ -75,12 +76,12 @@ Perform Password Reset
     ...    email=${email}
     ...    password=${new_pass}
     ...    otp=${otp}
-    PATCH On Session    api_session    ${RECOVER_PATH}    json=&{payload}    expected_status=200
+    PUT On Session    api_session    ${RECOVER_PATH}    json=&{payload}    expected_status=200
     Log    Password reset successfully for: ${email}    level=INFO
 
 Login With New Password
     [Documentation]    Verifies login with new password and validates access token
     [Arguments]    ${email}    ${password}
-    ${auth_data} =    Login With Credentials    ${email}    ${password}
+    ${auth_data} =    Auth Login With Credentials    ${email}    ${password}
     Dictionary Should Contain Key    ${auth_data}    accessToken
     RETURN    ${auth_data}

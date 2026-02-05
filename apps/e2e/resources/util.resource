@@ -14,17 +14,11 @@ ${REGEX_EMAIL_OTP} =    id="otp"[^>]*>\\s*([a-zA-Z0-9]{6})\\s*</span>
 
 
 *** Keywords ***
-Connect To Mailbox
-    [Documentation]    Centralizes the mailbox opening
-    Open Mailbox
-    ...    host=${ROBOT_MAILER_IMAP_HOST}
-    ...    port=${ROBOT_MAILER_IMAP_PORT}
-    ...    user=${ROBOT_MAILER_IMAP_USERNAME}
-    ...    password=${ROBOT_MAILER_IMAP_PASSWORD}
-
-Connect To Postgres
+Postgres Connect
     [Documentation]    Centralizes the database connection by parsing the URL
-    VAR    ${p} =    ${{__import__('urllib.parse').parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)}}
+    ${p} =    Evaluate
+    ...    urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)
+    ...    modules=urllib.parse
     Connect To Database
     ...    db_module=psycopg2
     ...    db_name=${{$p.path[1:]}}
@@ -33,22 +27,35 @@ Connect To Postgres
     ...    db_host=${{$p.hostname}}
     ...    db_port=${{$p.port}}
 
-Disconnect From Postgres
+Postgres Disconnect
     [Documentation]    Centralizes the database disconnection
     Disconnect From Database
 
-Query Postgres
+Postgres Query
     [Documentation]    Executes a query and returns the result
     [Arguments]    ${query}
-    ${result} =    Query    ${query}
+    ${result} =    Query    ${query}    return_dict=True
     RETURN    ${result}
 
-Execute Postgres
+Postgres Execute
     [Documentation]    Executes a query and returns the result
     [Arguments]    ${query}
     Execute Sql String    ${query}
 
-Get OTP From Email
+Postgres Delete User By Email
+    [Documentation]    Deletes a user from the database using their email address
+    [Arguments]    ${email}
+    Postgres Execute    DELETE FROM "user" WHERE email = '${email}'
+
+Mailbox Connect
+    [Documentation]    Centralizes the mailbox opening
+    Open Mailbox
+    ...    host=${ROBOT_MAILER_IMAP_HOST}
+    ...    port=${ROBOT_MAILER_IMAP_PORT}
+    ...    user=${ROBOT_MAILER_IMAP_USERNAME}
+    ...    password=${ROBOT_MAILER_IMAP_PASSWORD}
+
+Mailbox Get OTP From Email
     [Documentation]    Retrieves the OTP code from the email with retry logic
     [Arguments]    ${recipient_email}    ${max_attempts}=15    ${wait_between_attempts}=5s
     Log    Starting email retrieval for: ${recipient_email}    level=INFO
@@ -58,41 +65,41 @@ Get OTP From Email
     FOR    ${attempt}    IN RANGE    1    ${range_end}
         Log    Attempt ${attempt}/${max_attempts} to retrieve email    level=INFO
         TRY
-            ${otp_code} =    Try Get OTP From Mailbox    ${recipient_email}
+            ${otp_code} =    Mailbox Try Get OTP    ${recipient_email}
             RETURN    ${otp_code}
         EXCEPT    AS    ${error}
             Log    Attempt ${attempt} failed: ${error}    level=WARN
-            Handle Failed OTP Attempt    ${attempt}    ${max_attempts_int}    ${wait_between_attempts}    ${error}
+            Mailbox Handle Failed OTP Attempt    ${attempt}    ${max_attempts_int}    ${wait_between_attempts}    ${error}
         END
     END
 
-Open Mailbox And Wait For Email
+Mailbox Open And Wait For Email
     [Documentation]    Opens the mailbox and waits for a specific recipient email
     [Arguments]    ${recipient_email}
-    Connect To Mailbox
+    Mailbox Connect
     ${emails} =    Wait For Email
     ...    sender=${ROBOT_MAILER_SMTP_FROM}
     ...    recipient=${recipient_email}
     ...    timeout=10
     RETURN    ${emails}
 
-Try Get OTP From Mailbox
+Mailbox Try Get OTP
     [Documentation]    Orchestrates mailbox access and OTP extraction
     [Arguments]    ${recipient_email}
     TRY
-        ${email_index} =    Open Mailbox And Wait For Email    ${recipient_email}
+        ${email_index} =    Mailbox Open And Wait For Email    ${recipient_email}
         IF    $email_index == $None or $email_index == ""
             Fail    No email found yet
         END
-        ${email_body} =    Get Content From Multipart Email    ${email_index}
-        ${otp_code} =    Extract OTP From Content    ${email_body}
+        ${email_body} =    Mailbox Get Content From Multipart Email    ${email_index}
+        ${otp_code} =    Mailbox Extract OTP From Content    ${email_body}
         Delete Email    ${email_index}
         RETURN    ${otp_code}
     FINALLY
         Run Keyword And Ignore Error    Close Mailbox
     END
 
-Get Content From Multipart Email
+Mailbox Get Content From Multipart Email
     [Documentation]    Retrieves the OTP code from the email with retry logic
     [Arguments]    ${email_index}
     ${status} =    Walk Multipart Email    ${email_index}
@@ -111,7 +118,7 @@ Get Content From Multipart Email
     END
     RETURN    ${extracted_body}
 
-Extract OTP From Content
+Mailbox Extract OTP From Content
     [Documentation]    Parses the email body to find the OTP code using Regex
     [Arguments]    ${content}
     ${matches} =    Get Regexp Matches    ${content}    ${REGEX_EMAIL_OTP}    1
@@ -119,7 +126,7 @@ Extract OTP From Content
     Should Be True    ${match_count} > 0    msg=OTP pattern not found in email body
     RETURN    ${matches[0]}
 
-Handle Failed OTP Attempt
+Mailbox Handle Failed OTP Attempt
     [Documentation]    Handles failed OTP attempts with retry logic
     [Arguments]    ${attempt}    ${max_attempts}    ${wait_time}    ${error}
     IF    $attempt == $max_attempts
@@ -128,7 +135,16 @@ Handle Failed OTP Attempt
     Log    Waiting ${wait_time} before next attempt...    level=INFO
     Sleep    ${wait_time}
 
-Login With Credentials
+Mailbox Delete All Emails
+    [Documentation]    Cleans the inbox to avoid state interference
+    TRY
+        Mailbox Connect
+        Run Keyword And Return Status    Delete All Emails
+    FINALLY
+        Run Keyword And Ignore Error    Close Mailbox
+    END
+
+Auth Login With Credentials
     [Documentation]    Logs in with credentials and returns auth data
     [Arguments]    ${email}    ${password}    ${expected_status}=200
     VAR    &{payload} =
@@ -139,15 +155,12 @@ Login With Credentials
     ...    auth/login/credential
     ...    json=${payload}
     ...    expected_status=${expected_status}
-    IF    $response.text == ""    RETURN    ${{ {} }}
-    VAR    ${auth_data} =    ${response.json()}
-    RETURN    ${auth_data}
+    RETURN    ${response.json()}
 
-Delete All Emails From Mailbox
-    [Documentation]    Cleans the inbox to avoid state interference
-    TRY
-        Connect To Mailbox
-        Run Keyword And Return Status    Delete All Emails
-    FINALLY
-        Run Keyword And Ignore Error    Close Mailbox
-    END
+Url Extract Query Param
+    [Documentation]    Extracts a query parameter from a URL
+    [Arguments]    ${url}    ${name}
+    ${parsed_url} =    Evaluate    urllib.parse.urlparse($url)    modules=urllib.parse
+    ${query_params} =    Evaluate    urllib.parse.parse_qs($parsed_url.query)    modules=urllib.parse
+    ${value} =    Get From Dictionary    ${query_params}    ${name}    default=${None}
+    RETURN    ${value}[0]

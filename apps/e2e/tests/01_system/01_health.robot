@@ -14,7 +14,6 @@ ${HEALTH_PATH}      system/health
 *** Test Cases ***
 Verify API System Health Status
     [Documentation]    Verify API system health status
-    [Tags]    system    health
     ${json}=    Do Health Request
     Validate Health Request    ${json}
 
@@ -23,7 +22,7 @@ Verify API System Health Status
 Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
     Create Session    api_session    ${ROBOT_URL}    verify=True
-    Delete All Emails From Mailbox
+    Mailbox Delete All Emails
 
 Teardown Test Suite
     [Documentation]    Closes all sessions
