@@ -21,55 +21,55 @@
 - O sistema irá verificar se se o email é único na base. Caso contrário, ele irá retornar um erro de conflito. Também irá ver se a senha atende aos requisitos mínimos de complexidade.
 - Se não houverem problemas, o sistema irá criar o usuário com o status "PENDING" e enviar um e-mail de ativação.
 - A senha deve ser processada com hashing (bcrypt ou argon2) antes de persistir no banco.
-##### 01.03.⚡✔️🌎`[auth]` send activation email
+##### 01.03.🔄✔️🌎`[auth]` dispatch send email after register
+- Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
+- Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
+- O código OTP deve ter validade de 15 minutos.
+##### 01.04.⚡✔️🌎`[auth]` send activation email
 - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
 - O sistema irá gerar um novo código de ativação e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.     
-##### 01.04.⚡✔️🌎`[auth]` activate user using email and otp
+##### 01.05.⚡✔️🌎`[auth]` activate user using email and otp
 - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
 - Ao acessar o link, o usuário será direcionado a uma tela de ativação onde ele irá capturar as informações do searchParam e iniciar a ativação.
 - Se o email + o código de ativação estiverem ok então o sistema irá alterar o status do usuário para "ACTIVE". E redirecionar para a tela de login.
-##### 01.05.⚡✔️🌎`[auth]` request password reset
+##### 01.06.⚡✔️🌎`[auth]` request password reset
 - Usuário informa seu email para recuperar senha.
 - Sistema gera código OTP (15 minutos de validade) e armazena em cache.
 - Envia email com link contendo o código.
 - Não revela se o email existe ou não (segurança contra enumeração).
-##### 01.06.⚡✔️🌎`[auth]` reset password
+##### 01.07.🔄✔️🌎`[auth]` dispatch send password reset email
+- Após evento de solicitação de reset de senha.
+- Gera código OTP (15 minutos) e envia email com template de recuperação.
+- Email contém link com código como searchParam.      
+##### 01.08.⚡✔️🌎`[auth]` reset password
 - Usuário informa: email, código OTP e nova senha.
 - Sistema valida código OTP e sua validade.
 - Valida complexidade da nova senha (mesmo padrão do registro).
 - Atualiza hash da senha no banco.
 - Invalida todas as sessões ativas do usuário (logout forçado).
-##### 01.07.⚡✔️🌎`[auth]` login using credential
+##### 01.09.⚡✔️🌎`[auth]` login using credential
 - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
 - O sistema irá verificar as credenciais. Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
 - Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
 - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
-##### 01.08.⚡✔️🌎`[auth]` authorize 2fa code
+##### 01.10.⚡✔️🌎`[auth]` authorize 2fa code
 - O usuário irá fornecer o código de 2FA e o ID do desafio (Challenge).
 - O sistema irá buscar o desafio pelo ID e validar o código.
 - Se válido, marca o desafio como COMPLETED e emite o token de acesso final.
 - Se inválido, incrementa contadores de erro (se houver) e retorna erro.
-##### 01.09.⚡✔️🌎`[auth]` send 2fa code
+##### 01.11.⚡✔️🌎`[auth]` send 2fa code
 - O usuário solicita o reenvio do código de 2FA fornecendo o challengeId.
 - O sistema irá gerar um novo código de 2FA e enviar para o email do usuário.
-##### 01.10.⚡✔️🌎`[auth]` login using token
+##### 01.12.⚡✔️🌎`[auth]` login using token
 - Após a autenticação via token (ex: link mágico), o sistema valida o token.
 - Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
 - Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
 - Registra a tentativa (sucesso/falha).
-##### 01.11.⚡✔️🌎`[auth]` refresh token
+##### 01.13.⚡✔️🌎`[auth]` refresh token
 - O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
 - O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
 - O refresh de token não tem nada a ver com permissões de device ou algo do tipo
-##### 01.12.🔄✔️🌎`[auth]` dispatch send email after register
-- Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
-- Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
-- O código OTP deve ter validade de 15 minutos.
-##### 01.13.🔄✔️🌎`[auth]` dispatch send password reset email
-- Após evento de solicitação de reset de senha.
-- Gera código OTP (15 minutos) e envia email com template de recuperação.
-- Email contém link com código como searchParam.      
 ##### 01.14.⚡✔️🌎`[sso]` callback from provider and upsert
 - Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
 - A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
