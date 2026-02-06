@@ -12,7 +12,7 @@ ${TEST_EMAIL}    ${EMPTY}
 
 *** Test Cases ***
 Complete Registration Flow
-    [Documentation]    Complete registration and login flow
+    [Documentation]    Register > Get OTP > Resend OTP > Get New OTP > Activate > Login
     ${TEST_EMAIL} =    Register New Account
     ${first_otp} =    Get First Activation Code    ${TEST_EMAIL}
     ${second_otp} =    Resend And Get New Code    ${TEST_EMAIL}    ${first_otp}

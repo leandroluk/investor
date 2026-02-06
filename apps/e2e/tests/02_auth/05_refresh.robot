@@ -14,12 +14,13 @@ ${TEST_EMAIL}       ${EMPTY}
 
 *** Test Cases ***
 Complete Token Refresh Flow
-    [Documentation]    Full flow: register, activate, login, and refresh the session token
+    [Documentation]    Register > Activate > Login > Refresh > Validate
     ${TEST_EMAIL} =    Create Active User For Testing
     ${auth_data} =    Login And Get Auth Data    ${TEST_EMAIL}
     Sleep    1.1s
     ${new_auth_data} =    Perform Token Refresh    ${auth_data['refresh_token']}
     Validate New Session Data    ${auth_data['access_token']}    ${new_auth_data}
+
 
 *** Keywords ***
 Setup Test Suite

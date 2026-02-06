@@ -14,11 +14,12 @@ ${TEST_EMAIL}      ${EMPTY}
 
 *** Test Cases ***
 Complete Recovery Flow
-    [Documentation]    Complete password recovery and reset flow
+    [Documentation]    Request recover > Reset password > Login
     ${TEST_EMAIL} =    Create Active User For Recovery
     ${recovery_otp} =    Request Recovery And Get Code    ${TEST_EMAIL}
     Perform Password Reset    ${TEST_EMAIL}    ${recovery_otp}    ${NEW_PASSWORD}
     Login With New Password    ${TEST_EMAIL}    ${NEW_PASSWORD}
+
 
 *** Keywords ***
 Setup Test Suite

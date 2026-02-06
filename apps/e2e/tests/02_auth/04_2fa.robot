@@ -14,7 +14,7 @@ ${TEST_EMAIL}       ${EMPTY}
 
 *** Test Cases ***
 Complete 2FA Authentication Flow
-    [Documentation]    Full flow: register, enable 2FA, login, get OTP, authorize 2FA, validate
+    [Documentation]    Register > Enable 2FA > Login > Validate > Get OTP > Authorize 2FA
     ${TEST_EMAIL} =    Register New Account
     Enable User And Set To Use 2FA On Database    ${TEST_EMAIL}
     ${auth_data} =    Login With Activated Account    ${TEST_EMAIL}

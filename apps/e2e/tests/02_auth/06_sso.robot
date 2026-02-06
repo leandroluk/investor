@@ -15,7 +15,7 @@ ${CALLBACK_URL}         http://whatever.local/callback
 
 *** Test Cases ***
 Complete Login Using SSO
-    [Documentation]    Full flow: redirect to provider, redirecto to callback_url, send token to login
+    [Documentation]    Redirect to provider > Redirec to callback_url > Login with token
     ${token}=    Get SSO Token From Redirect
     ${auth_data}=    Exchange Token For Auth Token    ${token}
     Validate Authorization Token    ${auth_data}

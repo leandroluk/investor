@@ -47,6 +47,20 @@ Postgres Delete User By Email
     [Arguments]    ${email}
     Postgres Execute    DELETE FROM "user" WHERE email = '${email}'
 
+Postgres Create Test User
+    [Documentation]    Creates a test user in the database with password "Test@123"
+    ${id} =       Evaluate    uuid.uuid4()             modules=uuid
+    ${name} =    Evaluate    faker.Faker().name()    modules=faker
+    ${email} =    Evaluate    faker.Faker().email()    modules=faker
+    ${query} =    Catenate
+    ...    INSERT INTO "user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "name",
+    ...    "status", "wallet_address", "wallet_verified_at", "wallet_seed_encrypted", "kyc_status", "kyc_verified_at",
+    ...    "two_factor_enabled", "language", "timezone") VALUES ('${id}', NOW(), NOW(), NULL, '${email}',
+    ...    'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', '${name}', 'active', null, null, null, 'active', null,
+    ...    false, 'en', 'UTC');
+    Postgres Execute    ${query}
+    RETURN    ${email}
+
 Mailbox Connect
     [Documentation]    Centralizes the mailbox opening
     Open Mailbox
@@ -69,7 +83,11 @@ Mailbox Get OTP From Email
             RETURN    ${otp_code}
         EXCEPT    AS    ${error}
             Log    Attempt ${attempt} failed: ${error}    level=WARN
-            Mailbox Handle Failed OTP Attempt    ${attempt}    ${max_attempts_int}    ${wait_between_attempts}    ${error}
+            Mailbox Handle Failed OTP Attempt
+            ...    ${attempt}
+            ...    ${max_attempts_int}
+            ...    ${wait_between_attempts}
+            ...    ${error}
         END
     END
 
@@ -147,14 +165,8 @@ Mailbox Delete All Emails
 Auth Login With Credentials
     [Documentation]    Logs in with credentials and returns auth data
     [Arguments]    ${email}    ${password}    ${expected_status}=200
-    VAR    &{payload} =
-    ...    email=${email}
-    ...    password=${password}
-    ${response} =    POST On Session
-    ...    api_session
-    ...    auth/login/credential
-    ...    json=${payload}
-    ...    expected_status=${expected_status}
+    VAR    &{payload} =    email=${email}    password=${password}
+    ${response} =    POST On Session    api_session    auth/login/credential    json=${payload}    expected_status=${expected_status}
     RETURN    ${response.json()}
 
 Url Extract Query Param
