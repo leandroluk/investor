@@ -14,44 +14,95 @@
 >   - 🔄 saga
  
 ### 01. Account (Identity and Access Management)
-##### 01.01.⚡✔️🌎`[auth]` register user using email and password
+##### 01.01.🔍✔️🌎`[auth]` check if email is available
+- Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
+##### 01.02.⚡✔️🌎`[auth]` register user using email and password
 - Para acessar a aplicação o usuário precisa se registrar. Para isso ele precisa informar seu nome, e-mail e senha.
 - O sistema irá verificar se se o email é único na base. Caso contrário, ele irá retornar um erro de conflito. Também irá ver se a senha atende aos requisitos mínimos de complexidade.
 - Se não houverem problemas, o sistema irá criar o usuário com o status "PENDING" e enviar um e-mail de ativação.
 - A senha deve ser processada com hashing (bcrypt ou argon2) antes de persistir no banco.
-##### 01.02.⚡✔️🌎`[auth]` send activation email
+##### 01.03.⚡✔️🌎`[auth]` send activation email
 - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
 - O sistema irá gerar um novo código de ativação e enviar para o email do usuário. 
 - O código OTP deve ter validade de 15 minutos.     
-##### 01.03.⚡✔️🌎`[auth]` activate user using email and otp
+##### 01.04.⚡✔️🌎`[auth]` activate user using email and otp
 - O usuário irá receber um e-mail de ativação com um link de ativação que contém o código de ativação da conta como searchParam. 
 - Ao acessar o link, o usuário será direcionado a uma tela de ativação onde ele irá capturar as informações do searchParam e iniciar a ativação.
 - Se o email + o código de ativação estiverem ok então o sistema irá alterar o status do usuário para "ACTIVE". E redirecionar para a tela de login.
-##### 01.04.⚡✔️🌎`[auth]` request password reset
+##### 01.05.⚡✔️🌎`[auth]` request password reset
 - Usuário informa seu email para recuperar senha.
 - Sistema gera código OTP (15 minutos de validade) e armazena em cache.
 - Envia email com link contendo o código.
 - Não revela se o email existe ou não (segurança contra enumeração).
-##### 01.05.⚡✔️🌎`[auth]` reset password
+##### 01.06.⚡✔️🌎`[auth]` reset password
 - Usuário informa: email, código OTP e nova senha.
 - Sistema valida código OTP e sua validade.
 - Valida complexidade da nova senha (mesmo padrão do registro).
 - Atualiza hash da senha no banco.
 - Invalida todas as sessões ativas do usuário (logout forçado).
-##### 01.06.⚡✔️🌎`[auth]` login using credential
+##### 01.07.⚡✔️🌎`[auth]` login using credential
 - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
 - O sistema irá verificar as credenciais. Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
 - Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
 - Registra a tentativa (sucesso/falha) com IP e ID do usuário para auditoria.
-##### 01.07.⚡✔️🌎`[auth]` authorize 2fa code
+##### 01.08.⚡✔️🌎`[auth]` authorize 2fa code
 - O usuário irá fornecer o código de 2FA e o ID do desafio (Challenge).
 - O sistema irá buscar o desafio pelo ID e validar o código.
 - Se válido, marca o desafio como COMPLETED e emite o token de acesso final.
 - Se inválido, incrementa contadores de erro (se houver) e retorna erro.
-##### 01.08.⚡✔️🌎`[auth]` send 2fa code
+##### 01.09.⚡✔️🌎`[auth]` send 2fa code
 - O usuário solicita o reenvio do código de 2FA fornecendo o challengeId.
 - O sistema irá gerar um novo código de 2FA e enviar para o email do usuário.
-##### 01.09.⚡⛔🔒`[auth]` link wallet address (web3 signature)
+##### 01.10.⚡✔️🌎`[auth]` login using token
+- Após a autenticação via token (ex: link mágico), o sistema valida o token.
+- Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
+- Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
+- Registra a tentativa (sucesso/falha).
+##### 01.11.⚡✔️🌎`[auth]` refresh token
+- O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
+- O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
+- O refresh de token não tem nada a ver com permissões de device ou algo do tipo
+##### 01.12.🔄✔️🌎`[auth]` dispatch send email after register
+- Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
+- Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
+- O código OTP deve ter validade de 15 minutos.
+##### 01.13.🔄✔️🌎`[auth]` dispatch send password reset email
+- Após evento de solicitação de reset de senha.
+- Gera código OTP (15 minutos) e envia email com template de recuperação.
+- Email contém link com código como searchParam.      
+##### 01.14.⚡✔️🌎`[sso]` callback from provider and upsert
+- Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
+- A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
+##### 01.15.🔍✔️🌎`[sso]` get sso redirect url
+- Para fazer a autenticação via SSO deve ser passado o callback_url e o provider. O provider pode ser "google", "microsoft", etc. O callback_url é a url para onde o usuário será redirecionado após a autenticação.
+- O sistema então vai gerar a url de redirecionamento para o provider de autenticação colocando o callback_url no state de forma encriptada, executando o redirecionamento.
+##### 01.16.⚡✔️🔒`[device]` register device (fingerprint)
+- O sistema identifica unicamente o dispositivo do usuário através de um fingerprint gerado pela compilação de múltiplos fatores de hardware e software (web ou mobile).
+- Esse identificador é utilizado para monitorar sessões ativas, prevenir fraudes e permitir o logout remoto.
+- Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
+##### 01.17.⚡✔️🔒`[device]` revoke device (remote logout)
+- Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
+##### 01.18.🔍✔️🔒`[device]` list active devices
+- Lista todos os dispositivos onde a sessão ainda é válida.
+##### 01.19.⚡✅🔒`[profile]` update user profile
+- Permite que o usuário autenticado atualize informações básicas de sua conta, como nome de exibição e preferências de idioma.
+- Bloqueio de Campos Críticos: Por segurança, o sistema impede a alteração direta de e-mail e endereços de carteira vinculada através deste fluxo comum, exigindo processos específicos de validação para essas trocas.
+- Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
+##### 01.20.🔍✅🔒`[profile]` get user profile
+- Retorna dados básicos, status de segurança e carteira vinculada.
+##### 01.21.⚡⛔🔒`[kyc]` upload document
+- Permite que o usuário envie arquivos para comprovação de identidade e residência (RG, CNH, Selfie, comprovante de endereço).
+- O sistema deve validar o formato (JPG, PNG, PDF) e o tamanho máximo do arquivo antes de gerar uma URL de upload seguro para o storage.
+- Cada documento enviado é registrado com um identificador único, data de expiração (se aplicável) e status inicial como PENDING.
+- Transição de Estado: Se o status global de KYC do usuário for NONE, ele deve ser alterado automaticamente para PENDING assim que o primeiro documento obrigatório for recebido.
+- O sistema deve garantir que arquivos sensíveis não sejam acessíveis publicamente, utilizando links temporários (presigned URLs) para visualização administrativa.
+##### 01.22.🔍⛔🔒`[kyc]` list documents to approve (admin)
+##### 01.23.⚡⛔🔒`[kyc]` approve/reject document (admin)
+##### 01.24.🔍⛔🔒`[kyc]` list user documents
+- Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
+- Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
+- Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
+##### 01.25.⚡⛔🔒`[wallet]` link wallet address (web3 signature)
 - Permite que o usuário vincule uma carteira criptográfica (ex: Ethereum) ao seu perfil provando a posse da chave privada sem expô-la.
 - O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto).
 - O usuário deve assinar uma mensagem padronizada contendo este nonce usando sua carteira (ex: via Metamask ou WalletConnect).
@@ -59,78 +110,33 @@
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
 - Após a validação bem-sucedida, o endereço é persistido no perfil do usuário e o evento é registrado no log de auditoria.
-##### 01.10.⚡✔️🌎`[sso]` callback from provider and upsert
-- Após a autenticação no provider, o mesmo irá redirecionar de volta pra api. caso a autenticação tenha sucesso então o provider irá enviar um código de autorização. 
-- A api irá validar o código de autorização e fazer o upsert do usuário, criar um token encriptado contendo o id do usuário e um ttl de 1 minuto, redirecionando o token no searchParams para o callback url recebido na primeira etapa da autenticação via SSO.
-##### 01.11.⚡✔️🌎`[auth]` login using token
-- Após a autenticação via token (ex: link mágico), o sistema valida o token.
-- Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
-- Sempre emite os tokens de acesso e refresh. Se houver desafio pendente, o acesso aos recursos protegidos retornará 428.
-- Registra a tentativa (sucesso/falha).
-##### 01.12.⚡✔️🌎`[auth]` refresh token
-- O token de refresh é utilizado para obter um novo token de acesso. Quando o token de acesso expira o usuário precisa solicitar um novo.
-- O token tem um tempo limite que pode ser refrescado, ou seja após esse tempo ele precisa fazer um novo login.
-- O refresh de token não tem nada a ver com permissões de device ou algo do tipo
-##### 01.13.⚡⛔🔒`[profile]` update user profile
-- Permite que o usuário autenticado atualize informações básicas de sua conta, como nome de exibição e preferências de idioma.
-- Bloqueio de Campos Críticos: Por segurança, o sistema impede a alteração direta de e-mail e endereços de carteira vinculada através deste fluxo comum, exigindo processos específicos de validação para essas trocas.
-- Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
-##### 01.14.⚡✅🔒`[device]` register device (fingerprint)
-- O sistema identifica unicamente o dispositivo do usuário através de um fingerprint gerado pela compilação de múltiplos fatores de hardware e software (web ou mobile).
-- Esse identificador é utilizado para monitorar sessões ativas, prevenir fraudes e permitir o logout remoto.
-- Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
-##### 01.15.⚡✅🔒`[device]` revoke device (remote logout)
-- Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
-##### 01.16.⚡⛔🔒`[wallet]` generate wallet
+##### 01.26.⚡⛔🔒`[wallet]` generate wallet
 - Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança.
 - Deriva a chave privada e o endereço público para a rede Ethereum utilizando o derivation path padrão m/44'/60'/0'/0/0.
 - Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM antes da persistência. A chave de criptografia deve ser derivada da senha do usuário (ex: via PBKDF2 ou Argon2), garantindo que a plataforma não possua custódia total sem a interação do usuário.
 - O sistema armazena o endereço público, a seed criptografada e o Initialization Vector (IV) no banco de dados.
 - Regra de Idempotência: O sistema deve impedir a geração de uma nova carteira se o usuário já possuir uma vinculada ao perfil, retornando erro de conflito caso tentado.
-##### 01.17.⚡⛔🔒`[kyc]` upload document
-- Permite que o usuário envie arquivos para comprovação de identidade e residência (RG, CNH, Selfie, comprovante de endereço).
-- O sistema deve validar o formato (JPG, PNG, PDF) e o tamanho máximo do arquivo antes de gerar uma URL de upload seguro para o storage.
-- Cada documento enviado é registrado com um identificador único, data de expiração (se aplicável) e status inicial como PENDING.
-- Transição de Estado: Se o status global de KYC do usuário for NONE, ele deve ser alterado automaticamente para PENDING assim que o primeiro documento obrigatório for recebido.
-- O sistema deve garantir que arquivos sensíveis não sejam acessíveis publicamente, utilizando links temporários (presigned URLs) para visualização administrativa.
-##### 01.18.⚡⛔🔒`[kyc]` approve/reject document (admin)
-- Interface de back-office que permite a um administrador revisar a validade dos documentos enviados pelo usuário.
-- Fluxo de Aprovação: Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED.
-- Fluxo de Rejeição: Caso o documento seja inválido (ex: foto ilegível), o administrador deve obrigatoriamente informar o motivo da rejeição.
-- Notificação de Feedback: O sistema dispara automaticamente um alerta (e-mail/push) informando o usuário sobre o resultado da análise e os passos necessários para correção, se houver rejeição.
-##### 01.19.🔍✔️🌎`[auth]` check if email is available
-- Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
-##### 01.20.🔍✔️🌎`[sso]` get sso redirect url
-- Para fazer a autenticação via SSO deve ser passado o callback_url e o provider. O provider pode ser "google", "microsoft", etc. O callback_url é a url para onde o usuário será redirecionado após a autenticação.
-- O sistema então vai gerar a url de redirecionamento para o provider de autenticação colocando o callback_url no state de forma encriptada, executando o redirecionamento.
-##### 01.21.🔍⛔🔒`[profile]` get user profile
-- Retorna dados básicos, status de segurança e carteira vinculada.
-##### 01.22.🔍✅🔒`[device]` list active devices
-- Lista todos os dispositivos onde a sessão ainda é válida.
-##### 01.23.🔍⛔🔒`[wallet]` reveal seed phrase
+##### 01.27.🔍⛔🔒`[wallet]` reveal seed phrase
 - Permite que o usuário visualize as 12 palavras (mnemonic) de sua carteira gerada internamente.
 - Re-autenticação Obrigatória: Exige que o usuário forneça sua senha atual e o código 2FA ativo no momento exato da solicitação, independentemente de já estar logado.
 - Auditoria Rígida: Cada acesso a essa funcionalidade deve gerar um registro imutável no log de auditoria (ledger), contendo o IP, ID do dispositivo e timestamp para fins de conformidade e segurança.
 - Restrição de Acesso: O sistema deve bloquear essa funcionalidade caso a conta esteja em processo de recuperação de senha ou apresente comportamento suspeito detectado pelo módulo de segurança.
-##### 01.24.🔍⛔🔒`[kyc]` list user documents
-- Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
-- Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
-- Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
-##### 01.25.🔄✔️🌎`[auth]` dispatch send email after register
-- Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
-- Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
-- O código OTP deve ter validade de 15 minutos.
-##### 01.26.🔄✔️🌎`[auth]` dispatch send password reset email
-- Após evento de solicitação de reset de senha.
-- Gera código OTP (15 minutos) e envia email com template de recuperação.
-- Email contém link com código como searchParam.      
-##### 01.27.🔄⛔🌎`[onboarding]` dispatch coordination between registration, welcome email and initial notice
-- Atua como o orquestrador responsável por garantir que o usuário tenha uma experiência inicial completa após a ativação da conta.
-- Passo 1: Inicialização de Preferências: Garante a criação automática das configurações padrão de perfil e notificações antes de qualquer comunicação externa.
-- Passo 2: Disparo de Boas-vindas: Com o perfil configurado, o sistema envia o e-mail de boas-vindas utilizando as preferências de idioma definidas no passo anterior.
-- Passo 3: Notificação de Primeiro Acesso: Registra e dispara a primeira notificação in-app orientando o usuário a realizar o vínculo da carteira ou o envio de documentos (KYC).
-- Garantia de Consistência: Em caso de falha, a saga gerencia retentativas automáticas para evitar que o usuário fique em um estado incompleto.
-- Flag de Conclusão: Ao finalizar, marca o registro como onboarding_completed para evitar re-execução.
+##### 01.28.🔄⛔🌎`[onboarding]` dispatch coordination between registration, welcome email and initial notice
+- Atua como uma Saga de Longa Duração (Long-Running Process) que orquestra todo o ciclo de vida inicial do usuário até que ele esteja apto a operar.
+- **Gatilho Inicial**: Escuta o evento `UserActivatedEvent`.
+- **Fase 1 (Setup)**: 
+  - Cria configurações padrão de perfil e notificações.
+  - Envia e-mail de boas-vindas.
+  - Altera status interno para `ONBOARDING_KYC_PENDING`.
+- **Fase 2 (KYC)**: 
+  - Aguarda o evento `KycApprovedEvent` (disparado pelo Admin em 01.22).
+  - Ao receber, envia notificação "Sua conta foi aprovada! Agora vincule sua carteira".
+  - Altera status interno para `ONBOARDING_WALLET_PENDING`.
+- **Fase 3 (Wallet)**: 
+  - Aguarda o evento `WalletLinkedEvent` (disparado em 01.24).
+  - Ao receber, envia e-mail "Tudo pronto para investir!".
+  - Marca o registro como `onboarding_completed`.
+- **Resiliência**: A saga deve persistir seu estado para sobreviver a reinícios do sistema e continuar ouvindo eventos por tempo indeterminado.
 ### 02. Catalog (Market Data & Public Info)
 ##### 02.01. 🔍⛔🌎`[assets]` list supported assets
 - Retorna a lista de ativos (criptomoedas/tokens) que possuem integração ativa e estão habilitados para negociação no sistema.
