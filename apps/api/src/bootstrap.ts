@@ -34,7 +34,7 @@ export async function bootstrap(): Promise<void> {
     .addHook('onRequest', (req, _, done) => {
       Object.assign(req, {
         startTime: new Date(),
-        fingerprint: req.headers['x-fingerprint'] ?? 'unknown',
+        fingerprint: req.headers['x-fingerprint'] || 'unknown',
       });
       done();
     })
