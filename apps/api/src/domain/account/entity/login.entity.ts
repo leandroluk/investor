@@ -10,16 +10,10 @@ export class LoginEntity implements Indexable, Creatable {
   id!: string;
 
   @ApiProperty({
-    example: '192.168.1.1',
-    description: 'IP address of the login attempt',
+    example: new Date(),
+    description: 'Timestamp of the attempt (Immutable)',
   })
-  ip!: string;
-
-  @ApiProperty({
-    example: true,
-    description: 'Whether the authentication was successful',
-  })
-  success!: boolean;
+  createdAt!: Date;
 
   @ApiProperty({
     example: '018f3b5e-1234-7000-8000-000000000000',
@@ -29,8 +23,15 @@ export class LoginEntity implements Indexable, Creatable {
   userId!: string;
 
   @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the attempt (Immutable)',
+    example: '192.168.1.1',
+    description: 'IP address of the login attempt',
+    maxLength: 50,
   })
-  createdAt!: Date;
+  ip!: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Whether the authentication was successful',
+  })
+  success!: boolean;
 }

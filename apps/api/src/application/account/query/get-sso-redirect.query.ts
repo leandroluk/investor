@@ -1,5 +1,6 @@
 import {Query} from '#/application/_shared/bus';
 import {OidcPort} from '#/domain/_shared/port';
+import {SsoProviderEnum} from '#/domain/account/enum/sso-provider.enum';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
@@ -12,10 +13,17 @@ const querySchema = z.object({
 type QuerySchema = z.infer<typeof querySchema>;
 
 export class GetSsoRedirectQuery extends Query<QuerySchema> {
-  @ApiProperty({description: 'OAuth2 provider', example: 'google', enum: ['google', 'microsoft']})
-  readonly provider!: 'google' | 'microsoft';
+  @ApiProperty({
+    description: 'OAuth2 provider',
+    example: 'google',
+    enum: Object.values(SsoProviderEnum),
+  })
+  readonly provider!: SsoProviderEnum;
 
-  @ApiProperty({description: 'Callback URL after authentication', example: 'https://app.com/auth/callback'})
+  @ApiProperty({
+    description: 'Callback URL after authentication',
+    example: 'https://app.com/auth/callback',
+  })
   readonly callbackURL!: string;
 
   constructor(payload: GetSsoRedirectQuery) {

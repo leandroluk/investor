@@ -6,7 +6,7 @@ import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
 const querySchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.uuid(),
 });
 
 type QuerySchema = z.infer<typeof querySchema>;

@@ -2,6 +2,7 @@ import {Command} from '#/application/_shared/bus';
 import {CipherPort, OidcPort} from '#/domain/_shared/port';
 import {UserEntity} from '#/domain/account/entity';
 import {KycStatusEnum, UserStatusEnum} from '#/domain/account/enum';
+import {SsoProviderEnum} from '#/domain/account/enum/sso-provider.enum';
 import {SsoInvalidOAuthCodeError, SsoInvalidStateError} from '#/domain/account/error';
 import {UserRepository} from '#/domain/account/repository';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -17,13 +18,23 @@ const commandSchema = z.object({
 type CommandSchema = z.infer<typeof commandSchema>;
 
 export class SsoCallbackCommand extends Command<CommandSchema> {
-  @ApiProperty({description: 'OAuth2 provider', example: 'google', enum: ['google', 'microsoft']})
-  readonly provider!: 'google' | 'microsoft';
+  @ApiProperty({
+    description: 'OAuth2 provider',
+    example: 'google',
+    enum: Object.values(SsoProviderEnum),
+  })
+  readonly provider!: SsoProviderEnum;
 
-  @ApiProperty({description: 'Authorization code from provider', example: 'abc123...'})
+  @ApiProperty({
+    description: 'Authorization code from provider',
+    example: 'abc123...',
+  })
   readonly code!: string;
 
-  @ApiProperty({description: 'Encrypted state with callback_url', example: 'eyJ...'})
+  @ApiProperty({
+    description: 'Encrypted state with callback_url',
+    example: 'eyJ...',
+  })
   readonly state!: string;
 
   constructor(payload: SsoCallbackCommand) {
@@ -82,13 +93,14 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, s
       timezone: 'UTC',
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     };
 
     await this.userRepository.create(newUser);
     return newUser;
   }
 
-  private async generateToken(provider: 'google' | 'microsoft', userId: UserEntity['id']): Promise<string> {
+  private async generateToken(provider: SsoProviderEnum, userId: UserEntity['id']): Promise<string> {
     const payload = {provider, userId, exp: Date.now() + this.addOneMinute};
     const result = this.cipherPort.encrypt(payload);
     return result;

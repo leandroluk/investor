@@ -1,161 +1,76 @@
 import {Throws} from '#/application/_shared/decorator';
 import {DatabasePort} from '#/domain/_shared/port';
-import {DeviceEntity} from '#/domain/account/entity';
-import {DeviceRepository} from '#/domain/account/repository';
+import {DeviceEntity as Entity} from '#/domain/account/entity';
+import {DeviceRepository as Interface} from '#/domain/account/repository';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';
-
-const findByFingerprint = `
-  SELECT
-    "id",
-    "user_id",
-    "platform",
-    "fingerprint",
-    "is_active",
-    "brand",
-    "model",
-    "name",
-    "created_at",
-    "updated_at"
-  FROM "device"
-  WHERE "user_id" = $1 AND "fingerprint" = $2
-`;
-
-const create = `
-  INSERT INTO "device" (
-    "id",
-    "user_id",
-    "platform",
-    "fingerprint",
-    "is_active",
-    "brand",
-    "model",
-    "name",
-    "created_at",
-    "updated_at"
-  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-`;
-
-const update = `
-  UPDATE "device" SET
-    "is_active" = $1,
-    "brand" = $2,
-    "model" = $3,
-    "name" = $4,
-    "updated_at" = $5
-  WHERE "id" = $6
-`;
-
-const findById = `
-  SELECT
-    "id",
-    "user_id",
-    "platform",
-    "fingerprint",
-    "is_active",
-    "brand",
-    "model",
-    "name",
-    "created_at",
-    "updated_at"
-  FROM "device"
-  WHERE "id" = $1
-`;
-
-const listActiveByUserId = `
-  SELECT
-    "id",
-    "user_id",
-    "platform",
-    "fingerprint",
-    "is_active",
-    "brand",
-    "model",
-    "name",
-    "created_at",
-    "updated_at"
-  FROM "device"
-  WHERE "user_id" = $1 AND "is_active" = true
-`;
-
-const listFingerprintByUserId = `
-  SELECT "fingerprint"
-  FROM "device"
-  WHERE "user_id" = $1 AND "is_active" = true
-`;
+import {DatabasePostgresRepository as Repository} from '../postgres.repository';
 
 @Throws(DatabasePostgresError)
-@InjectableExisting(DeviceRepository)
-export class DatabasePostgresDeviceRepository implements DeviceRepository {
-  constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {}
-
-  async create(device: DeviceEntity): Promise<void> {
-    await this.database.exec(create, [
-      device.id,
-      device.userId,
-      device.platform,
-      device.fingerprint,
-      device.isActive,
-      device.brand,
-      device.model,
-      device.name,
-      device.createdAt,
-      device.updatedAt,
-    ]);
+@InjectableExisting(Interface)
+export class DatabasePostgresDeviceRepository extends Repository<Entity> implements Interface {
+  constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {
+    super('device', {
+      id: 'id',
+      userId: 'user_id',
+      platform: 'platform',
+      fingerprint: 'fingerprint',
+      isActive: 'is_active',
+      brand: 'brand',
+      model: 'model',
+      name: 'name',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    });
   }
 
-  async update(device: DeviceEntity): Promise<void> {
-    await this.database.exec(update, [
-      device.isActive, //
-      device.brand,
-      device.model,
-      device.name,
-      device.updatedAt,
-      device.id,
-    ]);
+  async create(device: Entity): Promise<void> {
+    const {cols, places, values} = this.makeInsertOne(device);
+    await this.database.exec(
+      `INSERT INTO "${this.tableName}" (${cols}) 
+       VALUES (${places})`,
+      values
+    );
   }
 
-  async findByFingerprint(userId: string, fingerprint: string): Promise<DeviceEntity | null> {
-    const [row] = await this.database.query<any>(findByFingerprint, [userId, fingerprint]);
-    if (!row) {
-      return null;
-    }
-    return {
-      id: row.id,
-      userId: row.user_id,
-      platform: row.platform,
-      fingerprint: row.fingerprint,
-      isActive: row.is_active,
-      brand: row.brand,
-      model: row.model,
-      name: row.name,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    };
+  async update(device: Entity): Promise<void> {
+    const {setClause, values} = this.makeUpdate(device);
+    await this.database.exec(
+      `UPDATE "${this.tableName}" 
+       SET ${setClause} 
+       WHERE "id" = $1`,
+      values
+    );
   }
 
-  async findById(id: string): Promise<DeviceEntity | null> {
-    const [row] = await this.database.query<any>(findById, [id]);
-    if (!row) {
-      return null;
-    }
-    return {
-      id: row.id,
-      userId: row.user_id,
-      platform: row.platform,
-      fingerprint: row.fingerprint,
-      isActive: row.is_active,
-      brand: row.brand,
-      model: row.model,
-      name: row.name,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    };
+  async findByFingerprint(userId: string, fingerprint: string): Promise<Entity | null> {
+    const [row] = await this.database.query<any>(
+      `SELECT ${this.selectAsPart}
+       FROM "${this.tableName}"
+       WHERE "user_id" = $1 AND "fingerprint" = $2`,
+      [userId, fingerprint]
+    );
+    return row ?? null;
   }
 
-  async listActiveByUserId(userId: string): Promise<DeviceEntity[]> {
-    const rows = await this.database.query<any>(listActiveByUserId, [userId]);
+  async findById(id: string): Promise<Entity | null> {
+    const [row] = await this.database.query<any>(
+      `SELECT ${this.selectAsPart}
+       FROM "${this.tableName}"
+       WHERE "id" = $1`,
+      [id]
+    );
+    return row ?? null;
+  }
+
+  async listActiveByUserId(userId: string): Promise<Entity[]> {
+    const rows = await this.database.query<any>(
+      `SELECT ${this.selectAsPart}
+       FROM "${this.tableName}"
+       WHERE "user_id" = $1 AND "is_active" = true`,
+      [userId]
+    );
     return rows.map(row => ({
       id: row.id,
       userId: row.user_id,
@@ -170,8 +85,13 @@ export class DatabasePostgresDeviceRepository implements DeviceRepository {
     }));
   }
 
-  async listFingerprintByUserId(userId: string): Promise<Array<DeviceEntity['fingerprint']>> {
-    const rows = await this.database.query<any>(listFingerprintByUserId, [userId]);
+  async listFingerprintByUserId(userId: string): Promise<Array<Entity['fingerprint']>> {
+    const rows = await this.database.query<any>(
+      `SELECT "fingerprint"
+       FROM "device"
+       WHERE "user_id" = $1 AND "is_active" = true`,
+      [userId]
+    );
     return rows.map(row => row.fingerprint);
   }
 }

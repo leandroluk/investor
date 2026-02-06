@@ -11,6 +11,12 @@ export class LedgerEntity implements Indexable, Creatable {
   id!: string;
 
   @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the record (Immutable)',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
     example: '018f3b5e-1234-7000-8000-000000000000',
     description: 'The user associated with this financial record',
     format: 'uuid',
@@ -18,9 +24,10 @@ export class LedgerEntity implements Indexable, Creatable {
   userId!: string;
 
   @ApiProperty({
-    example: 'investment',
+    example: 'INVESTMENT',
     description: 'Type of financial event recorded',
     enum: Object.values(LedgerTypeEnum),
+    maxLength: 50,
   })
   type!: LedgerTypeEnum;
 
@@ -36,10 +43,4 @@ export class LedgerEntity implements Indexable, Creatable {
     format: 'uuid',
   })
   referenceId!: string;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the record (Immutable)',
-  })
-  createdAt!: Date;
 }

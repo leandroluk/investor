@@ -22,7 +22,9 @@ export class ActivateUserCommand extends Command<CommandSchema> {
   @ApiPropertyOf(UserEntity, 'email')
   readonly email!: string;
 
-  @ApiProperty({description: 'One Time Password', example: '123456', minLength: 6, maxLength: 6})
+  @ApiProperty({
+    description: 'One Time Password', example: '123456', minLength: 6, maxLength: 6
+  })
   readonly otp!: string;
 
   constructor(payload: ActivateUserCommand) {

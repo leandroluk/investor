@@ -12,7 +12,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import {GetMeta, GetUser, MapDomainError} from '../_shared/decorator';
+import {GetMeta, GetUserId, MapDomainError} from '../_shared/decorator';
 import {AuthGuard, ChallengeGuard} from '../_shared/guard';
 import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from './dto';
 
@@ -34,10 +34,10 @@ export class DeviceController {
   @ApiCreatedResponse({description: 'Device registered successfully'})
   async postRegisterDevice(
     @GetMeta() meta: GetMeta,
-    @GetUser() user: GetUser,
+    @GetUserId() userId: GetUserId,
     @Body() body: RegisterDeviceBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RegisterDeviceCommand({...meta, userId: user.claims.id, ...body}));
+    await this.commandBus.execute(new RegisterDeviceCommand({...meta, userId, ...body}));
   }
   // #endregion
 
@@ -49,10 +49,10 @@ export class DeviceController {
   @ApiNoContentResponse({description: 'Device revoked successfully'})
   async deleteRevokeDevice(
     @GetMeta() meta: GetMeta, //
-    @GetUser() user: GetUser,
+    @GetUserId() userId: GetUserId,
     @Param('id') id: string
   ): Promise<void> {
-    await this.commandBus.execute(new RevokeDeviceCommand({...meta, userId: user.claims.id, id}));
+    await this.commandBus.execute(new RevokeDeviceCommand({...meta, userId, id}));
   }
   // #endregion
 
@@ -63,9 +63,9 @@ export class DeviceController {
   @ApiOkResponse({type: ListActiveDeviceResultDTO})
   async getListActiveDevice(
     @GetMeta() meta: GetMeta, //
-    @GetUser() user: GetUser
+    @GetUserId() userId: GetUserId
   ): Promise<ListActiveDeviceResultDTO> {
-    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta, userId: user.claims.id}));
+    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta, userId}));
     return {items: result};
   }
   // #endregion

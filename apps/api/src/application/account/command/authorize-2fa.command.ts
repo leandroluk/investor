@@ -9,7 +9,7 @@ import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
 const commandSchema = z.object({
-  challengeId: z.string().uuid(),
+  challengeId: z.uuid(),
   otp: z.string().min(1),
 });
 
@@ -18,7 +18,6 @@ type CommandSchema = z.infer<typeof commandSchema>;
 export class Authorize2FACommand extends Command<CommandSchema> {
   @ApiProperty({
     description: 'Challenge ID',
-    format: 'uuid',
   })
   readonly challengeId!: string;
 

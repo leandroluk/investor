@@ -11,14 +11,28 @@ export class InvestmentEntity implements Indexable, Creatable, Updatable {
   id!: string;
 
   @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the investment intent creation',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the last status update (e.g., confirmation)',
+  })
+  updatedAt!: Date;
+
+  @ApiProperty({
     example: 'stable-yield-v1',
     description: 'The strategy chosen for this investment',
+    format: 'uuid',
   })
   strategyId!: string;
 
   @ApiProperty({
     example: 'usdc-polygon',
     description: 'The asset used for the investment',
+    format: 'uuid',
   })
   assetId!: string;
 
@@ -36,21 +50,10 @@ export class InvestmentEntity implements Indexable, Creatable, Updatable {
   amountUsd!: number;
 
   @ApiProperty({
-    example: 'active',
+    example: 'ACTIVE',
     description: 'Current status of the investment lifecycle',
     enum: Object.values(InvestmentStatusEnum),
+    maxLength: 20,
   })
   status!: InvestmentStatusEnum;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the investment intent creation',
-  })
-  createdAt!: Date;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the last status update (e.g., confirmation)',
-  })
-  updatedAt!: Date;
 }

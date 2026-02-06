@@ -41,16 +41,28 @@ export class LoginUsingCredentialCommand extends Command<CommandSchema> {
 }
 
 export class LoginUsingCredentialCommandResult implements TokenPort.Authorization {
-  @ApiProperty({description: 'Token type', example: 'Bearer'})
+  @ApiProperty({
+    description: 'Token type',
+    example: 'Bearer',
+  })
   tokenType!: string;
 
-  @ApiProperty({description: 'Access token', example: 'eyJhbGci...'})
+  @ApiProperty({
+    description: 'Access token',
+    example: 'eyJhbGci...',
+  })
   accessToken!: string;
 
-  @ApiProperty({description: 'Expires in', example: 3600})
+  @ApiProperty({
+    description: 'Expires in',
+    example: 3600,
+  })
   expiresIn!: number;
 
-  @ApiProperty({description: 'Refresh token', example: 'eyJhbGci...'})
+  @ApiProperty({
+    description: 'Refresh token',
+    example: 'eyJhbGci...',
+  })
   refreshToken?: string;
 }
 

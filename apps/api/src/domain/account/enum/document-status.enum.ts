@@ -1,5 +1,4 @@
-export enum KycStatusEnum {
-  NONE = 'none',
+export enum DocumentStatusEnum {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',

@@ -12,7 +12,9 @@ const querySchema = z.object({
 type QuerySchema = z.infer<typeof querySchema>;
 
 export class CheckEmailQuery extends Query<QuerySchema> {
-  @ApiProperty({description: 'Email to check'})
+  @ApiProperty({
+    description: 'Email to check',
+  })
   readonly email!: string;
 
   constructor(payload: CheckEmailQuery) {
@@ -22,10 +24,10 @@ export class CheckEmailQuery extends Query<QuerySchema> {
 
 @QueryHandler(CheckEmailQuery)
 export class CheckEmailQueryHandler implements IQueryHandler<CheckEmailQuery, void> {
-  constructor(private readonly repository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   private async existsByEmail(email): Promise<void> {
-    const exists = await this.repository.existsByEmail(email);
+    const exists = await this.userRepository.existsByEmail(email);
     if (exists) {
       throw new UserEmailInUseError(email);
     }

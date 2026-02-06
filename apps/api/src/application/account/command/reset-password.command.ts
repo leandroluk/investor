@@ -23,10 +23,14 @@ export class ResetPasswordCommand extends Command<CommandSchema> {
   @ApiPropertyOf(UserEntity, 'email')
   readonly email!: string;
 
-  @ApiProperty({description: 'One Time Password', example: '123456', minLength: 6, maxLength: 6})
+  @ApiProperty({
+    description: 'One Time Password', example: '123456', minLength: 6, maxLength: 6
+  })
   readonly otp!: string;
 
-  @ApiProperty({description: 'New password', example: 'NewP@ssw0rd!', minLength: 8})
+  @ApiProperty({
+    description: 'New password', example: 'NewP@ssw0rd!', minLength: 8
+  })
   readonly password!: string;
 
   constructor(payload: ResetPasswordCommand) {

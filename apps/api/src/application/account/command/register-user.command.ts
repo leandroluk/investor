@@ -73,6 +73,7 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
       timezone: 'UTC',
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     };
     await this.userRepository.create(user);
     return user;

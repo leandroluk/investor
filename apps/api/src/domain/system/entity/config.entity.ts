@@ -10,19 +10,6 @@ export class ConfigEntity implements Indexable, Creatable, Updatable {
   id!: string;
 
   @ApiProperty({
-    example: 'MAINTENANCE_MODE',
-    description: 'The unique key identifying the configuration setting',
-    uniqueItems: true,
-  })
-  key!: string;
-
-  @ApiProperty({
-    example: 'false',
-    description: 'The value associated with the configuration key, stored as a string',
-  })
-  value!: string;
-
-  @ApiProperty({
     example: new Date(),
     description: 'Timestamp when the configuration was first created',
   })
@@ -33,4 +20,18 @@ export class ConfigEntity implements Indexable, Creatable, Updatable {
     description: 'Timestamp of the last modification to the configuration value',
   })
   updatedAt!: Date;
+
+  @ApiProperty({
+    example: 'MAINTENANCE_MODE',
+    description: 'The unique key identifying the configuration setting',
+    uniqueItems: true,
+    maxLength: 100,
+  })
+  key!: string;
+
+  @ApiProperty({
+    example: 'false',
+    description: 'The value associated with the configuration key, stored as a string',
+  })
+  value!: string;
 }

@@ -1,7 +1,7 @@
-import {type Indexable, type Updatable} from '#/domain/_shared/interface';
+import {type Creatable, type Deletable, type Indexable, type Updatable} from '#/domain/_shared/interface';
 import {ApiProperty} from '@nestjs/swagger';
 
-export class StrategyEntity implements Indexable, Updatable {
+export class StrategyEntity implements Indexable, Creatable, Updatable, Deletable {
   @ApiProperty({
     example: '018f3b5e-9012-7000-8000-000000000000',
     description: 'Unique identifier for the strategy entry (UUIDv7)',
@@ -10,8 +10,28 @@ export class StrategyEntity implements Indexable, Updatable {
   id!: string;
 
   @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of strategy creation',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the last strategy adjustment',
+  })
+  updatedAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp when the strategy was deleted',
+    nullable: true,
+  })
+  deletedAt!: Date | null;
+
+  @ApiProperty({
     example: 'stable-yield-v1',
     description: 'Unique slug for the investment strategy',
+    maxLength: 50,
   })
   alias!: string;
 
@@ -32,16 +52,4 @@ export class StrategyEntity implements Indexable, Updatable {
     description: 'Maximum expected Annual Percentage Yield (APY)',
   })
   expectedApyRangeHigh!: number;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of strategy creation',
-  })
-  createdAt!: Date;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the last strategy adjustment',
-  })
-  updatedAt!: Date;
 }

@@ -11,3 +11,4 @@ export * from './send-2fa-email.command';
 export * from './send-activate-email.command';
 export * from './send-recover-email.command';
 export * from './sso-callback.command';
+export * from './update-user-profile.command';

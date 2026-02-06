@@ -12,7 +12,9 @@ export class HealthQuery extends Query<Envelope> {
 }
 
 export class HealthQueryResult {
-  @ApiProperty({description: 'Application uptime', example: '10m 30s'})
+  @ApiProperty({
+    description: 'Application uptime', example: '10m 30s'
+  })
   uptime!: string;
 }
 

@@ -10,6 +10,12 @@ export class EarningEntity implements Indexable, Creatable {
   id!: string;
 
   @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp when the earning was recorded in the system',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
     example: '018f3b5e-beef-7000-8000-000000000000',
     description: 'The identifier of the investment that generated this earning',
     format: 'uuid',
@@ -17,20 +23,14 @@ export class EarningEntity implements Indexable, Creatable {
   investmentId!: string;
 
   @ApiProperty({
-    example: '0.005234',
+    example: 0.005234,
     description: 'The amount earned in the native token of the strategy',
   })
-  amountToken!: string;
+  amountToken!: number;
 
   @ApiProperty({
-    example: '15.50',
+    example: 15.5,
     description: 'The equivalent value of the earning in USD at the time of record',
   })
-  amountUsd!: string;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp when the earning was recorded in the system',
-  })
-  createdAt!: Date;
+  amountUsd!: number;
 }

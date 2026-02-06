@@ -11,6 +11,18 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
   id!: string;
 
   @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the first device registration',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the last device activity or token update',
+  })
+  updatedAt!: Date;
+
+  @ApiProperty({
     example: '018f3b5e-1234-7000-8000-000000000000',
     description: 'The owner of this device registration',
     format: 'uuid',
@@ -21,12 +33,14 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
     example: 'ios',
     description: 'Operational system platform',
     enum: Object.values(DeviceTypeEnum),
+    maxLength: 20,
   })
   platform!: DeviceTypeEnum;
 
   @ApiProperty({
     example: 'fingerprint_82h1...',
     description: 'Unique fingerprint for device identification',
+    maxLength: 255,
   })
   fingerprint!: string;
 
@@ -39,30 +53,21 @@ export class DeviceEntity implements Indexable, Creatable, Updatable {
   @ApiProperty({
     example: 'Apple',
     description: 'Manufacturer of the device',
+    maxLength: 50,
   })
   brand!: string;
 
   @ApiProperty({
     example: 'My iPhone',
     description: 'User-friendly name for the device',
+    maxLength: 50,
   })
   name!: string;
 
   @ApiProperty({
     example: 'iPhone 15 Pro',
     description: 'Specific hardware model for device fingerprinting and anti-fraud analysis',
+    maxLength: 50,
   })
   model!: string;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the first device registration',
-  })
-  createdAt!: Date;
-
-  @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp of the last device activity or token update',
-  })
-  updatedAt!: Date;
 }

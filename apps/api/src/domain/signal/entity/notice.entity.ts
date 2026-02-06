@@ -10,16 +10,10 @@ export class NoticeEntity implements Indexable, Creatable {
   id!: string;
 
   @ApiProperty({
-    example: 'Investment Confirmed',
-    description: 'Title of the notification',
+    example: new Date(),
+    description: 'Timestamp when the notice was sent',
   })
-  title!: string;
-
-  @ApiProperty({
-    example: false,
-    description: 'Read status of the message',
-  })
-  isRead!: boolean;
+  createdAt!: Date;
 
   @ApiProperty({
     example: '018f3b5e-1234-7000-8000-000000000000',
@@ -29,8 +23,15 @@ export class NoticeEntity implements Indexable, Creatable {
   userId!: string;
 
   @ApiProperty({
-    example: new Date(),
-    description: 'Timestamp when the notice was sent',
+    example: 'Investment Confirmed',
+    description: 'Title of the notification',
+    maxLength: 150,
   })
-  createdAt!: Date;
+  title!: string;
+
+  @ApiProperty({
+    example: false,
+    description: 'Read status of the message',
+  })
+  isRead!: boolean;
 }

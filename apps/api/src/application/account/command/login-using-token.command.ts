@@ -2,6 +2,7 @@ import {Command} from '#/application/_shared/bus';
 import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/port';
 import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entity';
 import {DeviceTypeEnum} from '#/domain/account/enum';
+import {SsoProviderEnum} from '#/domain/account/enum/sso-provider.enum';
 import {UserInvalidCredentialsError} from '#/domain/account/error';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
 import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repository';
@@ -35,16 +36,28 @@ export class LoginUsingTokenCommand extends Command<CommandSchema> {
 }
 
 export class LoginUsingTokenCommandResult implements TokenPort.Authorization {
-  @ApiProperty({description: 'Token type', example: 'Bearer'})
+  @ApiProperty({
+    description: 'Token type',
+    example: 'Bearer',
+  })
   tokenType!: string;
 
-  @ApiProperty({description: 'Access token', example: 'eyJhbGci...'})
+  @ApiProperty({
+    description: 'Access token',
+    example: 'eyJhbGci...',
+  })
   accessToken!: string;
 
-  @ApiProperty({description: 'Expires in', example: 3600})
+  @ApiProperty({
+    description: 'Expires in',
+    example: 3600,
+  })
   expiresIn!: number;
 
-  @ApiProperty({description: 'Refresh token', example: 'eyJhbGci...'})
+  @ApiProperty({
+    description: 'Refresh token',
+    example: 'eyJhbGci...',
+  })
   refreshToken?: string;
 }
 
@@ -61,11 +74,11 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     private readonly brokerPort: BrokerPort
   ) {}
 
-  private async decryptToken(token: string): Promise<{userId: UserEntity['id']; provider: 'google' | 'microsoft'}> {
+  private async decryptToken(token: string): Promise<{userId: UserEntity['id']; provider: SsoProviderEnum}> {
     try {
       const value = this.cipherPort.decrypt<{
         userId: string;
-        provider: 'google' | 'microsoft';
+        provider: SsoProviderEnum;
         exp: number;
       }>(token);
       if (value.exp >= Date.now()) {
@@ -147,7 +160,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
   private async publishUserLoggedInEvent(
     correlationId: string,
     occurredAt: Date,
-    provider: 'google' | 'microsoft',
+    provider: SsoProviderEnum,
     userId: UserEntity['id']
   ): Promise<void> {
     await this.brokerPort.publish(

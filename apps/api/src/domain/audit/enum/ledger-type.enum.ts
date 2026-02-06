@@ -1,4 +1,4 @@
 export enum LedgerTypeEnum {
-  INVESTMENT = 'INVESTMENT',
-  WITHDRAWAL = 'WITHDRAWAL',
+  INVESTMENT = 'investment',
+  WITHDRAWAL = 'withdrawal',
 }

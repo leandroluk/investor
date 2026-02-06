@@ -1,5 +1,5 @@
 export enum ChallengeStatusEnum {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  EXPIRED = 'EXPIRED',
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  EXPIRED = 'expired',
 }
