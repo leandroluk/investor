@@ -1,11 +1,11 @@
-import {Envelope, Query} from '#/application/_shared/bus';
+import {Query} from '#/application/_shared/bus';
 import {BlockchainPort, BrokerPort, CachePort, DatabasePort} from '#/domain/_shared/port';
 import {UnhealthyError} from '#/domain/system/error';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import {ApiProperty} from '@nestjs/swagger';
 import ms from 'ms';
 
-export class HealthQuery extends Query<Envelope> {
+export class HealthQuery extends Query {
   constructor(payload) {
     super(payload);
   }
@@ -13,7 +13,8 @@ export class HealthQuery extends Query<Envelope> {
 
 export class HealthQueryResult {
   @ApiProperty({
-    description: 'Application uptime', example: '10m 30s'
+    description: 'Application uptime',
+    example: '10m 30s',
   })
   uptime!: string;
 }

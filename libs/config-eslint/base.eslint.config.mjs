@@ -93,7 +93,7 @@ const baseConfig = {
     'block-scoped-var': 'error',
     'prefer-const': 'error',
     'eol-last': 'error',
-    'prefer-arrow-callback': 'error',
+    'prefer-arrow-callback': ["error", {"allowNamedFunctions": true}],
     'n/no-extraneous-import': 'off',
     'n/no-missing-import': 'off',
     'n/no-empty-function': 'off',

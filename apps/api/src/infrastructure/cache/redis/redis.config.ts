@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import ms from 'ms';
-import {z} from 'zod';
+import z from 'zod';
 
 @Injectable()
 export class CacheRedisConfig {

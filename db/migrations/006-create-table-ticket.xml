@@ -8,22 +8,23 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-ticket" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "ticket" (
-        "id"         UUID           NOT NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "user_id"    UUID           NOT NULL,
-        "subject"    VARCHAR(150)   NOT NULL,
-        "message"    TEXT           NOT NULL,
-        "status"     VARCHAR(20)    NOT NULL,
+      CREATE TABLE "tb_ticket" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "user_id"       UUID           NOT NULL,
+        "subject"       VARCHAR(255)   NOT NULL,
+        "status"        VARCHAR(20)    NOT NULL,
+        "priority"      VARCHAR(20)    NOT NULL,
+        "description"   TEXT           NOT NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "ticket";
+      DROP TABLE "tb_ticket";
     ]]></sql></rollback>
   </changeSet>
 

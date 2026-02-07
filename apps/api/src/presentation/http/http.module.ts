@@ -1,16 +1,20 @@
 import {Module} from '@nestjs/common';
 import {CqrsModule} from '@nestjs/cqrs';
-import {AuthController} from './account/auth.controller';
-import {DeviceController} from './account/device.controller';
-import {ProfileController} from './account/profile.controller';
-import {SsoController} from './account/sso.controller';
+import {AdminKycController} from './admin/admin-kyc.controller';
+import {AuthController} from './auth/auth.controller';
+import {DeviceController} from './device/device.controller';
+import {SsoController} from './sso/sso.controller';
 import {SystemController} from './system/system.controller';
+import {KycController} from './user/kyc.controller';
+import {ProfileController} from './user/profile.controller';
 
 @Module({
   imports: [CqrsModule],
   controllers: [
-    AuthController, //
+    AuthController,
     DeviceController,
+    KycController,
+    AdminKycController,
     ProfileController,
     SsoController,
     SystemController,

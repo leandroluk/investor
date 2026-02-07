@@ -1,5 +1,5 @@
 import {HealthQuery} from '#/application/system/query';
-import {UnhealthyError} from '#/domain/system/error/unhealty.error';
+import {UnhealthyError} from '#/domain/system/error';
 import {Controller, Get, HttpStatus} from '@nestjs/common';
 import {QueryBus} from '@nestjs/cqrs';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';

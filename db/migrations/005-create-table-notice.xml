@@ -8,20 +8,21 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-notice" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "notice" (
-        "id"         UUID           NOT NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "user_id"    UUID           NOT NULL,
-        "title"      VARCHAR(150)   NOT NULL,
-        "is_read"    BOOLEAN        NOT NULL,
+      CREATE TABLE "tb_notice" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "type"          VARCHAR(20)    NOT NULL,
+        "title"         VARCHAR(255)   NOT NULL,
+        "content"       TEXT           NOT NULL,
+        "is_active"     BOOLEAN        NOT NULL DEFAULT TRUE,
         ---
-        PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
+        PRIMARY KEY ("id")
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "notice";
+      DROP TABLE "tb_notice";
     ]]></sql></rollback>
   </changeSet>
 

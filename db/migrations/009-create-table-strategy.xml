@@ -8,23 +8,23 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-strategy" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "strategy" (
-        "id"                      UUID           NOT NULL,
-        "created_at"              TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"              TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "deleted_at"              TIMESTAMPTZ(3)     NULL,
-        "alias"                   VARCHAR(50)    NOT NULL,
-        "description"             TEXT           NOT NULL,
-        "expected_apy_range_low"  DECIMAL        NOT NULL,
-        "expected_apy_range_high" DECIMAL        NOT NULL,
+      CREATE TABLE "tb_strategy" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "name"          VARCHAR(100)   NOT NULL,
+        "description"   TEXT               NULL,
+        "apy"           DECIMAL(5, 4)  NOT NULL,
+        "risk_level"    VARCHAR(20)    NOT NULL,
+        "asset_id"      UUID           NOT NULL,
         ---
         PRIMARY KEY ("id"),
-        UNIQUE      ("alias")
+        FOREIGN KEY ("asset_id") REFERENCES "tb_asset"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "strategy";
+      DROP TABLE "tb_strategy";
     ]]></sql></rollback>
   </changeSet>
 

@@ -8,7 +8,7 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-document" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "document" (
+      CREATE TABLE "tb_document" (
         "id"            UUID           NOT NULL,
         "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
@@ -19,12 +19,12 @@
         "reject_reason" TEXT               NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "document";
+      DROP TABLE "tb_document";
     ]]></sql></rollback>
   </changeSet>
 

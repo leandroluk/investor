@@ -8,7 +8,7 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-user" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "user" (
+      CREATE TABLE "tb_user" (
         "id"                    UUID           NOT NULL,
         "created_at"            TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"            TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
@@ -33,7 +33,7 @@
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "user";
+      DROP TABLE "tb_user";
     ]]></sql></rollback>
   </changeSet>
 

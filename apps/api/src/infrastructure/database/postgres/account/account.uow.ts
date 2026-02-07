@@ -1,4 +1,4 @@
-import {AccountUOW} from '#/domain/account/repository';
+import {AccountUOW} from '#/domain/account/uow';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {DatabasePostgresAdapter} from '../postgres.adapter';
 import {DatabasePostgresUOW} from '../postgres.uow';

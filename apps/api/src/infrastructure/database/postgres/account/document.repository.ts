@@ -1,7 +1,9 @@
 import {Throws} from '#/application/_shared/decorator';
 import {DatabasePort} from '#/domain/_shared/port';
 import {DocumentEntity as Entity} from '#/domain/account/entity';
+import {DocumentStatusEnum} from '#/domain/account/enum';
 import {DocumentRepository as Interface} from '#/domain/account/repository';
+import {DocumentView} from '#/domain/account/view';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';
@@ -11,7 +13,7 @@ import {DatabasePostgresRepository as Repository} from '../postgres.repository';
 @InjectableExisting(Interface)
 export class DatabasePostgresDocumentRepository extends Repository<Entity> implements Interface {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {
-    super('document', {
+    super('tb_document', {
       id: 'id',
       userId: 'user_id',
       type: 'type',
@@ -50,5 +52,67 @@ export class DatabasePostgresDocumentRepository extends Repository<Entity> imple
       [id]
     );
     return row ?? null;
+  }
+  async findByUserIdAndType(userId: string, type: string): Promise<Entity | null> {
+    const [row] = await this.database.query<Entity>(
+      `SELECT ${this.selectAsPart}
+       FROM "${this.tableName}"
+       WHERE "user_id" = $1 AND "type" = $2
+       LIMIT 1`,
+      [userId, type]
+    );
+    return row ?? null;
+  }
+
+  async findByUserId(userId: string): Promise<Entity[]> {
+    const rows = await this.database.query<Entity>(
+      `SELECT ${this.selectAsPart}
+       FROM "${this.tableName}"
+       WHERE "user_id" = $1`,
+      [userId]
+    );
+    return rows;
+  }
+
+  async findByStatus(
+    status: DocumentStatusEnum,
+    limit: number,
+    offset: number
+  ): Promise<{items: DocumentView[]; total: number}> {
+    const rows = await this.database.query<any>(
+      `SELECT id, created_at, updated_at, user_id, type, storage_key, status, reject_reason,
+              user_name, user_email, user_kyc_status
+       FROM "vw_document"
+       WHERE status = $1
+       ORDER BY created_at ASC
+       LIMIT $2 OFFSET $3`,
+      [status, limit, offset]
+    );
+
+    const [count] = await this.database.query<{total: string}>(
+      `SELECT COUNT(*) as total
+       FROM "vw_document"
+       WHERE "status" = $1`,
+      [status]
+    );
+
+    const items = rows.map(row => ({
+      id: row.id,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      userId: row.user_id,
+      type: row.type,
+      storageKey: row.storage_key,
+      status: row.status,
+      rejectReason: row.reject_reason,
+      userName: row.user_name,
+      userEmail: row.user_email,
+      userKycStatus: row.user_kyc_status,
+    }));
+
+    return {
+      items,
+      total: Number(count?.total || 0),
+    };
   }
 }

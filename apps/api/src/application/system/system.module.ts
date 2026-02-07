@@ -1,7 +1,7 @@
 import {Module} from '@nestjs/common';
-import {HealthQueryHandler} from './query';
+import * as query from './query';
 
-@Module({
-  providers: [HealthQueryHandler],
-})
+const providers = Array().concat(Object.values(query));
+
+@Module({providers, exports: providers})
 export class SystemModule {}

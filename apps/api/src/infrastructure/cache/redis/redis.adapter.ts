@@ -61,7 +61,6 @@ export class CacheRedisAdapter implements CachePort {
 
   async delete(...patterns: string[]): Promise<void> {
     const keysToDelete: string[] = [];
-
     for (const pattern of patterns) {
       if (pattern.includes('*')) {
         let cursor = '0';
@@ -74,35 +73,32 @@ export class CacheRedisAdapter implements CachePort {
         keysToDelete.push(pattern);
       }
     }
-
     if (keysToDelete.length > 0) {
       await this.redis.del(...keysToDelete);
     }
   }
 
   async exists(key: string): Promise<boolean> {
-    const count = await this.redis.exists(key);
-    return count > 0;
+    return Boolean(await this.redis.exists(key));
   }
 
-  async expire(key: string, ttl: number): Promise<void> {
-    await this.redis.expire(key, ttl);
-  }
+  //async expire(key: string, ttl: number): Promise<void> {
+  //  await this.redis.expire(key, ttl);
+  //}
 
-  async increment(key: string): Promise<number> {
-    const result = await this.redis.incr(key);
-    return result;
-  }
+  //async increment(key: string): Promise<number> {
+  //  return await this.redis.incr(key);
+  //}
 
-  async decrement(key: string): Promise<number> {
-    const result = await this.redis.decr(key);
-    return result;
-  }
+  //async decrement(key: string): Promise<number> {
+  //  return await this.redis.decr(key);
+  //}
 
-  async acquire(key: string, ttl: number): Promise<void> {
-    await this.redis.multi().setnx(key, '1').expire(key, ttl).exec();
-  }
-  async release(key: string): Promise<void> {
-    await this.redis.del(key);
-  }
+  //async acquire(key: string, ttl: number): Promise<void> {
+  //  await this.redis.multi().setnx(key, '1').expire(key, ttl).exec();
+  //}
+
+  //async release(key: string): Promise<void> {
+  //  await this.redis.del(key);
+  //}
 }

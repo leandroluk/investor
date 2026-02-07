@@ -12,7 +12,7 @@ import {DatabasePostgresRepository as Repository} from '../postgres.repository';
 @InjectableExisting(Interface)
 export class DatabasePostgresChallengeRepository extends Repository<Entity> implements Interface {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {
-    super('challenge', {
+    super('tb_challenge', {
       id: 'id',
       userId: 'user_id',
       type: 'type',

@@ -82,27 +82,25 @@
 - Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
 ##### 01.17.⚡✔️🔒`[device]` revoke device (remote logout)
 - Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
-##### 01.18.🔍✔️🔒`[device]` list active devices
+##### 01.18.🔍✔️🔒`[device]` list active device
 - Lista todos os dispositivos onde a sessão ainda é válida.
-##### 01.19.⚡✅🔒`[profile]` update user profile
+##### 01.19.⚡✅🔒`[user]` update user profile
 - Permite que o usuário autenticado atualize informações básicas de sua conta, como nome de exibição e preferências de idioma.
 - Bloqueio de Campos Críticos: Por segurança, o sistema impede a alteração direta de e-mail e endereços de carteira vinculada através deste fluxo comum, exigindo processos específicos de validação para essas trocas.
 - Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
-##### 01.20.🔍✅🔒`[profile]` get user profile
+##### 01.20.🔍✅🔒`[user]` get user profile
 - Retorna dados básicos, status de segurança e carteira vinculada.
-##### 01.21.⚡⛔🔒`[kyc]` upload document
+##### 01.21.⚡⛔🔒`[user]` upload user document
 - Permite que o usuário envie arquivos para comprovação de identidade e residência (RG, CNH, Selfie, comprovante de endereço).
 - O sistema deve validar o formato (JPG, PNG, PDF) e o tamanho máximo do arquivo antes de gerar uma URL de upload seguro para o storage.
 - Cada documento enviado é registrado com um identificador único, data de expiração (se aplicável) e status inicial como PENDING.
 - Transição de Estado: Se o status global de KYC do usuário for NONE, ele deve ser alterado automaticamente para PENDING assim que o primeiro documento obrigatório for recebido.
 - O sistema deve garantir que arquivos sensíveis não sejam acessíveis publicamente, utilizando links temporários (presigned URLs) para visualização administrativa.
-##### 01.22.🔍⛔🔒`[kyc]` list documents to approve (admin)
-##### 01.23.⚡⛔🔒`[kyc]` approve/reject document (admin)
-##### 01.24.🔍⛔🔒`[kyc]` list user documents
+##### 01.22.🔍⛔🔒`[user]` list user documents
 - Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
 - Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
 - Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
-##### 01.25.⚡⛔🔒`[wallet]` link wallet address (web3 signature)
+##### 01.23.⚡⛔🔒`[user]` link user wallet address (web3 signature)
 - Permite que o usuário vincule uma carteira criptográfica (ex: Ethereum) ao seu perfil provando a posse da chave privada sem expô-la.
 - O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto).
 - O usuário deve assinar uma mensagem padronizada contendo este nonce usando sua carteira (ex: via Metamask ou WalletConnect).
@@ -110,18 +108,18 @@
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
 - Após a validação bem-sucedida, o endereço é persistido no perfil do usuário e o evento é registrado no log de auditoria.
-##### 01.26.⚡⛔🔒`[wallet]` generate wallet
+##### 01.24.⚡⛔🔒`[user]` generate user wallet
 - Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança.
 - Deriva a chave privada e o endereço público para a rede Ethereum utilizando o derivation path padrão m/44'/60'/0'/0/0.
 - Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM antes da persistência. A chave de criptografia deve ser derivada da senha do usuário (ex: via PBKDF2 ou Argon2), garantindo que a plataforma não possua custódia total sem a interação do usuário.
 - O sistema armazena o endereço público, a seed criptografada e o Initialization Vector (IV) no banco de dados.
 - Regra de Idempotência: O sistema deve impedir a geração de uma nova carteira se o usuário já possuir uma vinculada ao perfil, retornando erro de conflito caso tentado.
-##### 01.27.🔍⛔🔒`[wallet]` reveal seed phrase
+##### 01.25.🔍⛔🔒`[user]` reveal user wallet seed phrase
 - Permite que o usuário visualize as 12 palavras (mnemonic) de sua carteira gerada internamente.
 - Re-autenticação Obrigatória: Exige que o usuário forneça sua senha atual e o código 2FA ativo no momento exato da solicitação, independentemente de já estar logado.
 - Auditoria Rígida: Cada acesso a essa funcionalidade deve gerar um registro imutável no log de auditoria (ledger), contendo o IP, ID do dispositivo e timestamp para fins de conformidade e segurança.
 - Restrição de Acesso: O sistema deve bloquear essa funcionalidade caso a conta esteja em processo de recuperação de senha ou apresente comportamento suspeito detectado pelo módulo de segurança.
-##### 01.28.🔄⛔🌎`[onboarding]` dispatch coordination between registration, welcome email and initial notice
+##### 01.26.🔄⛔🌎`[user]` dispatch coordination between registration, welcome email and initial notice
 - Atua como uma Saga de Longa Duração (Long-Running Process) que orquestra todo o ciclo de vida inicial do usuário até que ele esteja apto a operar.
 - **Gatilho Inicial**: Escuta o evento `UserActivatedEvent`.
 - **Fase 1 (Setup)**: 
@@ -137,6 +135,16 @@
   - Ao receber, envia e-mail "Tudo pronto para investir!".
   - Marca o registro como `onboarding_completed`.
 - **Resiliência**: A saga deve persistir seu estado para sobreviver a reinícios do sistema e continuar ouvindo eventos por tempo indeterminado.
+##### 01.27.🔍⛔🔒`[admin]` list admin document to approve (admin)
+- Permite que administradores listem documentos pendentes de análise globalmente.
+- **Filtros**: Deve permitir filtrar por status (padrão: PENDING), tipo de documento e intervalo de datas.
+- **Paginação**: Obrigatória, dado o volume potencial de documentos.
+- **Dados Retornados**: Deve incluir metadados do documento e dados básicos do usuário (ID, Nome, Email) para contexto da análise.
+##### 01.28.⚡⛔🔒`[admin]` approve/reject admin document (admin)
+- Interface de back-office que permite a um administrador revisar a validade dos documentos enviados pelo usuário.
+- Fluxo de Aprovação: Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED.
+- Fluxo de Rejeição: Caso o documento seja inválido (ex: foto ilegível), o administrador deve obrigatoriamente informar o motivo da rejeição.
+- Notificação de Feedback: O sistema dispara automaticamente um alerta (e-mail/push) informando o usuário sobre o resultado da análise e os passos necessários para correção, se houver rejeição.
 ### 02. Catalog (Market Data & Public Info)
 ##### 02.01. 🔍⛔🌎`[assets]` list supported assets
 - Retorna a lista de ativos (criptomoedas/tokens) que possuem integração ativa e estão habilitados para negociação no sistema.

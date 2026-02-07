@@ -8,25 +8,22 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-device" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "device" (
+      CREATE TABLE "tb_device" (
         "id"          UUID           NOT NULL,
         "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"     UUID           NOT NULL,
-        "platform"    VARCHAR(20)    NOT NULL,
+        "name"        VARCHAR(100)   NOT NULL,
         "fingerprint" VARCHAR(255)   NOT NULL,
         "is_active"   BOOLEAN        NOT NULL,
-        "brand"       VARCHAR(50)        NULL,
-        "name"        VARCHAR(50)        NULL,
-        "model"       VARCHAR(50)        NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "device";
+      DROP TABLE "tb_device";
     ]]></sql></rollback>
   </changeSet>
 

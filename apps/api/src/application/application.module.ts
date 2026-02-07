@@ -1,24 +1,13 @@
 import {Module} from '@nestjs/common';
-import {AccountModule} from './account/account.module';
+import {AdminDocumentModule} from './admin-document/admin-document.module';
 import {ApplicationListener} from './application.listener';
-import {AuditModule} from './audit/audit.module';
-import {CatalogModule} from './catalog/catalog.module';
-import {PortfolioModule} from './portfolio/portfolio.module';
-import {SignalModule} from './signal/signal.module';
-import {SupportModule} from './support/support.module';
+import {AuthModule} from './auth/auth.module';
+import {DeviceModule} from './device/device.module';
+import {SsoModule} from './sso/sso.module';
 import {SystemModule} from './system/system.module';
-import {TreasuryModule} from './treasury/treasury.module';
+import {UserModule} from './user/user.module';
 
-const modules = [
-  AccountModule,
-  AuditModule,
-  CatalogModule,
-  PortfolioModule,
-  SignalModule,
-  SupportModule,
-  SystemModule,
-  TreasuryModule,
-];
+const modules = [AdminDocumentModule, AuthModule, DeviceModule, SsoModule, SystemModule, UserModule];
 
 @Module({
   providers: [ApplicationListener],

@@ -1,6 +1,5 @@
 import {Throws} from '#/application/_shared/decorator';
 import {TokenPort} from '#/domain/_shared/port';
-import {UserEntity} from '#/domain/account/entity';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import jsonwebtoken from 'jsonwebtoken';
 import {TokenJwtConfig} from './jwt.config';
@@ -11,39 +10,26 @@ import {TokenJwtError} from './jwt.error';
 export class TokenJwtAdapter implements TokenPort {
   constructor(private readonly tokenJwtConfig: TokenJwtConfig) {}
 
-  create<T extends boolean>(
-    sessionKey: string,
-    user: UserEntity,
-    deviceFingerprintHash: string,
-    complete?: T
-  ): T extends true ? Required<TokenPort.Authorization> : TokenPort.Authorization {
-    const claims: TokenPort.Claims = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      language: user.language,
-      timezone: user.timezone,
-      hash: deviceFingerprintHash,
-    };
+  create<T extends boolean>(data: TokenPort.CreateData<T>): TokenPort.CreateReturn<T> {
     const token: TokenPort.Authorization = {
       tokenType: 'Bearer',
-      accessToken: jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
+      accessToken: jsonwebtoken.sign(data.claims, this.tokenJwtConfig.privateKey, {
         algorithm: this.tokenJwtConfig.algorithm,
         audience: this.tokenJwtConfig.audience,
         issuer: this.tokenJwtConfig.issuer,
-        jwtid: sessionKey,
+        jwtid: data.sessionKey,
         expiresIn: this.tokenJwtConfig.accessTTL,
         header: {alg: this.tokenJwtConfig.algorithm, typ: 'access'},
       }),
       expiresIn: this.tokenJwtConfig.accessTTL,
     };
 
-    if (complete) {
-      token.refreshToken = jsonwebtoken.sign(claims, this.tokenJwtConfig.privateKey, {
+    if (data.complete) {
+      token.refreshToken = jsonwebtoken.sign(data.claims, this.tokenJwtConfig.privateKey, {
         algorithm: this.tokenJwtConfig.algorithm,
         audience: this.tokenJwtConfig.audience,
         issuer: this.tokenJwtConfig.issuer,
-        jwtid: sessionKey,
+        jwtid: data.sessionKey,
         expiresIn: this.tokenJwtConfig.refreshTTL,
         header: {alg: this.tokenJwtConfig.algorithm, typ: 'refresh'},
       });

@@ -1,0 +1,104 @@
+import {IUpdatable, type ICreatable, type IDeletable, type IIndexable} from '#/domain/_shared/interface';
+import {ApiProperty} from '@nestjs/swagger';
+
+export class AssetEntity implements IIndexable, ICreatable, IDeletable {
+  @ApiProperty({
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the asset entry (UUIDv7)',
+    format: 'uuid',
+  })
+  id!: string;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp when the asset was supported',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp when the asset was deleted',
+    nullable: true,
+  })
+  deletedAt!: Date | null;
+
+  @ApiProperty({
+    example: 'usdc-polygon',
+    description: 'Unique identifier for the asset (slug)',
+    maxLength: 50,
+  })
+  slug!: string;
+
+  @ApiProperty({
+    example: 'USDC',
+    description: 'Ticker symbol of the asset',
+    maxLength: 10,
+  })
+  symbol!: string;
+
+  @ApiProperty({
+    example: 'polygon',
+    description: 'Blockchain network where the asset resides',
+    maxLength: 50,
+  })
+  network!: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Whether the asset is currently enabled for investments',
+  })
+  isActive!: boolean;
+}
+
+export class StrategyEntity implements IIndexable, ICreatable, IUpdatable, IDeletable {
+  @ApiProperty({
+    example: '018f3b5e-9012-7000-8000-000000000000',
+    description: 'Unique identifier for the strategy entry (UUIDv7)',
+    format: 'uuid',
+  })
+  id!: string;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of strategy creation',
+  })
+  createdAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp of the last strategy adjustment',
+  })
+  updatedAt!: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'Timestamp when the strategy was deleted',
+    nullable: true,
+  })
+  deletedAt!: Date | null;
+
+  @ApiProperty({
+    example: 'stable-yield-v1',
+    description: 'Unique slug for the investment strategy',
+    maxLength: 50,
+  })
+  alias!: string;
+
+  @ApiProperty({
+    example: 'Conservative strategy focused on stablecoins lending.',
+    description: 'Detailed explanation of the strategy risks and mechanisms',
+  })
+  description!: string;
+
+  @ApiProperty({
+    example: 5.5,
+    description: 'Minimum expected Annual Percentage Yield (APY)',
+  })
+  expectedApyRangeLow!: number;
+
+  @ApiProperty({
+    example: 8.2,
+    description: 'Maximum expected Annual Percentage Yield (APY)',
+  })
+  expectedApyRangeHigh!: number;
+}

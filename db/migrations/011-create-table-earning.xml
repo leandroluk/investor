@@ -8,20 +8,22 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-earning" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "earning" (
+      CREATE TABLE "tb_earning" (
         "id"            UUID           NOT NULL,
         "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "user_id"       UUID           NOT NULL,
         "investment_id" UUID           NOT NULL,
-        "amount_token"  DECIMAL        NOT NULL,
-        "amount_usd"    DECIMAL        NOT NULL,
+        "amount"        DECIMAL(19, 4) NOT NULL,
+        "type"          VARCHAR(20)    NOT NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("investment_id") REFERENCES "investment" ("id")
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("investment_id") REFERENCES "tb_investment"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "earning";
+      DROP TABLE "tb_earning";
     ]]></sql></rollback>
   </changeSet>
 

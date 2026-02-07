@@ -1,6 +1,6 @@
-import {type Indexable} from '#/domain/_shared/interface';
+import {type IIndexable} from '#/domain/_shared/interface';
 
-export abstract class DatabasePostgresRepository<TEntity extends Indexable> {
+export abstract class DatabasePostgresRepository<TEntity extends IIndexable> {
   protected readonly selectAsPart: string;
   protected readonly valuesPart: string;
 

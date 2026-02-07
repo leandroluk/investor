@@ -8,23 +8,23 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-challenge" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "challenge" (
+      CREATE TABLE "tb_challenge" (
         "id"          UUID           NOT NULL,
         "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"     UUID           NOT NULL,
-        "type"        VARCHAR(50)    NOT NULL,
-        "code"        VARCHAR(255)   NOT NULL,
-        "status"      VARCHAR(20)    NOT NULL,
+        "strategy"    VARCHAR(50)    NOT NULL,
+        "secret"      TEXT           NOT NULL,
         "expires_at"  TIMESTAMPTZ(3) NOT NULL,
+        "verified_at" TIMESTAMPTZ(3)     NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "challenge";
+      DROP TABLE "tb_challenge";
     ]]></sql></rollback>
   </changeSet>
 

@@ -11,7 +11,7 @@ import {DatabasePostgresRepository as Repository} from '../postgres.repository';
 @InjectableExisting(Interface)
 export class DatabasePostgresLoginRepository extends Repository<Entity> implements Interface {
   constructor(@Inject(DatabasePort) private readonly database: DatabasePort.Transaction) {
-    super('login', {
+    super('tb_login', {
       id: 'id',
       createdAt: 'created_at',
       userId: 'user_id',

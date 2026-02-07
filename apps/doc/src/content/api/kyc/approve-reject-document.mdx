@@ -1,0 +1,73 @@
+---
+title: Approve/Reject Document (Admin)
+---
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- **Admin Access**: Only users with ADMIN role can perform this action.
+- **Workflow**:
+    - **Approve**: Updates document status to `APPROVED`. Checks if all required docs are approved to upgrade user status.
+    - **Reject**: Updates status to `REJECTED`. Requires a `rejectReason`.
+- **Notification**: Triggers an email/notification to the user with the result.
+
+## Request
+
+- **Method**: `PATCH`
+- **Path**: `/kyc/document/:id/review`
+- **Body**:
+
+| Field | Type | Description | Required |
+| :--- | :--- | :--- | :--- |
+| status | string | 'approved' \| 'rejected' | Yes |
+| rejectReason | string | Reason for rejection | Conditional (if rejected) |
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["Admin"] -- "PATCH /kyc/document/:id/review" --> B["API"]
+    B --> C{"Is Admin?"}
+    C -- "No" --> D["Return 403 Forbidden"]
+    C -- "Yes" --> E{"Status?"}
+    E -- "Approved" --> F["Mark as APPROVED"]
+    E -- "Rejected" --> G["Mark as REJECTED + Reason"]
+    F & G --> H["Notify User"]
+    H --> I["Update User KYC Status?"]
+    I --> J["Return 200 OK"]
+```
+</MermaidZoom>
+
+## Success Case
+
+- **Status**: `200 OK`
+- **Body**:
+
+```json
+{
+  "id": "018b7c86-8a9d-72c0-8339-2c7c5a5a7e3d",
+  "status": "approved",
+  "rejectReason": null,
+  "updatedAt": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## Error Case
+
+- **Status**: `400 Bad Request`
+- **Body**:
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Reject reason is required when rejecting a document",
+  "details": [
+    {
+      "code": "custom",
+      "message": "Reject reason is required when rejecting a document",
+      "path": ["rejectReason"]
+    }
+  ]
+}
+```

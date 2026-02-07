@@ -8,20 +8,23 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-login" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "login" (
-        "id"         UUID           NOT NULL,
-        "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "user_id"    UUID           NOT NULL,
-        "ip"         VARCHAR(50)    NOT NULL,
-        "success"    BOOLEAN        NOT NULL,
+      CREATE TABLE "tb_login" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "user_id"       UUID           NOT NULL,
+        "device_id"     UUID               NULL,
+        "strategy"      VARCHAR(50)    NOT NULL,
+        "error_message" TEXT               NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("device_id") REFERENCES "tb_device"("id") ON DELETE SET NULL
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "login";
+      DROP TABLE "tb_login";
     ]]></sql></rollback>
   </changeSet>
 

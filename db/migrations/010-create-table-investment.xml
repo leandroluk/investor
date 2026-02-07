@@ -8,25 +8,25 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="create-table-investment" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "investment" (
-        "id"          UUID           NOT NULL,
-        "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "strategy_id" UUID           NOT NULL,
-        "asset_id"    UUID           NOT NULL,
-        "user_id"     UUID           NOT NULL,
-        "amount_usd"  DECIMAL        NOT NULL,
-        "status"      VARCHAR(20)    NOT NULL,
+      CREATE TABLE "tb_investment" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "user_id"       UUID           NOT NULL,
+        "strategy_id"   UUID           NOT NULL,
+        "asset_id"      UUID           NOT NULL,
+        "amount"        DECIMAL(19, 4) NOT NULL,
+        "status"        VARCHAR(20)    NOT NULL,
         ---
         PRIMARY KEY ("id"),
-        FOREIGN KEY ("strategy_id") REFERENCES "strategy" ("id"),
-        FOREIGN KEY ("asset_id")    REFERENCES "asset" ("id"),
-        FOREIGN KEY ("user_id")     REFERENCES "user" ("id") ON DELETE CASCADE
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("strategy_id") REFERENCES "tb_strategy"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("asset_id") REFERENCES "tb_asset"("id") ON DELETE CASCADE
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "investment";
+      DROP TABLE "tb_investment";
     ]]></sql></rollback>
   </changeSet>
 

@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {Algorithm} from 'jsonwebtoken';
-import {z} from 'zod';
+import z from 'zod';
 
 @Injectable()
 export class TokenJwtConfig {
