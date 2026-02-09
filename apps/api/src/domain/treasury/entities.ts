@@ -18,7 +18,7 @@ export class WithdrawalEntity extends createClass(
         description: 'Amount requested for withdrawal in USD',
       }),
       status: z.enum(WithdrawalStatusEnum).meta({
-        example: 'PENDING',
+        example: WithdrawalStatusEnum.COMPLETED,
         description: 'Current status of the withdrawal process',
         maxLength: 20,
       }),

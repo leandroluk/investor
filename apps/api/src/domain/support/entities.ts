@@ -23,7 +23,7 @@ export class TicketEntity extends createClass(
         description: 'Detailed description of the issue or feedback',
       }),
       status: z.enum(TicketStatusEnum).meta({
-        example: 'OPEN',
+        example: TicketStatusEnum.CLOSED,
         description: 'Current status of the support request',
         maxLength: 20,
       }),

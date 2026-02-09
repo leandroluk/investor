@@ -10,22 +10,24 @@ const primitiveMap: Record<string, any> = {
   boolean: Boolean,
   date: String,
   bigint: Number,
-  enum: String,
-  nativeEnum: String,
 };
 
-function createNestedDTO(schema: z.ZodObject<any>): Type<any> {
+function createNestedDTO(schema: z.ZodObject<any>, parentName: string, fieldName: string): Type<any> {
   class NestedDto {}
-  Object.defineProperty(NestedDto, 'name', {value: `Nested${uuidv7()}Dto`});
+
+  const uniqueName = parentName && fieldName ? `${parentName}_${fieldName}` : `Nested${uuidv7().split('-')[0]}Dto`;
+
+  Object.defineProperty(NestedDto, 'name', {value: uniqueName});
+
   const shape = schema.shape;
   for (const key of Object.keys(shape)) {
-    const options = extractMetadata(shape[key]);
+    const options = extractMetadata(shape[key], uniqueName, key);
     ApiProperty(options)(NestedDto.prototype, key);
   }
   return NestedDto;
 }
 
-function extractMetadata(schema: z.ZodTypeAny): ApiPropertyOptions {
+function extractMetadata(schema: z.ZodTypeAny, parentName?: string, fieldName?: string): ApiPropertyOptions {
   const options: ApiPropertyOptions = {required: true};
   let curr = schema as any;
 
@@ -58,6 +60,7 @@ function extractMetadata(schema: z.ZodTypeAny): ApiPropertyOptions {
       options.required = false;
       curr = curr.unwrap();
     } else if (type === 'default') {
+      options.required = false;
       curr = def.innerType;
     } else if (type === 'effect') {
       curr = def.schema;
@@ -76,10 +79,20 @@ function extractMetadata(schema: z.ZodTypeAny): ApiPropertyOptions {
   if (type && primitiveMap[type]) {
     options.type = primitiveMap[type];
   } else if (type === 'object') {
-    options.type = createNestedDTO(curr as z.ZodObject<any>);
-  } else if (['enum', 'nativeEnum'].includes(type)) {
-    if (!options.enum && def.values) {
-      options.enum = Object.values(def.values);
+    options.type = createNestedDTO(curr as z.ZodObject<any>, parentName || '', fieldName || '');
+  } else if (type === 'array') {
+    options.isArray = true;
+    if (curr.element) {
+      const innerOptions = extractMetadata(curr.element, parentName, fieldName);
+      options.type = innerOptions.type as any;
+      if (innerOptions.enum) {
+        options.enum = innerOptions.enum;
+      }
+    }
+  } else if (type === 'enum') {
+    const values = def.values || def.entries;
+    if (!options.enum && values) {
+      options.enum = Object.values(values);
     }
     options.type = String;
   } else if (['any', 'unknown'].includes(type)) {
@@ -154,7 +167,9 @@ export function createDTO(input: any): any {
   }
 
   const nameBase = ParentClass.name && ParentClass.name !== 'ParentClass' ? ParentClass.name : 'Generated';
-  Object.defineProperty(DTO, 'name', {value: `${nameBase}Dto_${uuidv7().split('-')[0]}`});
+  const dtoName = `${nameBase}DTO`;
+
+  Object.defineProperty(DTO, 'name', {value: dtoName});
 
   if (!Schema || !('shape' in Schema)) {
     return DTO;
@@ -163,7 +178,7 @@ export function createDTO(input: any): any {
   const shape = Schema.shape;
   for (const key of Object.keys(shape)) {
     const fieldSchema = shape[key];
-    const options = extractMetadata(fieldSchema);
+    const options = extractMetadata(fieldSchema, dtoName, key);
     ApiProperty(options)(DTO.prototype, key);
   }
 

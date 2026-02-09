@@ -31,7 +31,7 @@ export class ChallengeEntity extends createClass(
         maxLength: 255,
       }),
       status: z.enum(ChallengeStatusEnum).meta({
-        example: 'PENDING',
+        example: ChallengeStatusEnum.PENDING,
         description: 'Current status of the challenge',
         maxLength: 20,
       }),
@@ -53,7 +53,7 @@ export class DeviceEntity extends createClass(
         format: 'uuid',
       }),
       platform: z.enum(DeviceTypeEnum).meta({
-        example: 'ios',
+        example: DeviceTypeEnum.IOS,
         description: 'Operational system platform',
         maxLength: 20,
       }),
@@ -95,7 +95,7 @@ export class DocumentEntity extends createClass(
         format: 'uuid',
       }),
       type: z.enum(DocumentTypeEnum).meta({
-        example: 'RG_FRONT',
+        example: DocumentTypeEnum.RG_FRONT,
         description: 'Document type',
         maxLength: 50,
       }),
@@ -105,7 +105,7 @@ export class DocumentEntity extends createClass(
         maxLength: 255,
       }),
       status: z.enum(DocumentStatusEnum).meta({
-        example: 'PENDING',
+        example: DocumentStatusEnum.APPROVED,
         description: 'Document verification status',
         maxLength: 20,
       }),
@@ -160,7 +160,7 @@ export class UserEntity extends createClass(
         maxLength: 100,
       }),
       status: z.enum(UserStatusEnum).meta({
-        example: 'ACTIVE',
+        example: UserStatusEnum.ACTIVE,
         description: 'Current account lifecycle status',
         maxLength: 20,
       }),
@@ -178,7 +178,7 @@ export class UserEntity extends createClass(
         writeOnly: true,
       }),
       kycStatus: z.enum(KycStatusEnum).meta({
-        example: 'NONE',
+        example: KycStatusEnum.APPROVED,
         description: 'KYC verification status',
         maxLength: 20,
       }),

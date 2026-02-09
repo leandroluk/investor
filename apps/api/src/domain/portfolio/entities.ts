@@ -48,7 +48,7 @@ export class InvestmentEntity extends createClass(
         description: 'Amount invested in USD equivalent at the time of creation',
       }),
       status: z.enum(InvestmentStatusEnum).meta({
-        example: 'ACTIVE',
+        example: InvestmentStatusEnum.ACTIVE,
         description: 'Current status of the investment lifecycle',
         maxLength: 20,
       }),

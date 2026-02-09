@@ -13,7 +13,7 @@ export class SsoCallbackCommand extends createClass(
   z.object({
     provider: z.enum(Object.values(SsoProviderEnum)).meta({
       description: 'OAuth2 provider',
-      example: 'google',
+      example: SsoProviderEnum.GOOGLE,
       enum: Object.values(SsoProviderEnum),
     }),
     code: z.string().min(1).meta({

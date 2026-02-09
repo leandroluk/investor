@@ -10,7 +10,7 @@ export class GetSsoRedirectQuery extends createClass(
   z.object({
     provider: z.enum(Object.values(SsoProviderEnum)).meta({
       description: 'OAuth2 provider',
-      example: 'google',
+      example: SsoProviderEnum.GOOGLE,
       enum: Object.values(SsoProviderEnum),
     }),
     callbackURL: z.url().meta({

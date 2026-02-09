@@ -1,10 +1,15 @@
 import {ReviewDocumentCommand} from '#/application/admin/command';
-import {ListDocumentsToApproveQuery, ListDocumentsToApproveResult} from '#/application/admin/query';
+import {ListDocumentToApproveQuery} from '#/application/admin/query';
 import {Body, Controller, Get, Param, Patch, Query} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiBearerAuth, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {GetMeta} from '../_shared/decorators';
-import {ListDocumentQueryDTO, ReviewDocumentBodyDTO, ReviewDocumentParamDTO} from './dto';
+import {
+  ListDocumentToApproveQueryDTO,
+  ListDocumentToApproveResultDTO,
+  ReviewDocumentBodyDTO,
+  ReviewDocumentParamDTO,
+} from './dto';
 
 @ApiBearerAuth()
 @ApiTags('admin')
@@ -15,16 +20,19 @@ export class AdminController {
     private readonly queryBus: QueryBus
   ) {}
 
-  @Get('kyc/document')
-  @ApiOkResponse({description: 'List of documents to approve'})
-  async listDocuments(
+  // #region getListDocumentToApprove
+  @Get('document')
+  @ApiOkResponse({description: 'List of documents to approve', type: ListDocumentToApproveResultDTO})
+  async getListDocumentToApprove(
     @GetMeta() meta: GetMeta,
-    @Query() query: ListDocumentQueryDTO
-  ): Promise<ListDocumentsToApproveResult> {
-    return await this.queryBus.execute(new ListDocumentsToApproveQuery({...meta, ...query}));
+    @Query() query: ListDocumentToApproveQueryDTO
+  ): Promise<ListDocumentToApproveResultDTO> {
+    return await this.queryBus.execute(new ListDocumentToApproveQuery({...meta, ...query}));
   }
+  // #endregion
 
-  @Patch('kyc/document/:documentId/review')
+  // #region reviewDocument
+  @Patch('document/:documentId/review')
   @ApiOkResponse({description: 'Document reviewed successfully'})
   async reviewDocument(
     @GetMeta() {userId: adminId, ...meta}: GetMeta,
@@ -33,4 +41,5 @@ export class AdminController {
   ): Promise<void> {
     await this.commandBus.execute(new ReviewDocumentCommand({...meta, ...param, ...body, adminId}));
   }
+  // #endregion
 }

@@ -13,7 +13,7 @@ export class LedgerEntity extends createClass(
         format: 'uuid',
       }),
       type: z.enum(LedgerTypeEnum).meta({
-        example: 'INVESTMENT',
+        example: LedgerTypeEnum.INVESTMENT,
         description: 'Type of financial event recorded',
         maxLength: 50,
       }),
