@@ -1,9 +1,9 @@
 import {HealthQuery} from '#/application/system/query';
-import {UnhealthyError} from '#/domain/system/error';
+import {UnhealthyError} from '#/domain/system/errors';
 import {Controller, Get, HttpStatus} from '@nestjs/common';
 import {QueryBus} from '@nestjs/cqrs';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {GetMeta, MapDomainError} from '../_shared/decorator';
+import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {HealthResultDTO} from './dto';
 
 @ApiTags('system')

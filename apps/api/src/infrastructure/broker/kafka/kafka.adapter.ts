@@ -1,6 +1,6 @@
-import {Retry, Throws} from '#/application/_shared/decorator';
-import {DomainEvent} from '#/domain/_shared/event';
-import {BrokerPort} from '#/domain/_shared/port';
+import {Retry, Throws} from '#/application/_shared/decorators';
+import {DomainEvent} from '#/domain/_shared/events';
+import {BrokerPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Kafka, logLevel, type Consumer, type Producer} from 'kafkajs';

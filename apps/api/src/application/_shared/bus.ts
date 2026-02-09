@@ -1,37 +1,38 @@
+import {createClass} from '#/domain/_shared/factories';
 import {type Observable} from 'rxjs';
 import uuid from 'uuid';
-import z from 'zod';
+import {z} from 'zod';
 
-const command = z.object({
-  correlationId: z.uuid().default(() => uuid.v7()),
-  occurredAt: z.date().default(() => new Date()),
-});
+export const Command = createClass(
+  z.object({
+    correlationId: z
+      .uuid()
+      .default(() => uuid.v7())
+      .meta({
+        description: 'Unique identifier for the request',
+        example: '123e4567-e89b-12d3-a456-426614174000',
+      }),
+    occurredAt: z
+      .date()
+      .default(() => new Date())
+      .meta({
+        description: 'Date and time when the command was occurred',
+        example: new Date(),
+      }),
+  })
+);
 
-export abstract class Command<TType extends object, TUnion = TType & z.infer<typeof command>> {
-  readonly correlationId!: string;
-  readonly occurredAt!: Date;
+export type Command = InstanceType<typeof Command>;
 
-  constructor(payload?: TUnion, schema = z.object()) {
-    if (payload) {
-      Object.assign(this, command.extend(schema.shape).parse(payload));
-    }
-  }
-}
+export const Query = createClass(
+  z.object({
+    description: 'Unique identifier for the request',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+);
 
-const query = z.object({
-  correlationId: z.uuid().default(() => uuid.v7()),
-});
-
-export abstract class Query<TType = object, TUnion = TType & z.infer<typeof query>> {
-  readonly correlationId!: string;
-
-  constructor(payload?: TUnion, schema = z.object({})) {
-    if (payload) {
-      Object.assign(this, query.extend(schema.shape).parse(payload));
-    }
-  }
-}
+export type Query = InstanceType<typeof Command>;
 
 export interface Saga<TEvent = any> {
-  (event$: Observable<TEvent>): Observable<Command<any>>;
+  (event$: Observable<TEvent>): Observable<Command>;
 }

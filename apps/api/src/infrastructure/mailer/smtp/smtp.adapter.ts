@@ -1,5 +1,5 @@
-import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {MailerPort} from '#/domain/_shared/port';
+import {Retry, Throws, Trace} from '#/application/_shared/decorators';
+import {MailerPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';

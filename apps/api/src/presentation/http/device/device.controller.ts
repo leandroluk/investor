@@ -1,6 +1,6 @@
 import {RegisterDeviceCommand, RevokeDeviceCommand} from '#/application/device/command';
 import {ListActiveDeviceQuery} from '#/application/device/query';
-import {AuthUnauthorizedError, DeviceNotFoundError, DeviceNotOwnedError} from '#/domain/account/error';
+import {AuthUnauthorizedError, DeviceNotFoundError, DeviceNotOwnedError} from '#/domain/account/errors';
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {
@@ -12,9 +12,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import {GetMeta, MapDomainError} from '../_shared/decorator';
-import {AuthGuard, ChallengeGuard} from '../_shared/guard';
-import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from '../dto';
+import {GetMeta, MapDomainError} from '../_shared/decorators';
+import {AuthGuard, ChallengeGuard} from '../_shared/guards';
+import {ListActiveDeviceResultDTO, RegisterDeviceBodyDTO} from './dto';
 
 @ApiTags('device')
 @Controller('device')

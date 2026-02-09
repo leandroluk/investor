@@ -1,4 +1,4 @@
-import {OidcPort} from '#/domain/_shared/port';
+import {OidcPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import axios from 'axios';
 import {OidcFakeConfig} from './fake.config';

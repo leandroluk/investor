@@ -1,36 +1,20 @@
 import {Command} from '#/application/_shared/bus';
-import {ChallengeEntity, UserEntity} from '#/domain/account/entity';
-import {ChallengeStatusEnum, UserStatusEnum} from '#/domain/account/enum';
-import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/error';
-import {ChallengeRepository, UserRepository} from '#/domain/account/repository';
-import {ChallengeStore} from '#/domain/account/store';
+import {createClass} from '#/domain/_shared/factories';
+import {ChallengeEntity, UserEntity} from '#/domain/account/entities';
+import {ChallengeStatusEnum, UserStatusEnum} from '#/domain/account/enums';
+import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/errors';
+import {ChallengeRepository, UserRepository} from '#/domain/account/repositories';
+import {ChallengeStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  challengeId: z.uuid(),
-  otp: z.string().min(1),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class Authorize2FACommand extends Command<CommandSchema> {
-  @ApiProperty({
-    description: 'Challenge ID',
+export class Authorize2FACommand extends createClass(
+  Command,
+  z.object({
+    challengeId: z.uuid().meta({description: 'Challenge ID'}),
+    otp: z.string().min(1).meta({description: '2FA Code', example: '123456'}),
   })
-  readonly challengeId!: string;
-
-  @ApiProperty({
-    description: '2FA Code',
-    example: '123456',
-  })
-  readonly otp!: string;
-
-  constructor(payload: Authorize2FACommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(Authorize2FACommand)
 export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand, void> {

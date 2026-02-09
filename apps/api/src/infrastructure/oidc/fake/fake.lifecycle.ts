@@ -1,4 +1,4 @@
-import {TokenPort} from '#/domain/_shared/port';
+import {TokenPort} from '#/domain/_shared/ports';
 import {HttpStatus, Injectable, Logger, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
 import * as http from 'node:http';
 import {OidcFakeConfig} from './fake.config';

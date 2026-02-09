@@ -1,6 +1,6 @@
-import {type IIndexable} from '#/domain/_shared/interface';
+import {type TIndexable} from '#/domain/_shared/types';
 
-export abstract class DatabasePostgresRepository<TEntity extends IIndexable> {
+export abstract class DatabasePostgresRepository<TEntity extends TIndexable> {
   protected readonly selectAsPart: string;
   protected readonly valuesPart: string;
 

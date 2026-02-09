@@ -1,5 +1,5 @@
-import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {DatabasePort} from '#/domain/_shared/port';
+import {Retry, Throws, Trace} from '#/application/_shared/decorators';
+import {DatabasePort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Pool, types} from 'pg';
 import {DatabasePostgresConfig} from './postgres.config';

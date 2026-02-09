@@ -1,5 +1,5 @@
-import {Throws} from '#/application/_shared/decorator';
-import {CipherPort} from '#/domain/_shared/port';
+import {Throws} from '#/application/_shared/decorators';
+import {CipherPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import crypto from 'node:crypto';
 import {CipherStdConfig} from './std.config';

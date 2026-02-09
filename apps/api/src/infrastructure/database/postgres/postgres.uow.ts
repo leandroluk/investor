@@ -1,12 +1,12 @@
-import {Throws} from '#/application/_shared/decorator';
-import {DatabasePort} from '#/domain/_shared/port';
-import {type DomainUOW} from '#/domain/_shared/uow';
+import {Throws} from '#/application/_shared/decorators';
+import {UOW} from '#/domain/_shared/classes';
+import {DatabasePort} from '#/domain/_shared/ports';
 import {DatabasePostgresError} from './postgres.error';
 
-type Session<TDomain extends DomainUOW<any>> = Parameters<Parameters<TDomain['transaction']>[0]>[0];
+type Session<TDomain extends UOW<any>> = Parameters<Parameters<TDomain['transaction']>[0]>[0];
 
 @Throws(DatabasePostgresError)
-export abstract class DatabasePostgresUOW<TDomain extends DomainUOW<any>> implements DomainUOW<Session<TDomain>> {
+export abstract class DatabasePostgresUOW<TDomain extends UOW<any>> implements UOW<Session<TDomain>> {
   constructor(
     private readonly database: DatabasePort,
     private readonly createSession: (tx: DatabasePort.Transaction) => Session<TDomain>

@@ -1,39 +1,27 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {BrokerPort} from '#/domain/_shared/port';
-import {UserEntity} from '#/domain/account/entity';
-import {UserStatusEnum} from '#/domain/account/enum';
-import {UserInvalidOtpError, UserNotFoundError, UserNotPendingError} from '#/domain/account/error';
-import {UserActivatedEvent} from '#/domain/account/event';
-import {UserRepository} from '#/domain/account/repository';
-import {OtpStore} from '#/domain/account/store';
+import {createClass} from '#/domain/_shared/factories';
+import {BrokerPort} from '#/domain/_shared/ports';
+import {UserEntity} from '#/domain/account/entities';
+import {UserStatusEnum} from '#/domain/account/enums';
+import {UserInvalidOtpError, UserNotFoundError, UserNotPendingError} from '#/domain/account/errors';
+import {UserActivatedEvent} from '#/domain/account/events';
+import {UserRepository} from '#/domain/account/repositories';
+import {OtpStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  email: z.email(),
-  otp: z.string().length(6),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class ActivateUserCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(UserEntity, 'email')
-  readonly email!: string;
-
-  @ApiProperty({
-    description: 'One Time Password',
-    example: '123456',
-    minLength: 6,
-    maxLength: 6,
+export class ActivateUserCommand extends createClass(
+  Command,
+  z.object({
+    email: UserEntity.schema.shape.email,
+    otp: z.string().length(6).meta({
+      description: 'One Time Password',
+      example: '123456',
+      minLength: 6,
+      maxLength: 6,
+    }),
   })
-  readonly otp!: string;
-
-  constructor(payload: ActivateUserCommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(ActivateUserCommand)
 export class ActivateUserCommandHandler implements ICommandHandler<ActivateUserCommand> {

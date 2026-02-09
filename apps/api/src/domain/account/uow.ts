@@ -1,7 +1,12 @@
-import {DomainUOW} from '#/domain/_shared/uow';
-import {type ChallengeRepository, type DeviceRepository, type LoginRepository, type UserRepository} from './repository';
+import {UOW} from '#/domain/_shared/classes';
+import {
+  type ChallengeRepository,
+  type DeviceRepository,
+  type LoginRepository,
+  type UserRepository,
+} from './repositories';
 
-export abstract class AccountUOW extends DomainUOW<{
+export abstract class AccountUOW extends UOW<{
   get challenge(): ChallengeRepository;
   get device(): DeviceRepository;
   get login(): LoginRepository;

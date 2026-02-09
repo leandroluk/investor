@@ -1,30 +1,18 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {DeviceEntity} from '#/domain/account/entity';
-import {DeviceNotFoundError, DeviceNotOwnedError} from '#/domain/account/error';
-import {DeviceRepository} from '#/domain/account/repository';
-import {DeviceStore} from '#/domain/account/store';
+import {createClass} from '#/domain/_shared/factories';
+import {DeviceEntity} from '#/domain/account/entities';
+import {DeviceNotFoundError, DeviceNotOwnedError} from '#/domain/account/errors';
+import {DeviceRepository} from '#/domain/account/repositories';
+import {DeviceStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import z from 'zod';
 
-const commandSchema = z.object({
-  id: z.uuid(),
-  userId: z.uuid(),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class RevokeDeviceCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(DeviceEntity, 'id')
-  readonly id!: string;
-
-  @ApiPropertyOf(DeviceEntity, 'userId')
-  readonly userId!: string;
-
-  constructor(payload: RevokeDeviceCommand) {
-    super(payload, commandSchema);
-  }
-}
+export class RevokeDeviceCommand extends createClass(
+  Command,
+  DeviceEntity.schema.pick({
+    id: true,
+    userId: true,
+  })
+) {}
 
 @CommandHandler(RevokeDeviceCommand)
 export class RevokeDeviceHandler implements ICommandHandler<RevokeDeviceCommand, void> {

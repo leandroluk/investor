@@ -1,35 +1,24 @@
 import {Query} from '#/application/_shared/bus';
-import {OidcPort} from '#/domain/_shared/port';
-import {SsoProviderEnum} from '#/domain/account/enum';
+import {createClass} from '#/domain/_shared/factories';
+import {OidcPort} from '#/domain/_shared/ports';
+import {SsoProviderEnum} from '#/domain/account/enums';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const querySchema = z.object({
-  provider: z.enum(Object.values(SsoProviderEnum)),
-  callbackURL: z.string().url(),
-});
-
-type QuerySchema = z.infer<typeof querySchema>;
-
-export class GetSsoRedirectQuery extends Query<QuerySchema> {
-  @ApiProperty({
-    description: 'OAuth2 provider',
-    example: 'google',
-    enum: Object.values(SsoProviderEnum),
+export class GetSsoRedirectQuery extends createClass(
+  Query,
+  z.object({
+    provider: z.enum(Object.values(SsoProviderEnum)).meta({
+      description: 'OAuth2 provider',
+      example: 'google',
+      enum: Object.values(SsoProviderEnum),
+    }),
+    callbackURL: z.url().meta({
+      description: 'Callback URL after authentication',
+      example: 'https://app.com/auth/callback',
+    }),
   })
-  readonly provider!: SsoProviderEnum;
-
-  @ApiProperty({
-    description: 'Callback URL after authentication',
-    example: 'https://app.com/auth/callback',
-  })
-  readonly callbackURL!: string;
-
-  constructor(payload: GetSsoRedirectQuery) {
-    super(payload, querySchema);
-  }
-}
+) {}
 
 @QueryHandler(GetSsoRedirectQuery)
 export class GetSsoRedirectQueryHandler implements IQueryHandler<GetSsoRedirectQuery, string> {

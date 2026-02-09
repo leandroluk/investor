@@ -1,12 +1,12 @@
 import {SsoCallbackCommand} from '#/application/sso/command';
 import {GetSsoRedirectQuery} from '#/application/sso/query';
-import {SsoInvalidOAuthCodeError, SsoInvalidProviderError, SsoInvalidStateError} from '#/domain/account/error';
+import {SsoInvalidOAuthCodeError, SsoInvalidProviderError, SsoInvalidStateError} from '#/domain/account/errors';
 import {Controller, Get, HttpCode, HttpStatus, Param, Query, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiResponse, ApiTags} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
-import {GetMeta, MapDomainError} from '../_shared/decorator';
-import {GetSsoRedirectParamsDTO, GetSsoRedirectQueryDTO, SsoCallbackQueryDTO} from '../dto';
+import {GetMeta, MapDomainError} from '../_shared/decorators';
+import {GetSsoRedirectParamsDTO, GetSsoRedirectQueryDTO, SsoCallbackQueryDTO} from './dto';
 
 @ApiTags('sso')
 @Controller('sso')

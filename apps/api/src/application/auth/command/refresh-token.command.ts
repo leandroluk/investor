@@ -1,34 +1,24 @@
 import {Command} from '#/application/_shared/bus';
-import {HasherPort, TokenPort} from '#/domain/_shared/port';
-import {DeviceEntity, UserEntity} from '#/domain/account/entity';
-import {UserStatusEnum} from '#/domain/account/enum';
-import {AuthSessionExpiredError, AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/error';
-import {UserRepository} from '#/domain/account/repository';
-import {SessionStore} from '#/domain/account/store';
+import {createClass} from '#/domain/_shared/factories';
+import {HasherPort, TokenPort} from '#/domain/_shared/ports';
+import {DeviceEntity, UserEntity} from '#/domain/account/entities';
+import {UserStatusEnum} from '#/domain/account/enums';
+import {AuthSessionExpiredError, AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/errors';
+import {UserRepository} from '#/domain/account/repositories';
+import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  refreshToken: z.string().min(1),
-  fingerprint: z.string(),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class RefreshTokenCommand extends Command<CommandSchema> {
-  @ApiProperty({
-    description: 'Refresh token to exchange for a new access token',
-    example: 'ey...',
+export class RefreshTokenCommand extends createClass(
+  Command,
+  z.object({
+    refreshToken: z.string().min(1).meta({
+      description: 'Refresh token to exchange for a new access token',
+      example: 'ey...',
+    }),
+    fingerprint: z.string(),
   })
-  readonly refreshToken!: string;
-
-  readonly fingerprint!: string;
-
-  constructor(payload: RefreshTokenCommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand, TokenPort.Authorization> {

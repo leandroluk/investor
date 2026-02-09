@@ -1,5 +1,5 @@
-import {Throws} from '#/application/_shared/decorator';
-import {TemplatePort} from '#/domain/_shared/port';
+import {Throws} from '#/application/_shared/decorators';
+import {TemplatePort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import Mustache from 'mustache';
 import fs from 'node:fs';

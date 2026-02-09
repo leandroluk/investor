@@ -1,64 +1,30 @@
 import {Command} from '#/application/_shared/bus';
-import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/port';
-import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entity';
-import {DeviceTypeEnum, SsoProviderEnum} from '#/domain/account/enum';
-import {UserInvalidCredentialsError} from '#/domain/account/error';
-import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/event';
-import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repository';
-import {SessionStore} from '#/domain/account/store';
+import {authorizationTokenSchema} from '#/application/_shared/types';
+import {createClass} from '#/domain/_shared/factories';
+import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/ports';
+import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entities';
+import {DeviceTypeEnum, SsoProviderEnum} from '#/domain/account/enums';
+import {UserInvalidCredentialsError} from '#/domain/account/errors';
+import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/events';
+import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repositories';
+import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import uuid from 'uuid';
 import z from 'zod';
 
-const commandSchema = z.object({
-  ip: z.string().min(1),
-  fingerprint: z.string().min(1),
-  token: z.string().min(1),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class LoginUsingTokenCommand extends Command<CommandSchema> {
-  readonly ip!: string;
-  readonly fingerprint!: string;
-
-  @ApiProperty({
-    description: 'Encrypted temporary token',
-    example: 'eyJ...',
+export class LoginUsingTokenCommand extends createClass(
+  Command,
+  z.object({
+    ip: z.string().min(1),
+    fingerprint: z.string().min(1),
+    token: z.string().min(1).meta({
+      description: 'Encrypted temporary token',
+      example: 'eyJ...',
+    }),
   })
-  readonly token!: string;
+) {}
 
-  constructor(payload: LoginUsingTokenCommand) {
-    super(payload, commandSchema);
-  }
-}
-
-export class LoginUsingTokenCommandResult implements TokenPort.Authorization {
-  @ApiProperty({
-    description: 'Token type',
-    example: 'Bearer',
-  })
-  tokenType!: string;
-
-  @ApiProperty({
-    description: 'Access token',
-    example: 'eyJhbGci...',
-  })
-  accessToken!: string;
-
-  @ApiProperty({
-    description: 'Expires in',
-    example: 3600,
-  })
-  expiresIn!: number;
-
-  @ApiProperty({
-    description: 'Refresh token',
-    example: 'eyJhbGci...',
-  })
-  refreshToken?: string;
-}
+export class LoginUsingTokenCommandResult extends createClass(authorizationTokenSchema) {}
 
 @CommandHandler(LoginUsingTokenCommand)
 export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCommand, LoginUsingTokenCommandResult> {

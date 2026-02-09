@@ -1,6 +1,6 @@
-import {DomainEvent} from '#/domain/_shared/event';
-import {BrokerPort} from '#/domain/_shared/port';
-import * as accountEvent from '#/domain/account/event';
+import {DomainEvent} from '#/domain/_shared/events';
+import {BrokerPort} from '#/domain/_shared/ports';
+import * as accountEvent from '#/domain/account/events';
 import {Injectable, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
 import {EventBus} from '@nestjs/cqrs';
 

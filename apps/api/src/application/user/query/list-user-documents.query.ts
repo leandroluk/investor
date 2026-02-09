@@ -1,40 +1,34 @@
 import {Query} from '#/application/_shared/bus';
-import {StoragePort} from '#/domain/_shared/port';
-import {DocumentEntity} from '#/domain/account/entity';
-import {DocumentRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {StoragePort} from '#/domain/_shared/ports';
+import {DocumentEntity, UserEntity} from '#/domain/account/entities';
+import {DocumentRepository} from '#/domain/account/repositories';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
-const querySchema = z.object({
-  userId: z.uuid(),
-});
+export class ListUserDocumentQuery extends createClass(
+  Query,
+  z.object({
+    userId: UserEntity.schema.shape.id,
+  })
+) {}
 
-type QuerySchema = z.infer<typeof querySchema>;
-
-export class ListUserDocumentsQuery extends Query<QuerySchema> {
-  readonly userId!: string;
-
-  constructor(payload: QuerySchema) {
-    super(payload as any, querySchema);
-  }
-}
-
-export class ListUserDocumentsResultItem extends DocumentEntity {
+export class ListUserDocumentResultItem extends createClass(DocumentEntity.schema) {
   url!: string;
 }
 
-export class ListUserDocumentsResult {
-  readonly items!: ListUserDocumentsResultItem[];
+export class ListUserDocumentResult {
+  readonly items!: ListUserDocumentResultItem[];
 }
 
-@QueryHandler(ListUserDocumentsQuery)
-export class ListUserDocumentsHandler implements IQueryHandler<ListUserDocumentsQuery, ListUserDocumentsResult> {
+@QueryHandler(ListUserDocumentQuery)
+export class ListUserDocumentHandler implements IQueryHandler<ListUserDocumentQuery, ListUserDocumentResult> {
   constructor(
     private readonly documentRepository: DocumentRepository,
     private readonly storagePort: StoragePort
   ) {}
 
-  async execute(query: ListUserDocumentsQuery): Promise<ListUserDocumentsResult> {
+  async execute(query: ListUserDocumentQuery): Promise<ListUserDocumentResult> {
     const documents = await this.documentRepository.findByUserId(query.userId);
 
     const items = await Promise.all(

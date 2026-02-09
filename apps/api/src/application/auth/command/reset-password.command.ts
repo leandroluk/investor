@@ -1,42 +1,32 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {BrokerPort, HasherPort} from '#/domain/_shared/port';
-import {PASSWORD_REGEX_CONSTANT} from '#/domain/account/constant';
-import {UserEntity} from '#/domain/account/entity';
-import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/error';
-import {UserPasswordChangedEvent} from '#/domain/account/event';
-import {UserRepository} from '#/domain/account/repository';
-import {OtpStore} from '#/domain/account/store';
+import {createClass} from '#/domain/_shared/factories';
+import {BrokerPort, HasherPort} from '#/domain/_shared/ports';
+import {PASSWORD_REGEX_CONSTANT} from '#/domain/account/constants';
+import {UserEntity} from '#/domain/account/entities';
+import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/errors';
+import {UserPasswordChangedEvent} from '#/domain/account/events';
+import {UserRepository} from '#/domain/account/repositories';
+import {OtpStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  email: z.email(),
-  otp: z.string().length(6),
-  password: z.string().regex(PASSWORD_REGEX_CONSTANT),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class ResetPasswordCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(UserEntity, 'email')
-  readonly email!: string;
-
-  @ApiProperty({
-    description: 'One Time Password', example: '123456', minLength: 6, maxLength: 6
+export class ResetPasswordCommand extends createClass(
+  Command,
+  z.object({
+    email: UserEntity.schema.shape.email,
+    otp: z.string().length(6).meta({
+      description: 'One Time Password',
+      example: '123456',
+      minLength: 6,
+      maxLength: 6,
+    }),
+    password: z.string().regex(PASSWORD_REGEX_CONSTANT).meta({
+      description: 'New password',
+      example: 'NewP@ssw0rd!',
+      minLength: 8,
+    }),
   })
-  readonly otp!: string;
-
-  @ApiProperty({
-    description: 'New password', example: 'NewP@ssw0rd!', minLength: 8
-  })
-  readonly password!: string;
-
-  constructor(payload: ResetPasswordCommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {

@@ -1,5 +1,5 @@
-import {Throws} from '#/application/_shared/decorator';
-import {HasherPort} from '#/domain/_shared/port';
+import {Throws} from '#/application/_shared/decorators';
+import {HasherPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import crypto from 'node:crypto';
 import {HasherStdError} from './std.error';

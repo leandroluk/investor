@@ -1,9 +1,9 @@
-import {Throws} from '#/application/_shared/decorator';
-import {DatabasePort} from '#/domain/_shared/port';
-import {DocumentEntity as Entity} from '#/domain/account/entity';
-import {DocumentStatusEnum} from '#/domain/account/enum';
-import {DocumentRepository as Interface} from '#/domain/account/repository';
-import {DocumentView} from '#/domain/account/view';
+import {Throws} from '#/application/_shared/decorators';
+import {DatabasePort} from '#/domain/_shared/ports';
+import {DocumentEntity as Entity} from '#/domain/account/entities';
+import {DocumentStatusEnum} from '#/domain/account/enums';
+import {DocumentRepository as Interface} from '#/domain/account/repositories';
+import {DocumentView} from '#/domain/account/views';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';

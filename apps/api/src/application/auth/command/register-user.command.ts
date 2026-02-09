@@ -1,45 +1,30 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {BrokerPort, HasherPort} from '#/domain/_shared/port';
-import {PASSWORD_REGEX_CONSTANT} from '#/domain/account/constant';
-import {UserEntity} from '#/domain/account/entity';
-import {KycStatusEnum, UserStatusEnum} from '#/domain/account/enum';
-import {UserEmailInUseError} from '#/domain/account/error';
-import {UserRegisteredEvent} from '#/domain/account/event';
-import {UserRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {BrokerPort, HasherPort} from '#/domain/_shared/ports';
+import {PASSWORD_REGEX_CONSTANT} from '#/domain/account/constants';
+import {UserEntity} from '#/domain/account/entities';
+import {KycStatusEnum, UserStatusEnum} from '#/domain/account/enums';
+import {UserEmailInUseError} from '#/domain/account/errors';
+import {UserRegisteredEvent} from '#/domain/account/events';
+import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import uuid from 'uuid';
 import z from 'zod';
 
-const commandSchema = z.object({
-  name: z.string().min(1).max(255),
-  email: z.email(),
-  password: z.string().min(1).max(100).regex(PASSWORD_REGEX_CONSTANT),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class RegisterUserCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(UserEntity, 'email')
-  readonly email!: string;
-
-  @ApiPropertyOf(UserEntity, 'name')
-  readonly name!: string;
-
-  @ApiProperty({
-    description: 'User password used to authenticate',
-    minLength: 8,
-    maxLength: 100,
-    example: 'Test@123',
-    pattern: PASSWORD_REGEX_CONSTANT.source,
+export class RegisterUserCommand extends createClass(
+  Command,
+  z.object({
+    name: UserEntity.schema.shape.name,
+    email: UserEntity.schema.shape.email,
+    password: z.string().min(1).max(100).regex(PASSWORD_REGEX_CONSTANT).meta({
+      description: 'User password used to authenticate',
+      minLength: 8,
+      maxLength: 100,
+      example: 'Test@123',
+      pattern: PASSWORD_REGEX_CONSTANT.source,
+    }),
   })
-  readonly password!: string;
-
-  constructor(payload: RegisterUserCommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserCommand> {

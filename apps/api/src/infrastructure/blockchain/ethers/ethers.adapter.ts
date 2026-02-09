@@ -1,5 +1,5 @@
-import {Retry, Throws, Trace} from '#/application/_shared/decorator';
-import {BlockchainPort} from '#/domain/_shared/port';
+import {Retry, Throws, Trace} from '#/application/_shared/decorators';
+import {BlockchainPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {FetchRequest, Interface, JsonRpcProvider, isAddress} from 'ethers';
 import {BlockchainEthersConfig} from './ethers.config';

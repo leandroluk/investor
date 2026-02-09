@@ -1,24 +1,16 @@
 import {Query} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {DeviceEntity} from '#/domain/account/entity';
-import {DeviceRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {DeviceEntity} from '#/domain/account/entities';
+import {DeviceRepository} from '#/domain/account/repositories';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
-const querySchema = z.object({
-  userId: z.uuid(),
-});
-
-type QuerySchema = z.infer<typeof querySchema>;
-
-export class ListActiveDeviceQuery extends Query<QuerySchema> {
-  @ApiPropertyOf(DeviceEntity, 'userId')
-  readonly userId!: string;
-
-  constructor(payload: ListActiveDeviceQuery) {
-    super(payload, querySchema);
-  }
-}
+export class ListActiveDeviceQuery extends createClass(
+  Query,
+  z.object({
+    userId: z.uuid(),
+  })
+) {}
 
 @QueryHandler(ListActiveDeviceQuery)
 export class ListActiveDeviceHandler implements IQueryHandler<ListActiveDeviceQuery, DeviceEntity[]> {

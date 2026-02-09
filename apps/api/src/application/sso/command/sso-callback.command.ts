@@ -1,45 +1,31 @@
 import {Command} from '#/application/_shared/bus';
-import {CipherPort, OidcPort} from '#/domain/_shared/port';
-import {UserEntity} from '#/domain/account/entity';
-import {KycStatusEnum, SsoProviderEnum, UserStatusEnum} from '#/domain/account/enum';
-import {SsoInvalidOAuthCodeError, SsoInvalidStateError} from '#/domain/account/error';
-import {UserRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {CipherPort, OidcPort} from '#/domain/_shared/ports';
+import {UserEntity} from '#/domain/account/entities';
+import {KycStatusEnum, SsoProviderEnum, UserStatusEnum} from '#/domain/account/enums';
+import {SsoInvalidOAuthCodeError, SsoInvalidStateError} from '#/domain/account/errors';
+import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  provider: z.enum(Object.values(SsoProviderEnum)),
-  code: z.string().min(1),
-  state: z.string().min(1),
-});
-
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class SsoCallbackCommand extends Command<CommandSchema> {
-  @ApiProperty({
-    description: 'OAuth2 provider',
-    example: 'google',
-    enum: Object.values(SsoProviderEnum),
+export class SsoCallbackCommand extends createClass(
+  Command,
+  z.object({
+    provider: z.enum(Object.values(SsoProviderEnum)).meta({
+      description: 'OAuth2 provider',
+      example: 'google',
+      enum: Object.values(SsoProviderEnum),
+    }),
+    code: z.string().min(1).meta({
+      description: 'Authorization code from provider',
+      example: 'abc123...',
+    }),
+    state: z.string().min(1).meta({
+      description: 'Encrypted state with callback_url',
+      example: 'eyJ...',
+    }),
   })
-  readonly provider!: SsoProviderEnum;
-
-  @ApiProperty({
-    description: 'Authorization code from provider',
-    example: 'abc123...',
-  })
-  readonly code!: string;
-
-  @ApiProperty({
-    description: 'Encrypted state with callback_url',
-    example: 'eyJ...',
-  })
-  readonly state!: string;
-
-  constructor(payload: SsoCallbackCommand) {
-    super(payload, commandSchema);
-  }
-}
+) {}
 
 @CommandHandler(SsoCallbackCommand)
 export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, string> {

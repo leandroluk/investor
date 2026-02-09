@@ -1,26 +1,23 @@
 import {Query} from '#/application/_shared/bus';
-import {UserEntity} from '#/domain/account/entity';
-import {UserNotFoundError} from '#/domain/account/error';
-import {UserRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {UserEntity} from '#/domain/account/entities';
+import {UserNotFoundError} from '#/domain/account/errors';
+import {UserRepository} from '#/domain/account/repositories';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
-import {OmitType} from '@nestjs/swagger';
 import z from 'zod';
 
-const querySchema = z.object({
-  userId: z.string().uuid(),
-});
+export class GetUserProfileQuery extends createClass(
+  Query,
+  z.object({
+    userId: UserEntity.schema.shape.id,
+  })
+) {}
 
-type QuerySchema = z.infer<typeof querySchema>;
-
-export class GetUserProfileQuery extends Query<QuerySchema> {
-  readonly userId!: string;
-
-  constructor(payload: QuerySchema) {
-    super(payload as any, querySchema);
-  }
-}
-
-export class GetUserProfileQueryResult extends OmitType(UserEntity, ['passwordHash']) {}
+export class GetUserProfileQueryResult extends createClass(
+  UserEntity.schema.omit({
+    passwordHash: true,
+  })
+) {}
 
 @QueryHandler(GetUserProfileQuery)
 export class GetUserProfileHandler implements IQueryHandler<GetUserProfileQuery, GetUserProfileQueryResult> {

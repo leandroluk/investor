@@ -1,4 +1,4 @@
-import {LoggerPort} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Logger as WinstonLogger, createLogger, format, transports} from 'winston';
 import LokiTransport from 'winston-loki';

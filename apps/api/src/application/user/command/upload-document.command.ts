@@ -1,38 +1,43 @@
 import {Command} from '#/application/_shared/bus';
-import {StoragePort} from '#/domain/_shared/port';
-import {DocumentEntity} from '#/domain/account/entity';
-import {DocumentStatusEnum, DocumentTypeEnum, KycStatusEnum} from '#/domain/account/enum';
-import {UserNotFoundError} from '#/domain/account/error';
-import {DocumentRepository, UserRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {StoragePort} from '#/domain/_shared/ports';
+import {DocumentEntity, UserEntity} from '#/domain/account/entities';
+import {DocumentStatusEnum, KycStatusEnum} from '#/domain/account/enums';
+import {UserNotFoundError} from '#/domain/account/errors';
+import {DocumentRepository, UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import uuid from 'uuid';
 import z from 'zod';
 
-const commandSchema = z.object({
-  userId: z.uuid(),
-  type: z.enum(DocumentTypeEnum),
-  contentType: z.string().min(1),
-  size: z.number().positive(),
-});
+export class UploadDocumentCommand extends createClass(
+  Command,
+  z.object({
+    userId: UserEntity.schema.shape.id,
+    type: DocumentEntity.schema.shape.type,
+    contentType: z.string().min(1).meta({
+      description: 'File content type',
+      example: 'image/jpeg',
+    }),
+    size: z.number().positive().meta({
+      description: 'File size in bytes',
+      example: 1024,
+    }),
+  })
+) {}
 
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class UploadDocumentCommand extends Command<CommandSchema> {
-  readonly userId!: string;
-  readonly type!: DocumentTypeEnum;
-  readonly contentType!: string;
-  readonly size!: number;
-
-  constructor(payload: CommandSchema) {
-    super(payload as any, commandSchema);
-  }
-}
-
-export class UploadDocumentCommandResult {
-  readonly id!: string;
-  readonly uploadUrl!: string;
-  readonly expiresAt!: Date;
-}
+export class UploadDocumentCommandResult extends createClass(
+  z.object({
+    id: DocumentEntity.schema.shape.id,
+    uploadUrl: z.url().meta({
+      description: 'URL to upload the document',
+      example: 'https://storage...',
+    }),
+    expiresAt: z.date().meta({
+      description: 'Expiration date of the upload URL',
+      example: new Date(),
+    }),
+  })
+) {}
 
 @CommandHandler(UploadDocumentCommand)
 export class UploadDocumentHandler implements ICommandHandler<UploadDocumentCommand, UploadDocumentCommandResult> {

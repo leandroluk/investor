@@ -1,50 +1,36 @@
 import {Command} from '#/application/_shared/bus';
-import {ApiPropertyOf} from '#/application/_shared/decorator';
-import {UserEntity} from '#/domain/account/entity';
-import {UserNotFoundError} from '#/domain/account/error';
-import {UserRepository} from '#/domain/account/repository';
+import {createClass} from '#/domain/_shared/factories';
+import {UserEntity} from '#/domain/account/entities';
+import {UserNotFoundError} from '#/domain/account/errors';
+import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {OmitType} from '@nestjs/swagger';
 import z from 'zod';
 
-const commandSchema = z.object({
-  userId: z.string().uuid(),
-  name: z.string().min(1).max(100).optional(),
-  language: z.string().length(2).optional(),
-  timezone: z
-    .string()
-    .refine(value => {
-      try {
-        Intl.DateTimeFormat(undefined, {timeZone: value});
-        return true;
-      } catch {
-        return false;
-      }
-    })
-    .optional(),
-});
+export class UpdateUserProfileCommand extends createClass(
+  Command,
+  z.object({
+    userId: z.uuid(),
+    name: z.string().min(1).max(100).optional(),
+    language: z.string().length(2).optional(),
+    timezone: z
+      .string()
+      .refine(value => {
+        try {
+          Intl.DateTimeFormat(undefined, {timeZone: value});
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .optional(),
+  })
+) {}
 
-type CommandSchema = z.infer<typeof commandSchema>;
-
-export class UpdateUserProfileCommand extends Command<CommandSchema> {
-  @ApiPropertyOf(UserEntity, 'id')
-  readonly userId!: string;
-
-  @ApiPropertyOf(UserEntity, 'name')
-  readonly name?: string;
-
-  @ApiPropertyOf(UserEntity, 'language')
-  readonly language?: string;
-
-  @ApiPropertyOf(UserEntity, 'timezone')
-  readonly timezone?: string;
-
-  constructor(payload: UpdateUserProfileCommand) {
-    super(payload, commandSchema);
-  }
-}
-
-export class UpdateUserProfileCommandResult extends OmitType(UserEntity, ['passwordHash']) {}
+export class UpdateUserProfileCommandResult extends createClass(
+  UserEntity.schema.omit({
+    passwordHash: true,
+  })
+) {}
 
 @CommandHandler(UpdateUserProfileCommand)
 export class UpdateUserProfileHandler implements ICommandHandler<

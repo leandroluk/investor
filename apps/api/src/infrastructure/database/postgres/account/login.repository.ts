@@ -1,7 +1,7 @@
-import {Throws} from '#/application/_shared/decorator';
-import {DatabasePort} from '#/domain/_shared/port';
-import {LoginEntity as Entity} from '#/domain/account/entity';
-import {LoginRepository as Interface} from '#/domain/account/repository';
+import {Throws} from '#/application/_shared/decorators';
+import {DatabasePort} from '#/domain/_shared/ports';
+import {LoginEntity as Entity} from '#/domain/account/entities';
+import {LoginRepository as Interface} from '#/domain/account/repositories';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {Inject} from '@nestjs/common';
 import {DatabasePostgresError} from '../postgres.error';

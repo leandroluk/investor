@@ -1,0 +1,4 @@
+import {LoginUsingTokenCommand} from '#/application/auth/command';
+import {PickType} from '@nestjs/swagger';
+
+export class LoginUsingTokenBodyDTO extends PickType(LoginUsingTokenCommand, ['token']) {}

@@ -1,5 +1,5 @@
-import {Throws} from '#/application/_shared/decorator';
-import {TokenPort} from '#/domain/_shared/port';
+import {Throws} from '#/application/_shared/decorators';
+import {TokenPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import jsonwebtoken from 'jsonwebtoken';
 import {TokenJwtConfig} from './jwt.config';

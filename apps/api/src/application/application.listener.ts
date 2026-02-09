@@ -1,4 +1,4 @@
-import {LoggerPort} from '#/domain/_shared/port';
+import {LoggerPort} from '#/domain/_shared/ports';
 import {Injectable} from '@nestjs/common';
 import {OnEvent} from '@nestjs/event-emitter';
 import ms from 'ms';

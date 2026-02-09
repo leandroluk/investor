@@ -1,23 +1,21 @@
 import {Query} from '#/application/_shared/bus';
-import {BlockchainPort, BrokerPort, CachePort, DatabasePort} from '#/domain/_shared/port';
-import {UnhealthyError} from '#/domain/system/error';
+import {createClass} from '#/domain/_shared/factories';
+import {BlockchainPort, BrokerPort, CachePort, DatabasePort} from '#/domain/_shared/ports';
+import {UnhealthyError} from '#/domain/system/errors';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
-import {ApiProperty} from '@nestjs/swagger';
 import ms from 'ms';
+import z from 'zod';
 
-export class HealthQuery extends Query {
-  constructor(payload) {
-    super(payload);
-  }
-}
+export class HealthQuery extends Query {}
 
-export class HealthQueryResult {
-  @ApiProperty({
-    description: 'Application uptime',
-    example: '10m 30s',
+export class HealthQueryResult extends createClass(
+  z.object({
+    uptime: z.string().meta({
+      description: 'Application uptime',
+      example: '10m 30s',
+    }),
   })
-  uptime!: string;
-}
+) {}
 
 @QueryHandler(HealthQuery)
 export class HealthQueryHandler implements IQueryHandler<HealthQuery, HealthQueryResult> {

@@ -1,5 +1,5 @@
-import {Throws} from '#/application/_shared/decorator';
-import {StoragePort} from '#/domain/_shared/port';
+import {Throws} from '#/application/_shared/decorators';
+import {StoragePort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
 import {DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';

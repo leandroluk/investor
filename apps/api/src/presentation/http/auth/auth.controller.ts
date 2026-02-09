@@ -6,12 +6,12 @@ import {
   RefreshTokenCommand,
   RegisterUserCommand,
   ResetPasswordCommand,
-  Send2FAEmailCommand,
-  SendActivateEmailCommand,
+  Send2FACommand,
+  SendActivateCommand,
   SendRecoverCommand,
 } from '#/application/auth/command';
 import {CheckEmailQuery} from '#/application/auth/query';
-import {TokenPort} from '#/domain/_shared/port';
+import {TokenPort} from '#/domain/_shared/ports';
 import {
   AuthSessionExpiredError,
   AuthUnauthorizedError,
@@ -21,12 +21,12 @@ import {
   UserNotFoundError,
   UserNotPendingError,
   UserStatusError,
-} from '#/domain/account/error';
+} from '#/domain/account/errors';
 import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiCreatedResponse, ApiHeader, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {GetMeta, MapDomainError} from '../_shared/decorator';
-import {ChallengeGuard} from '../_shared/guard';
+import {GetMeta, MapDomainError} from '../_shared/decorators';
+import {ChallengeGuard} from '../_shared/guards';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
@@ -37,9 +37,9 @@ import {
   RegisterUserBodyDTO,
   ResetPasswordBodyDTO,
   Send2FABodyDTO,
-  SendActivationEmailBodyDTO,
+  SendActivationBodyDTO,
   SendRecoverBodyDTO,
-} from './auth.dto';
+} from './dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -90,9 +90,9 @@ export class AuthController {
   @ApiOkResponse({description: 'Activation email sent.'})
   async postSendActivationEmail(
     @GetMeta() meta: GetMeta, //
-    @Body() body: SendActivationEmailBodyDTO
+    @Body() body: SendActivationBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new SendActivateEmailCommand({...meta, ...body}));
+    await this.commandBus.execute(new SendActivateCommand({...meta, ...body}));
   }
   // #endregion
 
@@ -159,7 +159,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: Send2FABodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new Send2FAEmailCommand({...meta, ...body}));
+    await this.commandBus.execute(new Send2FACommand({...meta, ...body}));
   }
   // #endregion
 
