@@ -4,7 +4,7 @@ import {AuthSaga} from './auth.saga';
 import * as command from './command';
 import * as query from './query';
 
-const providers = Array().concat(AuthConfig, AuthSaga, Object.values(command), Object.values(query));
+const providers = [AuthConfig, AuthSaga, ...Object.values(command), ...Object.values(query)];
 
 @Module({providers, exports: providers})
 export class AuthModule {}

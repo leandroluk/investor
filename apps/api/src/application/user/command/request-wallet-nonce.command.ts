@@ -2,7 +2,7 @@ import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
 import {NonceStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {randomUUID} from 'crypto';
+import uuid from 'uuid';
 import z from 'zod';
 
 export class RequestWalletNonceCommand extends createClass(
@@ -26,7 +26,7 @@ export class RequestWalletNonceHandler implements ICommandHandler<
   constructor(private readonly nonceStore: NonceStore) {}
 
   async execute(command: RequestWalletNonceCommand): Promise<RequestWalletNonceCommandResult> {
-    const nonce = `Sign this message to prove you own this wallet: ${randomUUID()}`;
+    const nonce = `Sign this message to prove you own this wallet: ${uuid.v7()}`;
     await this.nonceStore.save({
       userId: command.userId,
       nonce,

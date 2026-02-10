@@ -71,7 +71,7 @@ export function Trace(sufix?: string): ClassDecorator & MethodDecorator {
   return createHandlerDecorator(function (this: any, originalMethod, methodName, ...args) {
     const start = performance.now();
     const emit = (): void => {
-      const eventEmitter = (global as any).eventEmitter as EventEmitter2;
+      const eventEmitter = (globalThis as any).eventEmitter as EventEmitter2;
 
       if (eventEmitter) {
         eventEmitter.emit(['monitor.trace', sufix].filter(Boolean).join('.'), {

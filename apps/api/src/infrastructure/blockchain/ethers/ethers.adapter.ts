@@ -8,7 +8,7 @@ import {BlockchainEthersError} from './ethers.error';
 @Throws(BlockchainEthersError)
 @InjectableExisting(BlockchainPort)
 export class BlockchainEthersAdapter implements BlockchainPort {
-  private provider: JsonRpcProvider;
+  private readonly provider: JsonRpcProvider;
 
   constructor(private readonly blockchainEthersConfig: BlockchainEthersConfig) {
     const request = new FetchRequest(this.blockchainEthersConfig.rpcURL);
@@ -63,6 +63,14 @@ export class BlockchainEthersAdapter implements BlockchainPort {
     }
 
     const block = tx.blockNumber ? await this.provider.getBlock(tx.blockNumber) : null;
+    let status: BlockchainPort.Transaction['status'] = 'pending';
+    if (receipt) {
+      if (receipt.status === 1) {
+        status = 'confirmed';
+      } else {
+        status = 'failed';
+      }
+    }
 
     return {
       hash: tx.hash,
@@ -71,7 +79,7 @@ export class BlockchainEthersAdapter implements BlockchainPort {
       value: tx.value,
       blockNumber: tx.blockNumber ?? 0,
       timestamp: block ? new Date(block.timestamp * 1000) : new Date(),
-      status: !receipt ? 'pending' : receipt.status === 1 ? 'confirmed' : 'failed',
+      status,
       input: tx.data,
       fee: receipt ? BigInt(receipt.gasUsed) * BigInt(receipt.gasPrice ?? 0) : undefined,
     };

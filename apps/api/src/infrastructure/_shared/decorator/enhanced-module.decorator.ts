@@ -1,38 +1,33 @@
-import {Module, type ModuleMetadata, type Type} from '@nestjs/common';
+import {Module, type ModuleMetadata} from '@nestjs/common';
 import {InjectableExisting} from './injectable-existing.decorator';
 
 export function EnhancedModule(metadata: ModuleMetadata): ClassDecorator {
-  const processedMetadata = {...metadata};
+  const extraProviders = resolveItems(metadata.providers, (token, item) => ({
+    provide: token,
+    useExisting: item,
+  }));
 
-  if (metadata.providers) {
-    const additionalProviders: any[] = [];
+  const extraExports = resolveItems(metadata.exports, token => token);
 
-    for (const provider of metadata.providers) {
-      if (typeof provider === 'function') {
-        const token = InjectableExisting.getMetadata(provider);
-        if (token) {
-          additionalProviders.push({provide: token, useExisting: provider});
-        }
-      }
-    }
+  return Module({
+    ...metadata,
+    providers: [...(metadata.providers || []), ...extraProviders],
+    exports: [...(metadata.exports || []), ...extraExports],
+  });
+}
 
-    processedMetadata.providers = [...metadata.providers, ...additionalProviders];
+function resolveItems<T>(items: any[] | undefined, factory: (token: any, item: any) => T): T[] {
+  if (!items) {
+    return [];
   }
 
-  if (metadata.exports) {
-    const additionalExports: any[] = [];
-
-    for (const provider of metadata.exports) {
-      if (typeof provider === 'function') {
-        const token = InjectableExisting.getMetadata(provider as Type<any>);
-        if (token) {
-          additionalExports.push(token);
-        }
+  return items.reduce((acc, item) => {
+    if (typeof item === 'function') {
+      const token = InjectableExisting.getMetadata(item);
+      if (token) {
+        acc.push(factory(token, item));
       }
     }
-
-    processedMetadata.exports = [...metadata.exports, ...additionalExports];
-  }
-
-  return Module(processedMetadata);
+    return acc;
+  }, [] as T[]);
 }

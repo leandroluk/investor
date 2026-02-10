@@ -9,7 +9,7 @@ export class OidcFakeLifecycle implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OidcFakeLifecycle.name);
 
   // Initial state that can be modified via POST by the ROBOT
-  private state = {
+  private readonly state = {
     tokens: {
       accessToken: 'fake_access',
       refreshToken: 'fake_refresh',

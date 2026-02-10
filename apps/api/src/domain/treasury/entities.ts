@@ -23,7 +23,7 @@ export class WithdrawalEntity extends createClass(
         description: 'Amount requested for withdrawal in crypto units',
       }),
       amountUsd: z.number().meta({
-        example: 500.0,
+        example: 500,
         description: 'Amount requested for withdrawal in USD',
       }),
       status: z.enum(WithdrawalStatusEnum).meta({

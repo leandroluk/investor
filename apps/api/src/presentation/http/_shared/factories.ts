@@ -1,7 +1,7 @@
 import {type ZodDomainStatic} from '#/domain/_shared/factories';
 import {type Type} from '@nestjs/common';
 import {ApiProperty, type ApiPropertyOptions} from '@nestjs/swagger';
-import {v7 as uuidv7} from 'uuid';
+import uuid from 'uuid';
 import {type z} from 'zod';
 
 const primitiveMap: Record<string, any> = {
@@ -17,51 +17,52 @@ function capitalize(value: string): string {
 }
 
 function createNestedDTO(schema: z.ZodObject<any>, parentName: string, fieldName: string): Type<any> {
-  class NestedDto {}
+  class NestedDTO {} // NOSONAR
 
-  let uniqueName = `Nested${uuidv7().split('-')[0]}DTO`;
+  let uniqueName = `Nested${uuid.v7().split('-')[0]}DTO`;
   if (parentName && fieldName) {
     uniqueName = `${parentName.replace(/DTO$/, '')}${capitalize(fieldName)}DTO`;
   }
 
-  Object.defineProperty(NestedDto, 'name', {value: uniqueName});
+  Object.defineProperty(NestedDTO, 'name', {value: uniqueName});
 
   const shape = schema.shape;
   for (const key of Object.keys(shape)) {
     const options = extractMetadata(shape[key], uniqueName, key);
-    ApiProperty(options)(NestedDto.prototype, key);
+    ApiProperty(options)(NestedDTO.prototype, key);
   }
-  return NestedDto;
+  return NestedDTO;
 }
 
 function extractMetadata(schema: z.ZodTypeAny, parentName?: string, fieldName?: string): ApiPropertyOptions {
   const options: ApiPropertyOptions = {required: true};
-  let curr = schema as any;
+  const {curr, def, type} = unwrapSchema(schema, options);
+  resolveType(curr, def, type, options, parentName, fieldName);
+  applyValidationChecks(def, type, options);
+  if (!options.type && !options.enum) {
+    options.type = String;
+  }
+  return options;
+}
+
+function unwrapSchema(schema: any, options: ApiPropertyOptions): {curr: any; def: any; type: any} {
+  let curr = schema;
+  let def = curr.def || curr._def;
+  let type = def?.type || def?.typeName;
 
   while (curr) {
-    const def = curr.def || curr._def;
+    def = curr.def || curr._def;
     if (!def) {
       break;
     }
 
-    const type = def.type || def.typeName;
+    type = def.type || def.typeName;
 
     if (def.description) {
       options.description = def.description;
     }
 
-    const meta = def.meta || (curr._def && curr._def.meta) || curr.meta;
-    if (meta) {
-      if (typeof meta === 'function') {
-        try {
-          Object.assign(options, meta.call(curr));
-        } catch {
-          // no need catch it
-        }
-      } else {
-        Object.assign(options, meta);
-      }
-    }
+    extractCustomMeta(curr, def, options);
 
     if (['optional', 'nullable'].includes(type)) {
       options.required = false;
@@ -79,68 +80,125 @@ function extractMetadata(schema: z.ZodTypeAny, parentName?: string, fieldName?: 
     }
   }
 
-  const def = curr?.def || curr?._def;
-  const type = def?.type || def?.typeName;
+  def = curr?.def || curr?._def;
+  type = def?.type || def?.typeName;
 
-  if (type && primitiveMap[type]) {
+  return {curr, def, type};
+}
+
+function extractCustomMeta(curr: any, def: any, options: ApiPropertyOptions): void {
+  const meta = def.meta || curr.meta;
+  if (!meta) {
+    return;
+  }
+
+  if (typeof meta === 'function') {
+    try {
+      Object.assign(options, meta.call(curr));
+    } catch {
+      /* ignore */
+    }
+  } else {
+    Object.assign(options, meta);
+  }
+}
+
+function resolveType(
+  curr: any,
+  def: any,
+  type: string,
+  options: ApiPropertyOptions,
+  parentName?: string,
+  fieldName?: string
+): void {
+  if (!type) {
+    return;
+  }
+
+  if (primitiveMap[type]) {
     options.type = primitiveMap[type];
-  } else if (type === 'object') {
-    options.type = createNestedDTO(curr as z.ZodObject<any>, parentName || '', fieldName || '');
-  } else if (type === 'array') {
-    options.isArray = true;
-    if (curr.element) {
-      const innerOptions = extractMetadata(curr.element, parentName, fieldName);
-      options.type = innerOptions.type as any;
-      if (innerOptions.enum) {
-        options.enum = innerOptions.enum;
-      }
-    }
-  } else if (type === 'enum') {
-    const values = def.values || def.entries;
-    if (!options.enum && values) {
-      options.enum = Object.values(values);
-    }
-    options.type = String;
-  } else if (['any', 'unknown'].includes(type)) {
-    options.type = Object;
+    return;
   }
 
-  if (type === 'date') {
-    options.format = 'date-time';
-  } else if (type === 'string') {
-    for (const check of def.checks || []) {
-      if (check.kind === 'email') {
-        options.format = 'email';
-      }
-      if (check.kind === 'uuid') {
-        options.format = 'uuid';
-      }
-      if (check.kind === 'min') {
-        options.minLength = check.value;
-      }
-      if (check.kind === 'max') {
-        options.maxLength = check.value;
-      }
+  switch (type) {
+    case 'object': {
+      options.type = createNestedDTO(curr as z.ZodObject<any>, parentName || '', fieldName || '');
+      break;
     }
+    case 'array': {
+      options.isArray = true;
+      if (curr.element) {
+        const inner = extractMetadata(curr.element, parentName, fieldName);
+        options.type = inner.type as any;
+        if (inner.enum) {
+          options.enum = inner.enum;
+        }
+      }
+      break;
+    }
+    case 'enum': {
+      const values = def.values || def.entries;
+      if (!options.enum && values) {
+        options.enum = Object.values(values);
+      }
+      options.type = String;
+      break;
+    }
+    case 'any':
+    case 'unknown': {
+      options.type = Object;
+      break;
+    }
+    case 'date': {
+      options.format = 'date-time';
+      break;
+    }
+  }
+}
+
+function applyValidationChecks(def: any, type: string, options: ApiPropertyOptions): void {
+  if (!def?.checks?.length) {
+    return;
+  }
+
+  if (type === 'string') {
+    applyStringChecks(def.checks, options);
   } else if (type === 'number') {
-    for (const check of def.checks || []) {
-      if (check.kind === 'min') {
-        options.minimum = check.value;
-      }
-      if (check.kind === 'max') {
-        options.maximum = check.value;
-      }
-      if (check.kind === 'int') {
-        options.type = 'integer';
-      }
+    applyNumberChecks(def.checks, options);
+  }
+}
+
+function applyStringChecks(checks: any[], options: ApiPropertyOptions): void {
+  for (const check of checks) {
+    switch (check.kind) {
+      case 'email':
+      case 'uuid':
+        options.format = check.kind;
+        break;
+      case 'min':
+        options.minLength = check.value;
+        break;
+      case 'max':
+        options.maxLength = check.value;
+        break;
     }
   }
+}
 
-  if (!options.type && !options.enum) {
-    options.type = String;
+function applyNumberChecks(checks: any[], options: ApiPropertyOptions): void {
+  for (const check of checks) {
+    switch (check.kind) {
+      case 'min':
+        options.minimum = check.value;
+        break;
+      case 'max':
+        options.maximum = check.value;
+        break;
+      case 'int':
+        options.type = 'integer';
+        break;
+    }
   }
-
-  return options;
 }
 
 export function createDTO<T extends ZodDomainStatic<any>>(parent: T): T;
@@ -158,17 +216,13 @@ export function createDTO(input: any): any {
   }
 
   class DTO extends ParentClass {
-    static schema = Schema;
+    static readonly schema = Schema;
 
     static create(data: any): any {
       const parsed = Schema.parse(data);
       const instance = new DTO();
       Object.assign(instance, parsed);
       return instance;
-    }
-
-    constructor(...args: any[]) {
-      super(...args);
     }
   }
 

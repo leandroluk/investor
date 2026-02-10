@@ -42,7 +42,7 @@ export class CoinbaseAxiosAdapter implements CoinbasePort {
   @Trace()
   @Retry({attempts: 2, delay: 2000})
   async getHistoricalPrice(base: string, quote: string, date: Date): Promise<CoinbasePort.Quote> {
-    const formattedDate = date.toLocaleDateString('en-GB').replace(/\//g, '-'); // DD-MM-YYYY
+    const formattedDate = date.toLocaleDateString('en-GB').replaceAll('/', '-'); // DD-MM-YYYY
     const {data} = await this.http.get(`/coins/${base}/history`, {
       params: {date: formattedDate, localization: false},
     });

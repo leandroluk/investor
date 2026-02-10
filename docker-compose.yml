@@ -137,10 +137,10 @@ services:
       retries: 5
       start_period: 10s
   
-  investor-loki:
+  investor-grafana-loki:
     image: "grafana/loki:2.9.4"
     hostname: "loki"
-    container_name: "investor-loki"
+    container_name: "investor-grafana-loki"
     networks: [ "investor" ]
     ports: [ "${DOCKER_GRAFANA_LOKI_PORT:?DOCKER_GRAFANA_LOKI_PORT is required}:3100" ]
     command: -config.file=/etc/loki/local-config.yaml
@@ -157,7 +157,7 @@ services:
     networks: [ "investor" ]
     volumes: [ "./deploy/grafana/provisioning:/etc/grafana/provisioning" ]
     depends_on:
-      investor-loki:
+      investor-grafana-loki:
         condition: "service_healthy"
     ports: [ "${DOCKER_GRAFANA_PORT:?DOCKER_GRAFANA_PORT is required}:3000" ]
     environment:
@@ -168,3 +168,43 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  investor-sonarqube-create-db:
+    image: "postgres:15"
+    container_name: "investor-sonarqube-create-db"
+    networks: [ "investor" ]
+    depends_on:
+      investor-postgres:
+        condition: "service_healthy"
+    command: >
+      sh -c "
+      export PGPASSWORD=${DOCKER_POSTGRES_PASSWORD};
+      until pg_isready -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME}; do sleep 2; done;
+      psql -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME} -d ${DOCKER_POSTGRES_DATABASE} -tc \"SELECT 1 FROM pg_database WHERE datname = 'sonarqube'\" | grep -q 1 ||
+      createdb -h investor-postgres -U ${DOCKER_POSTGRES_USERNAME} sonarqube; exit 0"
+
+  investor-sonarqube:
+    image: "sonarqube:community"
+    hostname: "sonarqube"
+    container_name: "investor-sonarqube"
+    networks: [ "investor" ]
+    depends_on:
+      investor-sonarqube-create-db:
+        condition: "service_completed_successfully"
+      investor-postgres:
+        condition: "service_healthy"
+    ports: [ "${DOCKER_SONARQUBE_PORT:?DOCKER_SONARQUBE_PORT is required}:9000" ]
+    environment:
+      SONAR_JDBC_URL: "jdbc:postgresql://investor-postgres:5432/sonarqube"
+      SONAR_JDBC_USERNAME: "${DOCKER_POSTGRES_USERNAME}"
+      SONAR_JDBC_PASSWORD: "${DOCKER_POSTGRES_PASSWORD}"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/api/system/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s      

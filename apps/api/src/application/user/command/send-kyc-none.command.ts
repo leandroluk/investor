@@ -5,7 +5,7 @@ import {UserEntity} from '#/domain/account/entities';
 import {UserNotFoundError} from '#/domain/account/errors';
 import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import path from 'path';
+import path from 'node:path';
 import z from 'zod';
 import {UserConfig} from '../user.config';
 

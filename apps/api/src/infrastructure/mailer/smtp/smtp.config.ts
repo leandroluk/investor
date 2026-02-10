@@ -8,7 +8,7 @@ export class MailerSmtpConfig {
     port: z.coerce.number().default(587),
     username: z.string(),
     password: z.string(),
-    from: z.string().email().default('noreply@investor.dev'),
+    from: z.email().default('noreply@investor.dev'),
   });
 
   constructor() {

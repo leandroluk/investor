@@ -24,7 +24,7 @@ export class CacheRedisChallengeStore implements ChallengeStore {
 
   async get(userId: string): Promise<Pick<ChallengeEntity, 'id' | 'code' | 'expiresAt'> | null> {
     const {value} = await this.cacheRedisAdapter.get(this.key(userId));
-    return value ? value : null;
+    return value;
   }
 
   async delete(userId: string): Promise<void> {

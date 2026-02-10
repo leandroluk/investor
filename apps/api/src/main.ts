@@ -6,6 +6,13 @@ dotenvx.config({
   quiet: true,
 });
 
-import('./bootstrap') //
-  .then(({bootstrap}) => bootstrap())
-  .catch((e: Error) => [console.log(e), process.exit(1)]);
+async function main(): Promise<void> {
+  try {
+    const {bootstrap} = await import('./bootstrap');
+    await bootstrap();
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
+}
+void main(); // NOSONAR

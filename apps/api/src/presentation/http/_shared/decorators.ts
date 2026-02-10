@@ -49,9 +49,7 @@ export const MapDomainError = Object.assign(
 
     const errorByStatus = mappings.reduce(
       (acc, [errorClass, status]) => {
-        if (!acc[status]) {
-          acc[status] = [];
-        }
+        acc[status] ??= [];
         acc[status].push(`\`${errorClass.name}\``);
         return acc;
       },

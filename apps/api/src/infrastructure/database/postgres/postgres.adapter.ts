@@ -11,7 +11,7 @@ export class DatabasePostgresAdapter implements DatabasePort {
   readonly pool: Pool;
 
   constructor(private readonly databasePostgresConfig: DatabasePostgresConfig) {
-    types.setTypeParser(20, val => parseInt(val, 10));
+    types.setTypeParser(20, val => Number.parseInt(val, 10));
 
     this.pool = new Pool({
       connectionString: this.databasePostgresConfig.url,

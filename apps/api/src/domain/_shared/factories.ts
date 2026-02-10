@@ -47,17 +47,13 @@ export function createClass(schemaOrParent: any, maybeSchema: any = z.object({})
   }
 
   class GeneratedClass extends ParentClass {
-    static schema = finalSchema;
+    static readonly schema = finalSchema;
 
     static new(input: any): any {
       const parsed = finalSchema.parse(input);
       const instance = new this();
       Object.assign(instance, parsed);
       return instance;
-    }
-
-    constructor(...args: any[]) {
-      super(...args);
     }
   }
 

@@ -14,7 +14,7 @@ export function createHandlerDecorator(
 
     for (const propertyName of Object.getOwnPropertyNames(target.prototype)) {
       const methodDescriptor = Object.getOwnPropertyDescriptor(target.prototype, propertyName);
-      const isMethod = methodDescriptor?.value instanceof Function;
+      const isMethod = typeof methodDescriptor?.value === 'function';
 
       if (!isMethod || propertyName === 'constructor') {
         continue;

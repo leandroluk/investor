@@ -1,5 +1,4 @@
 import {createClass} from '#/domain/_shared/factories';
-import {type Observable} from 'rxjs';
 import uuid from 'uuid';
 import {z} from 'zod';
 
@@ -37,7 +36,3 @@ export const Query = createClass(
 );
 
 export type Query = InstanceType<typeof Command>;
-
-export interface Saga<TEvent = any> {
-  (event$: Observable<TEvent>): Observable<Command>;
-}

@@ -44,11 +44,11 @@ export class InvestmentEntity extends createClass(
         format: 'uuid',
       }),
       amount: z.number().meta({
-        example: 1000.0,
+        example: 1000,
         description: 'Amount invested in token units',
       }),
       amountUsd: z.number().meta({
-        example: 1000.0,
+        example: 1000,
         description: 'Amount invested in USD equivalent at the time of creation',
       }),
       status: z.enum(InvestmentStatusEnum).meta({
