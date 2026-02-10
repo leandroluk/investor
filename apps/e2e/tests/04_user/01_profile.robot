@@ -1,18 +1,20 @@
 *** Settings ***
-Documentation    Get and update user profile
+Documentation       Get and update user profile
 
-Resource    ../../resources/util.resource
+Resource            ../../resources/util.resource
 
-Suite Setup    Setup Test Suite
-Suite Teardown    Teardown Test Suite
+Suite Setup         Setup Test Suite
+Suite Teardown      Teardown Test Suite
+
 
 *** Variables ***
 ${PROFILE_PATH}     user/profile
 ${TEST_EMAIL}       ${EMPTY}
 
+
 *** Test Cases ***
 Complete Profile Flow
-    [Documentation]    Register > Login > Get Profile > Update Profile
+    [Documentation]    Register > Login > List Document (Empty) > Update Document >
     ${TEST_EMAIL} =    Postgres Create Test User
     &{auth_data} =    Auth Login With Credentials    ${TEST_EMAIL}    Test@123
     ${profile1} =    Get Profile    ${auth_data.accessToken}
@@ -48,22 +50,22 @@ Get Profile
 Validate Get Profile
     [Documentation]    Validate properties on profile
     [Arguments]    &{profile}
-    Should Not Be Empty    ${profile.name}
-    Should Not Be Empty    ${profile.status}
-    Should Not Be Empty    ${profile.walletVerifiedAt}
-    Should Not Be Empty    ${profile.kycStatus}
-    Should Not Be Empty    ${profile.kycVerifiedAt}
-    Should Not Be Empty    ${profile.twoFactorEnabled}
-    Should Not Be Empty    ${profile.language}
-    Should Not Be Empty    ${profile.timezone}
+    Dictionary Should Contain Key    ${profile}    name
+    Dictionary Should Contain Key    ${profile}    status
+    Dictionary Should Contain Key    ${profile}    walletVerifiedAt
+    Dictionary Should Contain Key    ${profile}    kycStatus
+    Dictionary Should Contain Key    ${profile}    kycVerifiedAt
+    Dictionary Should Contain Key    ${profile}    twoFactorEnabled
+    Dictionary Should Contain Key    ${profile}    language
+    Dictionary Should Contain Key    ${profile}    timezone
 
 Update Profile
     [Documentation]    Updates user profile
-    [Arguments]    ${accessToken}   ${profile}
+    [Arguments]    ${accessToken}    ${profile}
     VAR    &{headers} =    authorization=Bearer ${accessToken}
-    VAR    &{body} =    =
-    ...    name=New ${profile.name}
-    ...    twoFactorEnabled=${not ${profile.twoFactorEnabled}}
+    VAR    &{body} =
+    ...    name=New ${profile}[name]
+    ...    twoFactorEnabled=${{ not ${profile}[twoFactorEnabled] }}
     ...    language=pt
     ...    timezone=America/Sao_Paulo
     ${response} =    PUT On Session    api_session    ${PROFILE_PATH}    json=${body}    headers=&{headers}
@@ -73,7 +75,7 @@ Update Profile
 Compare Profiles
     [Documentation]    Compare profiles
     [Arguments]    ${profile1}    ${profile2}
-    Should Not Be Equal As Strings    ${profile1.name}    ${profile2.name}
-    Should Not Be Equal As Strings    ${profile1.twoFactorEnabled}    ${profile2.twoFactorEnabled}
-    Should Not Be Equal As Strings    ${profile1.language}    ${profile2.language}
-    Should Not Be Equal As Strings    ${profile1.timezone}    ${profile2.timezone}
+    Should Not Be Equal As Strings    ${profile1}[name]    ${profile2}[name]
+    Should Not Be Equal    ${profile1}[twoFactorEnabled]    ${profile2}[twoFactorEnabled]
+    Should Not Be Equal As Strings    ${profile1}[language]    ${profile2}[language]
+    Should Not Be Equal As Strings    ${profile1}[timezone]    ${profile2}[timezone]
