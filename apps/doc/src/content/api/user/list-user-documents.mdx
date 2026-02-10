@@ -1,7 +1,7 @@
 ---
 title: List User Documents
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -12,14 +12,14 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `GET`
-- **Path**: `/kyc/document`
+- **Path**: `/user/document`
 
 ## Diagram
 
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "GET /kyc/document" --> B["API"]
+    A["Client"] -- "GET /user/document" --> B["API"]
     B --> C{"Is Authenticated?"}
     C -- "No" --> D["Return 401 Unauthorized"]
     C -- "Yes" --> E["Query User Documents"]

@@ -126,7 +126,7 @@ os diretórios deverão ser perguntados ao usuário
             @Req() {params: {id}, body: changes}: ExampleRequest,
             @GetDomainEvent() domainEvent: DomainEvent
           ): Promise<ExampleResponse> {
-            return await this.commandBus.execute(new ExampleCommand({...domainEvent, id, changes}));
+            return await this.commandBus.execute(ExampleCommand.create({...domainEvent, id, changes}));
           }
         }
         ```    

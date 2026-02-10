@@ -18,7 +18,7 @@ export class SystemController {
   async getHealth(
     @GetMeta() meta: GetMeta //
   ): Promise<HealthResultDTO> {
-    const result = await this.queryBus.execute(new HealthQuery(meta));
+    const result = await this.queryBus.execute(HealthQuery.new(meta));
     return result;
   }
   // #endregion

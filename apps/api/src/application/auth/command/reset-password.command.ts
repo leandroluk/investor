@@ -45,9 +45,9 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
     return user;
   }
 
-  private async validateOtp(email: string, otp: string): Promise<void> {
-    const verifiedEmail = await this.otpStore.verify(otp);
-    if (verifiedEmail !== email) {
+  private async verifyOTP(id: UserEntity['id'], otp: string): Promise<void> {
+    const verifiedUserId = await this.otpStore.verify(otp);
+    if (verifiedUserId !== id) {
       throw new UserInvalidOtpError();
     }
   }
@@ -65,7 +65,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
 
   async execute(command: ResetPasswordCommand): Promise<void> {
     const user = await this.getUserByEmail(command.email);
-    await this.validateOtp(command.email, command.otp);
+    await this.verifyOTP(user.id, command.otp);
     const updatedUser = await this.updatePassword(user, command.password);
     await this.publishEvent(command.correlationId, updatedUser);
   }

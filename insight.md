@@ -50,7 +50,7 @@ Tempo: 1-2 meses
 PCI-DSS e Compliance
 
 Estudar os 12 requisitos do PCI-DSS
-Criptografia: AES, RSA, hashing (bcrypt, argon2)
+Criptografia: AES, RSA, hashing (por exemplo bcrypt ou argon2 mas não necessariamente essas)
 HTTPS/TLS, certificados SSL
 OWASP Top 10 (vulnerabilidades web)
 

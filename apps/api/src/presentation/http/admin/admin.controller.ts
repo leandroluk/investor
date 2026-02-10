@@ -1,9 +1,10 @@
 import {ReviewDocumentCommand} from '#/application/admin/command';
-import {ListDocumentToApproveQuery} from '#/application/admin/query';
-import {Body, Controller, Get, Param, Patch, Query} from '@nestjs/common';
+import {ListDocumentToReviewQuery} from '#/application/admin/query';
+import {DocumentNotFoundError, DocumentStatusError} from '#/domain/account/errors';
+import {Body, Controller, Get, HttpStatus, Param, Patch, Query} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiBearerAuth, ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {GetMeta} from '../_shared/decorators';
+import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {
   ListDocumentToApproveQueryDTO,
   ListDocumentToApproveResultDTO,
@@ -20,26 +21,27 @@ export class AdminController {
     private readonly queryBus: QueryBus
   ) {}
 
-  // #region getListDocumentToApprove
+  // #region getListDocumentToReview
   @Get('document')
-  @ApiOkResponse({description: 'List of documents to approve', type: ListDocumentToApproveResultDTO})
-  async getListDocumentToApprove(
+  @ApiOkResponse({description: 'List of documents to review', type: ListDocumentToApproveResultDTO})
+  async getListDocumentToReview(
     @GetMeta() meta: GetMeta,
     @Query() query: ListDocumentToApproveQueryDTO
   ): Promise<ListDocumentToApproveResultDTO> {
-    return await this.queryBus.execute(new ListDocumentToApproveQuery({...meta, ...query}));
+    return await this.queryBus.execute(ListDocumentToReviewQuery.new({...meta, ...query}));
   }
   // #endregion
 
   // #region reviewDocument
   @Patch('document/:documentId/review')
+  @MapDomainError([DocumentNotFoundError, HttpStatus.NOT_FOUND], [DocumentStatusError, HttpStatus.UNPROCESSABLE_ENTITY])
   @ApiOkResponse({description: 'Document reviewed successfully'})
   async reviewDocument(
     @GetMeta() {userId: adminId, ...meta}: GetMeta,
     @Param() param: ReviewDocumentParamDTO,
     @Body() body: ReviewDocumentBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new ReviewDocumentCommand({...meta, ...param, ...body, adminId}));
+    await this.commandBus.execute(ReviewDocumentCommand.new({...meta, ...param, ...body, adminId}));
   }
   // #endregion
 }

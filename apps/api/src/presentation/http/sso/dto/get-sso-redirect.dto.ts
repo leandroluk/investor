@@ -1,10 +1,14 @@
-import {ApiPropertyOf} from '#/application/_shared/decorators';
 import {GetSsoRedirectQuery} from '#/application/sso/query';
-import {PickType} from '@nestjs/swagger';
+import {createDTO} from '../../_shared/factories';
 
-export class GetSsoRedirectParamsDTO extends PickType(GetSsoRedirectQuery, ['provider']) {}
+export class GetSsoRedirectParamsDTO extends createDTO(
+  GetSsoRedirectQuery.schema.pick({
+    provider: true,
+  })
+) {}
 
-export class GetSsoRedirectQueryDTO {
-  @ApiPropertyOf(GetSsoRedirectQuery, 'callbackUrl', {required: true})
-  callback_url!: string;
-}
+export class GetSsoRedirectQueryDTO extends createDTO(
+  GetSsoRedirectQuery.schema.pick({
+    callback_url: true,
+  })
+) {}

@@ -1,7 +1,10 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
-import {DocumentEntity} from '#/domain/account/entities';
-import {DocumentStatusEnum, KycStatusEnum} from '#/domain/account/enums';
+import {BrokerPort} from '#/domain/_shared/ports';
+import {DocumentEntity, UserEntity} from '#/domain/account/entities';
+import {DocumentStatusEnum, DocumentTypeEnum, KycStatusEnum} from '#/domain/account/enums';
+import {DocumentNotFoundError, DocumentStatusError} from '#/domain/account/errors';
+import {DocumentReviewedEvent, UserKycStatusChangedEvent} from '#/domain/account/events';
 import {DocumentRepository, UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
@@ -20,59 +23,112 @@ export class ReviewDocumentCommand extends createClass(
 export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentCommand, void> {
   constructor(
     private readonly documentRepository: DocumentRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly brokerPort: BrokerPort
   ) {}
 
-  async execute(command: ReviewDocumentCommand): Promise<void> {
-    const document = await this.documentRepository.findById(command.documentId);
+  private async getDocumentById(documentId: DocumentEntity['id']): Promise<DocumentEntity> {
+    const document = await this.documentRepository.findById(documentId);
     if (!document) {
-      throw new Error('Document not found'); // Should be DomainError
+      throw new DocumentNotFoundError();
     }
+    return document;
+  }
 
-    if (command.status === DocumentStatusEnum.REJECTED && !command.rejectReason) {
-      throw new Error('Reject reason is required'); // DomainError
-    }
-
-    document.status = command.status;
-    document.rejectReason = command.status === DocumentStatusEnum.REJECTED ? command.rejectReason! : null;
+  private async updateDocumentStatus(
+    document: DocumentEntity,
+    status: DocumentStatusEnum,
+    rejectReason: string | null
+  ): Promise<void> {
+    document.status = status;
+    document.rejectReason = rejectReason;
     document.updatedAt = new Date();
     await this.documentRepository.update(document);
+  }
 
-    // If approved, check if all docs are approved to upgrade user status
+  private async publishDocumentReviewedEvent(
+    correlationId: string,
+    occurredAt: Date,
+    document: DocumentEntity
+  ): Promise<void> {
+    await this.brokerPort.publish(
+      new DocumentReviewedEvent(correlationId, occurredAt, {
+        documentId: document.id,
+        documentStatus: document.status,
+        documentRejectReason: document.rejectReason,
+        documentUserId: document.userId,
+      })
+    );
+  }
+
+  private async getDocumentListByUserId(userId: UserEntity['id']): Promise<DocumentEntity[]> {
+    return await this.documentRepository.findByUserId(userId);
+  }
+
+  private consolidateDocumentStatus(
+    documentList: DocumentEntity[]
+  ): [generalStatus: boolean, approvalMap: Partial<Record<DocumentStatusEnum, boolean>>] {
+    const approvalMap: Partial<Record<DocumentStatusEnum, boolean>> = {};
+    let generalStatus = true;
+    for (const {type, status} of documentList) {
+      approvalMap[type] = status === DocumentStatusEnum.APPROVED;
+      generalStatus = generalStatus && status === DocumentStatusEnum.APPROVED;
+    }
+    return [generalStatus, approvalMap];
+  }
+
+  private async approveUserKycStatus(userId: DocumentEntity['userId']): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findById(userId);
+    if (user && user.kycStatus !== KycStatusEnum.APPROVED) {
+      user.kycStatus = KycStatusEnum.APPROVED;
+      user.kycVerifiedAt = new Date();
+      user.updatedAt = new Date();
+      await this.userRepository.update(user);
+      return user;
+    }
+  }
+
+  private async publishUserKycStatusChangedEvent(
+    correlationId: string,
+    occurredAt: Date,
+    user: UserEntity
+  ): Promise<void> {
+    await this.brokerPort.publish(
+      new UserKycStatusChangedEvent(correlationId, occurredAt, {
+        userId: user.id,
+        userKycStatus: user.kycStatus,
+        userKycVerifiedAt: user.kycVerifiedAt,
+      })
+    );
+  }
+
+  async execute(command: ReviewDocumentCommand): Promise<void> {
+    const document = await this.getDocumentById(command.documentId);
+
+    if (command.status === DocumentStatusEnum.REJECTED && !command.rejectReason) {
+      throw new DocumentStatusError();
+    }
+
+    await this.updateDocumentStatus(document, command.status, command.rejectReason);
+
+    await this.publishDocumentReviewedEvent(command.correlationId, command.occurredAt, document);
+
     if (command.status === DocumentStatusEnum.APPROVED) {
-      const allDocs = await this.documentRepository.findByUserId(document.userId);
-      // Logic: At least one Identity (RG_FRONT+BACK or CNH) + Address + Selfie?
-      // Simplified Logic: If all uploaded docs are APPROVED? Or do we enforce specific types?
-      // cs.md: "Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED."
-      // I will assume for now: If we have at least 1 document and ALL active documents are APPROVED.
-      // Better: Check specific types. RG_FRONT+RG_BACK or CNH. And PROOF_ADDRESS. And SELFIE.
+      const documentList = await this.getDocumentListByUserId(document.userId);
+      const [generalStatus, approvalMap] = this.consolidateDocumentStatus(documentList);
 
-      // Logic: At least one Identity (RG_FRONT+BACK or CNH) + Address + Selfie?
-      // Simplified Logic: If all uploaded docs are APPROVED.
+      if (generalStatus) {
+        const selfieApproved = approvalMap[DocumentTypeEnum.SELFIE];
+        const rgApproved = approvalMap[DocumentTypeEnum.RG_FRONT] && approvalMap[DocumentTypeEnum.RG_BACK];
+        const cnhApproved = approvalMap[DocumentTypeEnum.CNH_FRONT] && approvalMap[DocumentTypeEnum.CNH_BACK];
 
-      const user = await this.userRepository.findById(document.userId);
-      if (user && user.kycStatus === KycStatusEnum.PENDING) {
-        // Check if pending docs exist
-        const hasPending = allDocs.some(d => d.status === DocumentStatusEnum.PENDING);
-        const hasRejected = allDocs.some(d => d.status === DocumentStatusEnum.REJECTED);
-        if (!hasPending && !hasRejected) {
-          // Upgrade to APPROVED? Only if minimum docs present?
-          // Assuming yes for MVP.
-          user.kycStatus = KycStatusEnum.APPROVED;
-          user.updatedAt = new Date();
-          await this.userRepository.update(user);
+        if (selfieApproved && (rgApproved || cnhApproved)) {
+          const user = await this.approveUserKycStatus(document.userId);
+
+          if (user) {
+            await this.publishUserKycStatusChangedEvent(command.correlationId, command.occurredAt, user);
+          }
         }
-      }
-    } else if (command.status === DocumentStatusEnum.REJECTED) {
-      const user = await this.userRepository.findById(document.userId);
-      if (user && user.kycStatus === KycStatusEnum.PENDING) {
-        // If any doc rejected, user status might go to REJECTED or stay PENDING (waiting correct doc).
-        // cs.md says: "O sistema dispara automaticamente um alerta... informando passos para correção".
-        // Does not explicitly say User Status goes to REJECTED.
-        // But KycStatusEnum has REJECTED.
-        // I will leave as PENDING unless Admin explicitly rejects user (separate use case?).
-        // Or set to REJECTED to block access?
-        // Let's keep PENDING so they can upload again.
       }
     }
   }

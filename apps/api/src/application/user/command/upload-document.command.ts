@@ -1,12 +1,12 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
-import {StoragePort} from '#/domain/_shared/ports';
+import {BrokerPort, StoragePort} from '#/domain/_shared/ports';
 import {DocumentEntity, UserEntity} from '#/domain/account/entities';
 import {DocumentStatusEnum, KycStatusEnum} from '#/domain/account/enums';
 import {UserNotFoundError} from '#/domain/account/errors';
+import {DocumentUploadedEvent} from '#/domain/account/events';
 import {DocumentRepository, UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import uuid from 'uuid';
 import z from 'zod';
 
 export class UploadDocumentCommand extends createClass(
@@ -28,7 +28,7 @@ export class UploadDocumentCommand extends createClass(
 export class UploadDocumentCommandResult extends createClass(
   z.object({
     id: DocumentEntity.schema.shape.id,
-    uploadUrl: z.url().meta({
+    uploadURL: z.url().meta({
       description: 'URL to upload the document',
       example: 'https://storage...',
     }),
@@ -44,42 +44,64 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
   constructor(
     private readonly userRepository: UserRepository,
     private readonly documentRepository: DocumentRepository,
-    private readonly storagePort: StoragePort
+    private readonly storagePort: StoragePort,
+    private readonly brokerPort: BrokerPort
   ) {}
 
-  async execute(command: UploadDocumentCommand): Promise<UploadDocumentCommandResult> {
-    const user = await this.userRepository.findById(command.userId);
+  private async getUserById(userId: UserEntity['id']): Promise<UserEntity> {
+    const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new UserNotFoundError();
     }
+    return user;
+  }
 
-    const documentId = uuid.v7();
-    const storageKey = `kyc/${user.id}/${documentId}`;
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-    const uploadUrl = await this.storagePort.getSignedUrl(storageKey, 15 * 60, 'write');
-    const document: DocumentEntity = {
-      id: documentId,
+  private async createDocumentWithUploadURL(
+    type: DocumentEntity['type'],
+    user: UserEntity
+  ): Promise<{document: DocumentEntity; uploadURL: string; expiresAt: Date}> {
+    const document = DocumentEntity.new({
       userId: user.id,
-      type: command.type,
+      type,
       status: DocumentStatusEnum.PENDING,
-      storageKey: storageKey,
       rejectReason: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      storageKey: '',
+    });
+    document.storageKey = `kyc/${user.id}/${type}-${document.id}`;
+    await this.documentRepository.create(document);
+    return {
+      document,
+      uploadURL: await this.storagePort.getSignedURL(document.storageKey, 15 * 60, 'write'),
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
     };
+  }
 
+  private async updateUserKycStatus(user: UserEntity): Promise<void> {
     if (user.kycStatus === KycStatusEnum.NONE) {
       user.kycStatus = KycStatusEnum.PENDING;
       user.updatedAt = new Date();
       await this.userRepository.update(user);
     }
+  }
 
-    await this.documentRepository.create(document);
+  private async publishDocumentUploadedEvent(
+    correlationId: string,
+    occurredAt: Date,
+    document: DocumentEntity
+  ): Promise<void> {
+    await this.brokerPort.publish(
+      new DocumentUploadedEvent(correlationId, occurredAt, {
+        documentId: document.id,
+        documentUserId: document.userId,
+      })
+    );
+  }
 
-    return {
-      id: document.id,
-      uploadUrl,
-      expiresAt,
-    };
+  async execute(command: UploadDocumentCommand): Promise<UploadDocumentCommandResult> {
+    const user = await this.getUserById(command.userId);
+    const {document, uploadURL, expiresAt} = await this.createDocumentWithUploadURL(command.type, user);
+    await this.updateUserKycStatus(user);
+    await this.publishDocumentUploadedEvent(command.correlationId, new Date(), document);
+    return {id: document.id, uploadURL, expiresAt};
   }
 }

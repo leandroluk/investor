@@ -27,5 +27,13 @@ export class TicketEntity extends createClass(
         description: 'Current status of the support request',
         maxLength: 20,
       }),
+      priority: z.string().meta({
+        example: 'HIGH',
+        description: 'Priority of the ticket',
+        maxLength: 20,
+      }),
+      metadata: z.record(z.string(), z.unknown()).nullable().meta({
+        description: 'Contextual technical data (OS, App Version)',
+      }),
     })
 ) {}

@@ -8,7 +8,7 @@
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
   <changeSet id="seed-user-ada.lovelace" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      INSERT INTO "user" (
+      INSERT INTO "tb_user" (
         "id",
         "created_at",
         "updated_at",
@@ -46,7 +46,7 @@
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DELETE FROM "user" WHERE "email" = 'ada.lovelace@email.com'
+      DELETE FROM "tb_user" WHERE "email" = 'ada.lovelace@email.com'
     ]]></sql></rollback>
   </changeSet>
 

@@ -33,7 +33,7 @@ export class ListUserDocumentHandler implements IQueryHandler<ListUserDocumentQu
 
     const items = await Promise.all(
       documents.map(async doc => {
-        const url = await this.storagePort.getSignedUrl(doc.storageKey, 15 * 60, 'read');
+        const url = await this.storagePort.getSignedURL(doc.storageKey, 15 * 60, 'read');
         return {...doc, url};
       })
     );

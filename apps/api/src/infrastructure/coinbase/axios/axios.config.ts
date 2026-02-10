@@ -4,7 +4,7 @@ import z from 'zod';
 @Injectable()
 export class CoinbaseAxiosConfig {
   static readonly schema = z.object({
-    apiUrl: z.url().default('https://api.coingecko.com/api/v3'),
+    apiURL: z.url().default('https://api.coingecko.com/api/v3'),
     apiKey: z.string().optional(),
   });
 
@@ -12,12 +12,12 @@ export class CoinbaseAxiosConfig {
     Object.assign(
       this,
       CoinbaseAxiosConfig.schema.parse({
-        apiUrl: process.env.API_COINBASE_AXIOS_URL,
+        apiURL: process.env.API_COINBASE_AXIOS_URL,
         apiKey: process.env.API_COINBASE_AXIOS_TIMEOUT,
       })
     );
   }
 
-  readonly apiUrl!: string;
+  readonly apiURL!: string;
   readonly apiKey?: string;
 }

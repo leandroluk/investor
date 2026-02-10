@@ -18,8 +18,8 @@ Complete Token Refresh Flow
     ${TEST_EMAIL} =    Create Active User For Testing
     ${auth_data} =    Login And Get Auth Data    ${TEST_EMAIL}
     Sleep    1.1s
-    ${new_auth_data} =    Perform Token Refresh    ${auth_data['refresh_token']}
-    Validate New Session Data    ${auth_data['access_token']}    ${new_auth_data}
+    ${new_auth_data} =    Perform Token Refresh    ${auth_data['refreshToken']}
+    Validate New Session Data    ${auth_data['accessToken']}    ${new_auth_data}
 
 
 *** Keywords ***
@@ -68,7 +68,8 @@ Perform Token Refresh
     [Arguments]    ${token}
 
     # Using Python evaluation to handle the JWT string safely
-    VAR    ${refresh_payload} =    ${{{"refresh_token": $token}}}
+    VAR    &{refresh_payload} =
+    ...    refreshToken=${token}
 
     # Perform POST request to refresh the token
     ${response} =    POST On Session
@@ -81,19 +82,19 @@ Perform Token Refresh
 
 Validate New Session Data
     [Documentation]    Verifies that the new access token is valid and unique
-    [Arguments]    ${old_access_token}    ${new_auth_data}
+    [Arguments]    ${old_token}    ${new_auth_data}
 
     # Validate mandatory fields in the refresh response
-    Dictionary Should Contain Key    ${new_auth_data}    access_token
-    Dictionary Should Contain Key    ${new_auth_data}    refresh_token
-    Dictionary Should Contain Key    ${new_auth_data}    expires_in
+    Dictionary Should Contain Key    ${new_auth_data}    accessToken
+    Dictionary Should Contain Key    ${new_auth_data}    refreshToken
+    Dictionary Should Contain Key    ${new_auth_data}    expiresIn
 
     # Check if access token actually changed
-    VAR    ${new_access_token} =    ${new_auth_data['access_token']}
-    Should Not Be Empty    ${new_access_token}
+    VAR    ${new_token} =    ${new_auth_data['accessToken']}
+    Should Not Be Empty    ${new_token}
 
     # This assertion will now pass thanks to the Sleep in Step 3
-    Should Not Be Equal    ${old_access_token}    ${new_access_token}
+    Should Not Be Equal    ${old_token}    ${new_token}
     ...    msg=New access token must be different from the old one
 
     Log    Token refresh successful. Session extended.    level=INFO

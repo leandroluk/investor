@@ -8,7 +8,6 @@ import {UserEmailInUseError} from '#/domain/account/errors';
 import {UserRegisteredEvent} from '#/domain/account/events';
 import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import uuid from 'uuid';
 import z from 'zod';
 
 export class RegisterUserCommand extends createClass(
@@ -42,8 +41,7 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
   }
 
   private async createUser(email: string, name: string, password: string): Promise<UserEntity> {
-    const user: UserEntity = {
-      id: uuid.v7(),
+    const user = UserEntity.new({
       email,
       passwordHash: this.hasherPort.hash(password),
       name,
@@ -56,10 +54,7 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
       twoFactorEnabled: false,
       language: 'en',
       timezone: 'UTC',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    };
+    });
     await this.userRepository.create(user);
     return user;
   }

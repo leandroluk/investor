@@ -1,4 +1,8 @@
 import {LoginUsingTokenCommand} from '#/application/auth/command';
-import {PickType} from '@nestjs/swagger';
+import {createDTO} from '../../_shared/factories';
 
-export class LoginUsingTokenBodyDTO extends PickType(LoginUsingTokenCommand, ['token']) {}
+export class LoginUsingTokenBodyDTO extends createDTO(
+  LoginUsingTokenCommand.schema.pick({
+    token: true,
+  })
+) {}

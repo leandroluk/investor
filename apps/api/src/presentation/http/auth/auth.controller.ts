@@ -11,7 +11,6 @@ import {
   SendRecoverCommand,
 } from '#/application/auth/command';
 import {CheckEmailQuery} from '#/application/auth/query';
-import {TokenPort} from '#/domain/_shared/ports';
 import {
   AuthSessionExpiredError,
   AuthUnauthorizedError,
@@ -22,11 +21,10 @@ import {
   UserNotPendingError,
   UserStatusError,
 } from '#/domain/account/errors';
-import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
 import {ApiCreatedResponse, ApiHeader, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
-import {ChallengeGuard} from '../_shared/guards';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
@@ -34,6 +32,7 @@ import {
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
   RefreshTokenBodyDTO,
+  RefreshTokenResultDTO,
   RegisterUserBodyDTO,
   ResetPasswordBodyDTO,
   Send2FABodyDTO,
@@ -60,7 +59,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Param() params: CheckEmailParamsDTO
   ): Promise<void> {
-    const result = await this.queryBus.execute(new CheckEmailQuery({...meta, ...params}));
+    const result = await this.queryBus.execute(CheckEmailQuery.new({...meta, ...params}));
     return result;
   }
   // #endregion
@@ -76,7 +75,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: RegisterUserBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RegisterUserCommand({...meta, ...body}));
+    await this.commandBus.execute(RegisterUserCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -92,7 +91,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: SendActivationBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new SendActivateCommand({...meta, ...body}));
+    await this.commandBus.execute(SendActivateCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -111,7 +110,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: ActivateUserBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new ActivateUserCommand({...meta, ...body}));
+    await this.commandBus.execute(ActivateUserCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -126,7 +125,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: SendRecoverBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new SendRecoverCommand({...meta, ...body}));
+    await this.commandBus.execute(SendRecoverCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -144,7 +143,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: ResetPasswordBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new ResetPasswordCommand({...meta, ...body}));
+    await this.commandBus.execute(ResetPasswordCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -159,7 +158,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: Send2FABodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new Send2FACommand({...meta, ...body}));
+    await this.commandBus.execute(Send2FACommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -172,7 +171,7 @@ export class AuthController {
     @GetMeta() meta: GetMeta, //
     @Body() body: Authorize2FABodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new Authorize2FACommand({...meta, ...body}));
+    await this.commandBus.execute(Authorize2FACommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -187,7 +186,7 @@ export class AuthController {
     @Body() body: LoginUsingCredentialBodyDTO,
     @Ip() ip: string
   ): Promise<void> {
-    const result = await this.commandBus.execute(new LoginUsingCredentialCommand({...meta, ...body, ip}));
+    const result = await this.commandBus.execute(LoginUsingCredentialCommand.new({...meta, ...body, ip}));
     return result;
   }
   // #endregion
@@ -203,7 +202,7 @@ export class AuthController {
     @Body() body: LoginUsingTokenBodyDTO,
     @Ip() ip: string
   ): Promise<void> {
-    const result = await this.commandBus.execute(new LoginUsingTokenCommand({...meta, ...body, ip}));
+    const result = await this.commandBus.execute(LoginUsingTokenCommand.new({...meta, ...body, ip}));
     return result;
   }
   // #endregion
@@ -216,13 +215,15 @@ export class AuthController {
     [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
     [AuthSessionExpiredError, HttpStatus.UNAUTHORIZED]
   )
-  @ApiOkResponse({description: 'Returns the new authorization tokens.'})
-  @UseGuards(ChallengeGuard)
+  @ApiOkResponse({
+    description: 'Returns the new authorization tokens.',
+    type: RefreshTokenResultDTO,
+  })
   async postRefreshToken(
     @GetMeta() meta: GetMeta, //
     @Body() body: RefreshTokenBodyDTO
-  ): Promise<TokenPort.Authorization> {
-    const result = await this.commandBus.execute(new RefreshTokenCommand({...meta, ...body}));
+  ): Promise<RefreshTokenResultDTO> {
+    const result = await this.commandBus.execute(RefreshTokenCommand.new({...meta, ...body}));
     return result;
   }
   // #endregion

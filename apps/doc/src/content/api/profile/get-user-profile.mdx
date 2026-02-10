@@ -11,14 +11,14 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `GET`
-- **Path**: `/profile`
+- **Path**: `/user/profile`
 
 ## Diagram
 
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "GET /profile" --> B["API"]
+    A["Client"] -- "GET /user/profile" --> B["API"]
     B --> C{"Is Authenticated?"}
     C -- "No" --> D["Return 401 Unauthorized"]
     C -- "Yes" --> E["Fetch User Data"]

@@ -62,8 +62,7 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, s
       return oldUser;
     }
 
-    const newUser: UserEntity = {
-      id: crypto.randomUUID() as UserEntity['id'],
+    const newUser = UserEntity.new({
       email: claims.email,
       name: `${claims.givenName} ${claims.familyName}`.trim(),
       passwordHash: '', // no need password when login using SSO
@@ -76,10 +75,7 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, s
       twoFactorEnabled: false,
       language: 'en',
       timezone: 'UTC',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    };
+    });
 
     await this.userRepository.create(newUser);
     return newUser;

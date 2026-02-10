@@ -16,7 +16,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `PATCH`
-- **Path**: `/profile`
+- **Path**: `/user/profile`
 - **Body**:
     - `name` (optional): string
     - `language` (optional): string
@@ -27,7 +27,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "PATCH /profile {name, language, ...}" --> B["API"]
+    A["Client"] -- "PATCH /user/profile {name, language, ...}" --> B["API"]
     B --> C{"Is Authenticated?"}
     C -- "No" --> D["Return 401 Unauthorized"]
     C -- "Yes" --> E["Validate Input (Zod)"]

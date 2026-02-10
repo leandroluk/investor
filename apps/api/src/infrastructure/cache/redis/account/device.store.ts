@@ -14,16 +14,25 @@ export class CacheRedisDeviceStore implements DeviceStore {
     return `device:userId:${userId}:fingerprint:${fingerprint}`;
   }
 
-  async save(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<void> {
-    await this.cacheRedisAdapter.set(this.key(userId, fingerprint), '1');
+  async save(args: {
+    userId: DeviceEntity['userId']; //
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void> {
+    await this.cacheRedisAdapter.set(this.key(args.userId, args.deviceFingerprint), '1');
   }
 
-  async has(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<boolean> {
-    const result = await this.cacheRedisAdapter.exists(this.key(userId, fingerprint));
+  async has(args: {
+    userId: DeviceEntity['userId']; //
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<boolean> {
+    const result = await this.cacheRedisAdapter.exists(this.key(args.userId, args.deviceFingerprint));
     return result;
   }
 
-  async delete(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<void> {
-    await this.cacheRedisAdapter.delete(this.key(userId, fingerprint));
+  async delete(args: {
+    userId: DeviceEntity['userId']; //
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void> {
+    await this.cacheRedisAdapter.delete(this.key(args.userId, args.deviceFingerprint));
   }
 }

@@ -15,7 +15,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 
-`POST /account/activate`
+`POST /auth/activate`
 
 ### Body
 
@@ -28,7 +28,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "POST /account/activate" --> B["API"]
+    A["Client"] -- "POST /auth/activate" --> B["API"]
     B --> C{"User exists?"}
     C -- "No" --> D["Return 404 Not Found"]
     D --> End([End])

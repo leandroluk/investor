@@ -1,4 +1,13 @@
 import {UserEntity} from '#/domain/account/entities';
-import {PickType} from '@nestjs/swagger';
+import {createDTO} from '../../_shared/factories';
 
-export class UpdateUserProfileBodyDTO extends PickType(UserEntity, ['name', 'language', 'timezone']) {}
+export class UpdateUserProfileBodyDTO extends createDTO(
+  UserEntity.schema
+    .pick({
+      name: true,
+      twoFactorEnabled: true,
+      language: true,
+      timezone: true,
+    })
+    .partial()
+) {}

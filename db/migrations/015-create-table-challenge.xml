@@ -13,8 +13,9 @@
         "created_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "updated_at"  TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
         "user_id"     UUID           NOT NULL,
-        "strategy"    VARCHAR(50)    NOT NULL,
-        "secret"      TEXT           NOT NULL,
+        "type"        VARCHAR(20)    NOT NULL,
+        "code"        VARCHAR(255)   NOT NULL,
+        "status"      VARCHAR(20)    NOT NULL,
         "expires_at"  TIMESTAMPTZ(3) NOT NULL,
         "verified_at" TIMESTAMPTZ(3)     NULL,
         ---

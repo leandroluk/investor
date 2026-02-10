@@ -1,6 +1,193 @@
  erDiagram
     %% MODULE: account
-    challenge {
+    tb_challenge {
+        uuidv7       id          PK
+        timestamp[3] created_at  ""
+        timestamp[3] updated_at  ""
+        uuidv7       user_id     FK
+        varchar[20]  type        ""
+        varchar[255] code        ""
+        varchar[20]  status      ""
+        timestamp[3] expires_at  ""
+        timestamp[3] verified_at ""
+    }    
+    tb_device {
+        uuidv7       id          PK
+        timestamp[3] created_at  ""
+        timestamp[3] updated_at  ""
+        uuidv7       user_id     FK
+        varchar[50]  name        ""
+        varchar[255] fingerprint ""
+        varchar[20]  platform    ""
+        text         push_token  ""
+        boolean      is_active   ""
+        varchar[50]  brand       ""
+        varchar[50]  model       ""
+        jsonb        metadata    ""
+    }
+    tb_document {
+        uuidv7       id            PK
+        timestamp[3] created_at    ""
+        timestamp[3] updated_at    ""
+        uuidv7       user_id       FK
+        varchar[50]  type          ""
+        varchar[255] storage_key   ""
+        varchar[20]  status        ""
+        text         reject_reason ""
+    }    
+    tb_login {
+        uuidv7       id             PK
+        timestamp[3] created_at     ""
+        uuidv7       user_id        FK
+        uuidv7       device_id      FK
+        varchar[45]  ip             ""
+        varchar[50]  strategy       ""
+        boolean      success        ""
+        text         failure_reason ""
+    }
+    tb_user {
+        uuidv7             id                    PK
+        timestamp[3]       created_at            ""
+        timestamp[3]       updated_at            ""
+        timestamp[3]       deleted_at            ""
+        varchar[100]       email                 UK
+        text               password_hash         ""
+        varchar[100]       name                  ""
+        varchar[20]        status                ""
+        char[42]           wallet_address        UK
+        timestamp[3]       wallet_verified_at    ""
+        text               wallet_seed_encrypted ""
+        varchar[20]        kyc_status            ""
+        timestamp[3]       kyc_verified_at       ""
+        boolean            two_factor_enabled    ""
+        varchar[10]        language              ""
+        varchar[100]       timezone              ""  
+    }
+
+    %% MODULE: audit
+    tb_ledger {
+        uuidv7       id           PK
+        timestamp[3] created_at   ""
+        uuidv7       user_id      FK
+        uuidv7       asset_id     FK
+        varchar[50]  type         "" 
+        decimal      amount       ""
+        uuidv7       reference_id ""
+        text         description  ""
+    }
+
+    %% MODULE: catalog
+    tb_asset {
+        uuidv7             id         PK
+        timestamp[3]       created_at ""
+        timestamp[3]       updated_at ""
+        timestamp[3]       deleted_at ""
+        varchar[100]       name       ""
+        varchar[10]        symbol     ""
+        varchar[100]       slug       ""
+        varchar[255]       logo_url   ""
+        varchar[50]        network    ""
+        char[42]           contract   ""
+        integer            decimals   ""
+        boolean            is_active  ""
+    }
+    tb_strategy {
+        uuidv7             id                 PK
+        timestamp[3]       created_at         ""
+        timestamp[3]       updated_at         ""
+        timestamp[3]       deleted_at         ""
+        uuidv7             asset_id           FK
+        varchar[100]       name               ""
+        varchar[100]       slug               ""
+        text               description        ""
+        varchar[20]        risk_level         ""
+        decimal            min_apy            ""
+        decimal            max_apy            ""
+        integer            min_lockup_seconds ""
+    }
+
+    %% MODULE: portfolio
+    tb_earning {
+        uuidv7       id            PK
+        timestamp[3] created_at    ""
+        uuidv7       investment_id FK
+        decimal      amount_token  ""
+        decimal      amount_usd    ""
+    }
+    tb_investment {
+        uuidv7       id          PK
+        timestamp[3] created_at  ""
+        timestamp[3] updated_at  ""
+        uuidv7       user_id     FK
+        uuidv7       strategy_id FK
+        uuidv7       asset_id    FK
+        decimal      amount      ""
+        decimal      amount_usd  ""
+        varchar[20]  status      ""
+    }
+
+    %% MODULE: signal
+    tb_notice {
+        uuidv7       id         PK
+        timestamp[3] created_at ""
+        uuidv7       user_id    FK
+        varchar[20]  type       ""
+        varchar[150] title      ""
+        text         content    ""
+        boolean      is_read    ""
+    }
+
+    %% MODULE: support
+    tb_ticket {
+        uuidv7       id         PK
+        timestamp[3] created_at ""
+        timestamp[3] updated_at ""
+        uuidv7       user_id    FK
+        varchar[150] subject    ""
+        text         message    ""
+        varchar[20]  status     ""
+        varchar[20]  priority   ""
+        jsonb        metadata   ""
+    }
+
+    %% MODULE: system
+    tb_config {
+        uuidv7       id           PK
+        timestamp[3] created_at   ""
+        timestamp[3] updated_at   ""
+        varchar[100] key          UK
+        text         value        ""
+        text         description  ""
+    }
+
+    %% MODULE: treasury
+    tb_withdrawal {
+        uuidv7       id                  PK
+        timestamp[3] created_at          ""
+        timestamp[3] updated_at          ""
+        uuidv7       user_id             FK
+        uuidv7       asset_id            FK
+        decimal      amount              ""
+        decimal      amount_usd          ""
+        char[42]     destination_address ""
+        char[66]     tx_hash             ""
+        varchar[20]  status              ""
+    }
+
+    tb_user       ||--o{ tb_device     : "has"
+    tb_user       ||--o{ tb_challenge  : "has"
+    tb_user       ||--o{ tb_login      : "logs"
+    tb_user       ||--o{ tb_notice     : "receives"
+    tb_user       ||--o{ tb_document   : "uploads"
+    tb_investment }o--|| tb_user       : "owns"
+    tb_withdrawal }o--|| tb_user       : "requests"
+    tb_ticket     }o--|| tb_user       : "opens"
+    tb_ledger     }o--|| tb_user       : "records"
+    tb_strategy   ||--o{ tb_investment : "defines"
+    tb_asset      ||--o{ tb_investment : "denominates"
+    tb_investment ||--o{ tb_earning    : "generates"
+    %% MODULE: account
+    tb_challenge {
         uuidv7       id         PK
         timestamp[3] created_at ""
         timestamp[3] updated_at ""
@@ -10,7 +197,7 @@
         varchar[20]  status     ""
         timestamp[3] expires_at ""
     }    
-    device {
+    tb_device {
         uuidv7       id          PK
         timestamp[3] created_at  ""
         timestamp[3] updated_at  ""
@@ -22,7 +209,7 @@
         varchar[50]  name        ""
         varchar[50]  model       ""
     }
-    document {
+    tb_document {
         uuidv7       id            PK
         timestamp[3] created_at    ""
         timestamp[3] updated_at    ""
@@ -32,14 +219,14 @@
         varchar[20]  status        ""
         null[text]   reject_reason ""
     }    
-    login {
+    tb_login {
         uuidv7       id         PK
         timestamp[3] created_at ""
         uuidv7       user_id    FK
         varchar[50]  ip         ""
         boolean      success    ""
     }
-    user {
+    tb_user {
         uuidv7             id                    PK
         timestamp[3]       created_at            ""
         timestamp[3]       updated_at            ""
@@ -59,7 +246,7 @@
     }
 
     %% MODULE: audit
-    ledger {
+    tb_ledger {
         uuidv7       id           PK
         timestamp[3] created_at   ""
         uuidv7       user_id      FK
@@ -69,7 +256,7 @@
     }
 
     %% MODULE: catalog
-    asset {
+    tb_asset {
         uuidv7             id         PK
         timestamp[3]       created_at ""
         null[timestamp[3]] deleted_at ""
@@ -78,7 +265,7 @@
         varchar[50]        network    ""
         boolean            is_active  ""
     }
-    strategy {
+    tb_strategy {
         uuidv7             id                      PK
         timestamp[3]       created_at              ""
         timestamp[3]       updated_at              ""
@@ -90,14 +277,14 @@
     }
 
     %% MODULE: portfolio
-    earning {
+    tb_earning {
         uuidv7       id            PK
         timestamp[3] created_at    ""
         uuidv7       investment_id FK
         decimal      amount_token  ""
         decimal      amount_usd    ""
     }
-    investment {
+    tb_investment {
         uuidv7       id          PK
         timestamp[3] created_at  ""
         timestamp[3] updated_at  ""
@@ -109,7 +296,7 @@
     }
 
     %% MODULE: signal
-    notice {
+    tb_notice {
         uuidv7       id         PK
         timestamp[3] created_at ""
         uuidv7       user_id    FK
@@ -118,7 +305,7 @@
     }
 
     %% MODULE: support
-    ticket {
+    tb_ticket {
         uuidv7       id         PK
         timestamp[3] created_at ""
         timestamp[3] updated_at ""
@@ -129,7 +316,7 @@
     }
 
     %% MODULE: system
-    config {
+    tb_config {
         uuidv7       id           PK
         timestamp[3] created_at   ""
         timestamp[3] updated_at   ""
@@ -138,7 +325,7 @@
     }
 
     %% MODULE: treasury
-    withdrawal {
+    tb_withdrawal {
         uuidv7       id               PK
         timestamp[3] created_at       ""
         timestamp[3] updated_at       ""
@@ -148,15 +335,15 @@
         char[66]     transaction_hash ""
     }
 
-    user       ||--o{ device     : "has"
-    user       ||--o{ challenge  : "has"
-    user       ||--o{ login      : "logs"
-    user       ||--o{ notice     : "receives"
-    user       ||--o{ document   : "uploads"
-    investment }o--|| user       : "owns"
-    withdrawal }o--|| user       : "requests"
-    ticket     }o--|| user       : "opens"
-    ledger     }o--|| user       : "records"
-    strategy   ||--o{ investment : "defines"
-    asset      ||--o{ investment : "denominates"
-    investment ||--o{ earning    : "generates"
+    tb_user       ||--o{ tb_device     : "has"
+    tb_user       ||--o{ tb_challenge  : "has"
+    tb_user       ||--o{ tb_login      : "logs"
+    tb_user       ||--o{ tb_notice     : "receives"
+    tb_user       ||--o{ tb_document   : "uploads"
+    tb_investment }o--|| tb_user       : "owns"
+    tb_withdrawal }o--|| tb_user       : "requests"
+    tb_ticket     }o--|| tb_user       : "opens"
+    tb_ledger     }o--|| tb_user       : "records"
+    tb_strategy   ||--o{ tb_investment : "defines"
+    tb_asset      ||--o{ tb_investment : "denominates"
+    tb_investment ||--o{ tb_earning    : "generates"

@@ -26,10 +26,10 @@ export class CacheRedisOtpStore implements OtpStore {
   }
 
   async verify(otp: string): Promise<UserEntity['id']> {
-    const {key, value} = await this.cacheRedisAdapter.get(this.key('*', otp));
-    if (otp === value) {
+    const {key} = await this.cacheRedisAdapter.get(this.key('*', otp));
+    if (key.includes(`:code:${otp}`)) {
       await this.cacheRedisAdapter.delete(key);
-      return key.split(':')[1]!;
+      return key.split(':')[2]!;
     }
     throw new CacheRedisError('Invalid OTP');
   }

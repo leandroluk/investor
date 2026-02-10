@@ -53,6 +53,7 @@ export class DatabasePostgresDocumentRepository extends Repository<Entity> imple
     );
     return row ?? null;
   }
+
   async findByUserIdAndType(userId: string, type: string): Promise<Entity | null> {
     const [row] = await this.database.query<Entity>(
       `SELECT ${this.selectAsPart}
@@ -79,36 +80,33 @@ export class DatabasePostgresDocumentRepository extends Repository<Entity> imple
     limit: number,
     offset: number
   ): Promise<{items: DocumentView[]; total: number}> {
-    const rows = await this.database.query<any>(
-      `SELECT id, created_at, updated_at, user_id, type, storage_key, status, reject_reason,
-              user_name, user_email, user_kyc_status
-       FROM "vw_document"
-       WHERE status = $1
-       ORDER BY created_at ASC
-       LIMIT $2 OFFSET $3`,
-      [status, limit, offset]
-    );
-
-    const [count] = await this.database.query<{total: string}>(
-      `SELECT COUNT(*) as total
-       FROM "vw_document"
-       WHERE "status" = $1`,
-      [status]
-    );
-
-    const items = rows.map(row => ({
-      id: row.id,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      userId: row.user_id,
-      type: row.type,
-      storageKey: row.storage_key,
-      status: row.status,
-      rejectReason: row.reject_reason,
-      userName: row.user_name,
-      userEmail: row.user_email,
-      userKycStatus: row.user_kyc_status,
-    }));
+    const [items, [count]] = await Promise.all([
+      this.database.query<any>(
+        `SELECT
+          id as "id",
+          created_at as "createdAt",
+          updated_at as "updatedAt",
+          user_id as "userId",
+          type as "type",
+          storage_key as "storageKey",
+          status as "status",
+          reject_reason as "rejectReason",
+          user_name as "userName",
+          user_email as "userEmail",
+          user_kyc_status as "userKycStatus"
+         FROM "vw_document"
+         WHERE status = $1
+         ORDER BY created_at ASC
+         LIMIT $2 OFFSET $3`,
+        [status, limit, offset]
+      ),
+      this.database.query<{total: string}>(
+        `SELECT COUNT(*) as total
+         FROM "vw_document"
+         WHERE "status" = $1`,
+        [status]
+      ),
+    ]);
 
     return {
       items,

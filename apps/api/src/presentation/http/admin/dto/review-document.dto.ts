@@ -1,17 +1,15 @@
-import {ApiPropertyOf} from '#/application/_shared/decorators';
-import {DocumentEntity} from '#/domain/account/entities';
-import {DocumentStatusEnum} from '#/domain/account/enums';
-import {ApiProperty} from '@nestjs/swagger';
+import {ReviewDocumentCommand} from '#/application/admin/command';
+import {createDTO} from '../../_shared/factories';
 
-export class ReviewDocumentParamDTO {
-  @ApiPropertyOf(DocumentEntity, 'id')
-  documentId!: string;
-}
+export class ReviewDocumentParamDTO extends createDTO(
+  ReviewDocumentCommand.schema.pick({
+    documentId: true,
+  })
+) {}
 
-export class ReviewDocumentBodyDTO {
-  @ApiProperty({enum: DocumentStatusEnum})
-  status!: DocumentStatusEnum;
-
-  @ApiProperty({required: false})
-  rejectReason?: string;
-}
+export class ReviewDocumentBodyDTO extends createDTO(
+  ReviewDocumentCommand.schema.pick({
+    status: true,
+    rejectReason: true,
+  })
+) {}

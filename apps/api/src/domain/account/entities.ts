@@ -1,12 +1,13 @@
 import z from 'zod';
 import {createClass} from '../_shared/factories';
-import {creatableSchema, indexableSchema, updatableSchema} from '../_shared/types';
+import {creatableSchema, deletableSchema, indexableSchema, updatableSchema} from '../_shared/types';
 import {
   ChallengeStatusEnum,
   DeviceTypeEnum,
   DocumentStatusEnum,
   DocumentTypeEnum,
   KycStatusEnum,
+  LoginStrategyEnum,
   UserStatusEnum,
 } from './enums';
 
@@ -20,24 +21,34 @@ export class ChallengeEntity extends createClass(
         description: 'The user who must solve the challenge',
         format: 'uuid',
       }),
-      type: z.string().meta({
+      type: z.string().default('2FA').meta({
         example: '2FA',
         description: 'Type of the challenge (e.g. 2FA, OTP)',
-        maxLength: 50,
+        maxLength: 20,
       }),
-      code: z.string().meta({
-        example: '123456',
-        description: 'The secret code or hash of the challenge',
-        maxLength: 255,
-      }),
-      status: z.enum(ChallengeStatusEnum).meta({
+      code: z
+        .string()
+        .default(() => Date.now().toString().split('').reverse().join('').slice(0, 6))
+        .meta({
+          example: '123456',
+          description: 'The secret code or hash of the challenge',
+          maxLength: 255,
+        }),
+      status: z.enum(ChallengeStatusEnum).default(ChallengeStatusEnum.PENDING).meta({
         example: ChallengeStatusEnum.PENDING,
         description: 'Current status of the challenge',
         maxLength: 20,
       }),
-      expiresAt: z.date().meta({
+      expiresAt: z
+        .date()
+        .default(() => new Date(Date.now() + 1000 * 60 * 15) /* 15 min */)
+        .meta({
+          example: new Date(),
+          description: 'Timestamp when the challenge expires',
+        }),
+      verifiedAt: z.date().nullable().default(null).meta({
         example: new Date(),
-        description: 'Timestamp when the challenge expires',
+        description: 'Timestamp when the challenge was verified',
       }),
     })
 ) {}
@@ -52,34 +63,41 @@ export class DeviceEntity extends createClass(
         description: 'The owner of this device registration',
         format: 'uuid',
       }),
-      platform: z.enum(DeviceTypeEnum).meta({
-        example: DeviceTypeEnum.IOS,
-        description: 'Operational system platform',
-        maxLength: 20,
+      name: z.string().meta({
+        example: 'My iPhone',
+        description: 'User-friendly name for the device',
+        maxLength: 50,
       }),
       fingerprint: z.string().meta({
         example: 'fingerprint_82h1...',
         description: 'Unique fingerprint for device identification',
         maxLength: 255,
       }),
+      platform: z.enum(DeviceTypeEnum).meta({
+        example: DeviceTypeEnum.IOS,
+        description: 'Operational system platform',
+        maxLength: 20,
+      }),
+      pushToken: z.string().nullable().meta({
+        example: 'fcm_token_123',
+        description: 'Push notification token (FCM/APNs)',
+      }),
       isActive: z.boolean().meta({
         example: true,
         description: 'Whether the device is active for push notifications',
       }),
-      brand: z.string().meta({
+      brand: z.string().nullable().meta({
         example: 'Apple',
         description: 'Manufacturer of the device',
         maxLength: 50,
       }),
-      name: z.string().meta({
-        example: 'My iPhone',
-        description: 'User-friendly name for the device',
+      model: z.string().nullable().meta({
+        example: 'iPhone 15 Pro',
+        description: 'Specific hardware model',
         maxLength: 50,
       }),
-      model: z.string().meta({
-        example: 'iPhone 15 Pro',
-        description: 'Specific hardware model for device fingerprinting and anti-fraud analysis',
-        maxLength: 50,
+      metadata: z.record(z.string(), z.unknown()).nullable().meta({
+        description: 'Additional device metadata',
       }),
     })
 ) {}
@@ -124,14 +142,27 @@ export class LoginEntity extends createClass(
         description: 'The user associated with the attempt',
         format: 'uuid',
       }),
+      deviceId: z.uuid().nullable().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'The device used for the login',
+        format: 'uuid',
+      }),
       ip: z.string().meta({
         example: '192.168.1.1',
         description: 'IP address of the login attempt',
+        maxLength: 45,
+      }),
+      strategy: z.enum(LoginStrategyEnum).meta({
+        example: LoginStrategyEnum.PASSWORD,
+        description: 'Authentication strategy used',
         maxLength: 50,
       }),
       success: z.boolean().meta({
         example: true,
         description: 'Whether the authentication was successful',
+      }),
+      failureReason: z.string().nullable().meta({
+        description: 'Reason for authentication failure',
       }),
     })
 ) {}
@@ -140,12 +171,9 @@ export class UserEntity extends createClass(
   indexableSchema
     .extend(creatableSchema.shape)
     .extend(updatableSchema.shape)
+    .extend(deletableSchema.shape)
     .extend({
-      deletedAt: z.date().nullable().meta({
-        example: new Date(),
-        description: 'Timestamp when the user was soft deleted',
-      }),
-      email: z.string().email().meta({
+      email: z.email().meta({
         example: 'john.doe@email.com',
         description: 'Unique electronic mail address',
         maxLength: 100,

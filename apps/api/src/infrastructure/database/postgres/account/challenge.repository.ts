@@ -19,6 +19,7 @@ export class DatabasePostgresChallengeRepository extends Repository<Entity> impl
       code: 'code',
       status: 'status',
       expiresAt: 'expires_at',
+      verifiedAt: 'verified_at',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     });

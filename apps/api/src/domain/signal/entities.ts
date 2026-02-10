@@ -11,12 +11,21 @@ export class NoticeEntity extends createClass(
         description: 'The recipient of the notice',
         format: 'uuid',
       }),
+      type: z.string().meta({
+        example: 'ALERT',
+        description: 'Type of notification (INFO, ALERT, etc)',
+        maxLength: 20,
+      }),
       title: z.string().meta({
         example: 'Investment Confirmed',
         description: 'Title of the notification',
         maxLength: 150,
       }),
-      isRead: z.boolean().meta({
+      content: z.string().meta({
+        example: 'Your investment of 1000 USDC was confirmed.',
+        description: 'Body content of the notification',
+      }),
+      isRead: z.boolean().default(false).meta({
         example: false,
         description: 'Read status of the message',
       }),

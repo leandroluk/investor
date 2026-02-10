@@ -12,12 +12,18 @@ export class ListActiveDeviceQuery extends createClass(
   })
 ) {}
 
+export class ListActiveDeviceQueryResult extends createClass(
+  z.object({
+    items: z.array(DeviceEntity.schema),
+  })
+) {}
+
 @QueryHandler(ListActiveDeviceQuery)
-export class ListActiveDeviceHandler implements IQueryHandler<ListActiveDeviceQuery, DeviceEntity[]> {
+export class ListActiveDeviceHandler implements IQueryHandler<ListActiveDeviceQuery, ListActiveDeviceQueryResult> {
   constructor(private readonly deviceRepository: DeviceRepository) {}
 
-  async execute(query: ListActiveDeviceQuery): Promise<DeviceEntity[]> {
-    const result = await this.deviceRepository.listActiveByUserId(query.userId);
-    return result;
+  async execute(query: ListActiveDeviceQuery): Promise<ListActiveDeviceQueryResult> {
+    const items = await this.deviceRepository.listActiveByUserId(query.userId);
+    return {items};
   }
 }

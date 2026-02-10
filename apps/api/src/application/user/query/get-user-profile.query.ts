@@ -14,8 +14,15 @@ export class GetUserProfileQuery extends createClass(
 ) {}
 
 export class GetUserProfileQueryResult extends createClass(
-  UserEntity.schema.omit({
-    passwordHash: true,
+  UserEntity.schema.pick({
+    name: true,
+    status: true,
+    walletVerifiedAt: true,
+    kycStatus: true,
+    kycVerifiedAt: true,
+    twoFactorEnabled: true,
+    language: true,
+    timezone: true,
   })
 ) {}
 
@@ -33,7 +40,6 @@ export class GetUserProfileHandler implements IQueryHandler<GetUserProfileQuery,
 
   async execute(query: GetUserProfileQuery): Promise<GetUserProfileQueryResult> {
     const user = await this.getUser(query.userId);
-    const {passwordHash: _, ...result} = user;
-    return result;
+    return GetUserProfileQueryResult.new(user);
   }
 }

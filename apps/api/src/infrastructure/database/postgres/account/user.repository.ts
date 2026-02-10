@@ -73,10 +73,20 @@ export class DatabasePostgresUserRepository extends Repository<Entity> implement
   async findById(id: string): Promise<Entity | null> {
     const [row] = await this.database.query(
       `SELECT ${this.selectAsPart}
-       FROM "user"
+       FROM "${this.tableName}"
        WHERE "id" = $1`,
       [id]
     );
     return row ?? null;
+  }
+
+  async getEmailById(id: string): Promise<Entity['email'] | null> {
+    const [row] = await this.database.query(
+      `SELECT "email"
+       FROM "${this.tableName}"
+       WHERE "id" = $1`,
+      [id]
+    );
+    return row?.email ?? null;
   }
 }

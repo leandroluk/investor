@@ -15,8 +15,11 @@ export class DatabasePostgresLoginRepository extends Repository<Entity> implemen
       id: 'id',
       createdAt: 'created_at',
       userId: 'user_id',
+      deviceId: 'device_id',
       ip: 'ip',
+      strategy: 'strategy',
       success: 'success',
+      failureReason: 'failure_reason',
     });
   }
 

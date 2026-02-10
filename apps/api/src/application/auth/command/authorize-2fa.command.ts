@@ -43,6 +43,7 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
     }
 
     challenge.status = ChallengeStatusEnum.COMPLETED;
+    challenge.verifiedAt = new Date();
     challenge.updatedAt = new Date();
     await this.challengeRepository.update(challenge);
     await this.challengeStore.delete(challenge.userId);

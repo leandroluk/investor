@@ -13,9 +13,9 @@ export class GetSsoRedirectQuery extends createClass(
       example: SsoProviderEnum.GOOGLE,
       enum: Object.values(SsoProviderEnum),
     }),
-    callbackURL: z.url().meta({
+    callback_url: z.url().meta({
       description: 'Callback URL after authentication',
-      example: 'https://app.com/auth/callback',
+      example: 'https://example.com/auth/callback',
     }),
   })
 ) {}
@@ -25,11 +25,9 @@ export class GetSsoRedirectQueryHandler implements IQueryHandler<GetSsoRedirectQ
   constructor(private readonly oidcPort: OidcPort) {}
 
   async execute(query: GetSsoRedirectQuery): Promise<string> {
-    const state: OidcPort.State = {callbackURL: query.callbackURL, provider: query.provider};
+    const state: OidcPort.State = {callbackURL: query.callback_url, provider: query.provider};
     const encodedState = this.oidcPort.encodeState(state);
     const adapter = this.oidcPort.getAdapter(query.provider);
-    const redirectUrl = adapter.getAuthURL(encodedState);
-
-    return redirectUrl;
+    return adapter.getAuthURL(encodedState);
   }
 }

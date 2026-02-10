@@ -1,20 +1,6 @@
-import {type applyDecorators, type Type} from '@nestjs/common';
+import {type applyDecorators} from '@nestjs/common';
 import {type EventEmitter2} from '@nestjs/event-emitter';
-import {ApiProperty, type ApiPropertyOptions} from '@nestjs/swagger';
 import {createHandlerDecorator} from './factories';
-
-// #region ApiPropertyOf
-export function ApiPropertyOf(
-  reference: (new () => object) | (abstract new () => object) | Type<any>,
-  fieldProperty: string,
-  options: ApiPropertyOptions = {}
-): PropertyDecorator {
-  return (target: object, propertyKey: string | symbol) => {
-    const metadata = Reflect.getMetadata('swagger/apiModelProperties', reference.prototype, fieldProperty) || {};
-    ApiProperty({...metadata, ...options})(target, propertyKey);
-  };
-}
-// #endregion
 
 // #region Retry
 export function Retry({attempts, delay = 1000}: {attempts: number; delay?: number}): ClassDecorator & MethodDecorator {

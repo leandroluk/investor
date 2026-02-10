@@ -3,13 +3,12 @@ import {authorizationTokenSchema} from '#/application/_shared/types';
 import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/ports';
 import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entities';
-import {DeviceTypeEnum, SsoProviderEnum} from '#/domain/account/enums';
+import {DeviceTypeEnum, LoginStrategyEnum, SsoProviderEnum} from '#/domain/account/enums';
 import {UserInvalidCredentialsError} from '#/domain/account/errors';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/events';
 import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repositories';
 import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import uuid from 'uuid';
 import z from 'zod';
 
 export class LoginUsingTokenCommand extends createClass(
@@ -74,8 +73,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
       await this.deviceRepository.update(existingDevice);
       return existingDevice;
     } else {
-      const newDevice: DeviceEntity = {
-        id: uuid.v7(),
+      const newDevice = DeviceEntity.new({
         userId: user.id,
         platform: DeviceTypeEnum.UNKNOWN,
         fingerprint,
@@ -83,28 +81,29 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
         brand: 'unknown',
         model: 'unknown',
         name: 'unknown',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+        pushToken: null,
+        metadata: null,
+      });
       await this.deviceRepository.create(newDevice);
       return newDevice;
     }
   }
 
-  private async createLogin(ip: string, user: UserEntity, success: boolean): Promise<void> {
-    const login: LoginEntity = {
-      id: uuid.v7(),
+  private async createLogin(ip: string, user: UserEntity, deviceId): Promise<void> {
+    const login = LoginEntity.new({
       ip,
-      success,
+      deviceId,
       userId: user.id,
-      createdAt: new Date(),
-    };
+      strategy: LoginStrategyEnum.TOKEN,
+      failureReason: null,
+      success: true,
+    });
     await this.loginRepository.create(login);
   }
 
   private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
     return this.tokenPort.create<true>({
-      sessionKey: await this.sessionStore.create(user.id, device.fingerprint),
+      sessionKey: await this.sessionStore.create({userId: user.id, deviceFingerprint: device.fingerprint}),
       claims: {
         id: user.id,
         email: user.email,
@@ -133,30 +132,29 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
   private async publishUserLoggedInEvent(
     correlationId: string,
     occurredAt: Date,
-    provider: SsoProviderEnum,
     userId: UserEntity['id']
   ): Promise<void> {
     await this.brokerPort.publish(
       new UserLoggedInEvent(correlationId, occurredAt, {
         userId,
-        provider,
+        strategy: LoginStrategyEnum.TOKEN,
       })
     );
   }
 
   async execute(command: LoginUsingTokenCommand): Promise<LoginUsingTokenCommandResult> {
-    const {userId, provider} = await this.decryptToken(command.token);
+    const {userId} = await this.decryptToken(command.token);
     const user = await this.getUserById(userId);
     try {
-      await this.createLogin(command.ip, user, true);
       const device = await this.upsertDevice(user, command.fingerprint);
+      await this.createLogin(command.ip, user, device.id);
       const result = await this.createToken(user, device);
 
       if (user.twoFactorEnabled) {
         await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
       }
 
-      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, provider, user.id);
+      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
 
       return result;
     } catch (error) {

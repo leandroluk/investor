@@ -13,7 +13,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 
-- Method: `PATCH`
+- Method: `PUT`
 - Path: `/auth/2fa`
 - Body:
   - `email`: User's email (required, email format)
@@ -24,7 +24,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-  A["Client"] -- "PATCH /auth/2fa" --> B["API"]
+  A["Client"] -- "PUT /auth/2fa" --> B["API"]
   B --> C{"Valid Code?"}
   C -- "No" --> D["Return 403 Forbidden"]
   C -- "Yes" --> E["Generate Tokens"]

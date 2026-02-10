@@ -41,7 +41,7 @@ export class StorageS3CompatAdapter implements StoragePort {
     await this.client.send(command);
   }
 
-  async getSignedUrl(path: string, expires: number, mode: 'read' | 'write'): Promise<string> {
+  async getSignedURL(path: string, expires: number, mode: 'read' | 'write'): Promise<string> {
     const config = {Bucket: this.config.bucket, Key: path};
     const command = mode === 'write' ? new PutObjectCommand(config) : new GetObjectCommand(config);
     return getSignedUrl(this.client, command, {expiresIn: expires});

@@ -28,7 +28,7 @@ Setup Test Suite
     [Documentation]    Initializes API session and cleans IMAP inbox
     Create Session    api_session    ${ROBOT_URL}    verify=True
     Postgres Connect
-    Postgres Execute    TRUNCATE TABLE "user" CASCADE;
+    Postgres Execute    TRUNCATE TABLE "tb_user" CASCADE;
     Mailbox Delete All Emails
 
 Teardown Test Suite

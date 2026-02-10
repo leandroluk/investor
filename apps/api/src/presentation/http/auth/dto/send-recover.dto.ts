@@ -1,6 +1,9 @@
 import {SendRecoverCommand} from '#/application/auth/command';
+import {createDTO} from '../../_shared/factories';
 
-// #endregion
-// #region SendRecover
-
-export class SendRecoverBodyDTO extends SendRecoverCommand {}
+export class SendRecoverBodyDTO extends createDTO(
+  SendRecoverCommand.schema.omit({
+    correlationId: true,
+    occurredAt: true,
+  })
+) {}

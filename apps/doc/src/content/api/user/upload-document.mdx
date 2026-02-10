@@ -1,7 +1,7 @@
 ---
 title: Upload Document
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -15,7 +15,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `POST`
-- **Path**: `/kyc/document`
+- **Path**: `/user/document`
 - **Body**:
 
 | Field | Type | Description | Required |
@@ -29,7 +29,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "POST /kyc/document" --> B["API"]
+    A["Client"] -- "POST /user/document" --> B["API"]
     B --> C{"Validate Input"}
     C -- "Invalid" --> D["Return 400"]
     C -- "Valid" --> E["Generate Presigned URL"]

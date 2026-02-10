@@ -6,7 +6,7 @@ import {DocumentView} from '#/domain/account/views';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
-export class ListDocumentToApproveQuery extends createClass(
+export class ListDocumentToReviewQuery extends createClass(
   Query,
   z.object({
     page: z.number().int().positive().default(1).meta({
@@ -24,7 +24,7 @@ export class ListDocumentToApproveQuery extends createClass(
   })
 ) {}
 
-export class ListDocumentToApproveResult extends createClass(
+export class ListDocumentToReviewResult extends createClass(
   z.object({
     items: z.array(DocumentView.schema).meta({
       description: 'List of documents',
@@ -44,14 +44,14 @@ export class ListDocumentToApproveResult extends createClass(
   })
 ) {}
 
-@QueryHandler(ListDocumentToApproveQuery)
-export class ListDocumentToApproveHandler implements IQueryHandler<
-  ListDocumentToApproveQuery,
-  ListDocumentToApproveResult
+@QueryHandler(ListDocumentToReviewQuery)
+export class ListDocumentToReviewHandler implements IQueryHandler<
+  ListDocumentToReviewQuery,
+  ListDocumentToReviewResult
 > {
   constructor(private readonly documentRepository: DocumentRepository) {}
 
-  async execute(query: ListDocumentToApproveQuery): Promise<ListDocumentToApproveResult> {
+  async execute(query: ListDocumentToReviewQuery): Promise<ListDocumentToReviewResult> {
     const offset = (query.page - 1) * query.limit;
     const {items, total} = await this.documentRepository.findByStatus(query.status, query.limit, offset);
 

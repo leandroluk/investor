@@ -7,9 +7,18 @@ export abstract class ChallengeStore {
 }
 
 export abstract class DeviceStore {
-  abstract save(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<void>;
-  abstract has(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<boolean>;
-  abstract delete(userId: DeviceEntity['userId'], fingerprint: DeviceEntity['fingerprint']): Promise<void>;
+  abstract save(args: {
+    userId: DeviceEntity['userId']; //
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void>;
+  abstract has(args: {
+    userId: DeviceEntity['userId'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<boolean>;
+  abstract delete(args: {
+    userId: DeviceEntity['userId'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void>;
 }
 
 export abstract class OtpStore {
@@ -18,15 +27,27 @@ export abstract class OtpStore {
 }
 
 export abstract class SessionStore {
-  abstract create(userId: UserEntity['id'], deviceFingerprint: DeviceEntity['fingerprint']): Promise<string>;
-  abstract refresh(
-    sessionKey: string,
-    userId: UserEntity['id'],
-    deviceFingerprint: DeviceEntity['fingerprint']
-  ): Promise<void>;
-  abstract revoke(
-    sessionKey: string,
-    userId: UserEntity['id'],
-    deviceFingerprint: DeviceEntity['fingerprint']
-  ): Promise<void>;
+  abstract create(args: {
+    userId: UserEntity['id']; //
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<string>;
+  abstract refresh(args: {
+    sessionKey: string;
+    userId: UserEntity['id'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void>;
+  abstract revoke(args: {
+    sessionKey: string;
+    userId: UserEntity['id'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void>;
+}
+
+export abstract class NonceStore {
+  abstract save(args: {
+    userId: UserEntity['id']; //
+    nonce: string;
+  }): Promise<void>;
+  abstract get(userId: UserEntity['id']): Promise<string | null>;
+  abstract delete(userId: UserEntity['id']): Promise<void>;
 }

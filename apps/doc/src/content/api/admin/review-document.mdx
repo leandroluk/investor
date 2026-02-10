@@ -1,7 +1,7 @@
 ---
-title: Approve/Reject Document (Admin)
+title: Approve/Reject Document
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -14,7 +14,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `PATCH`
-- **Path**: `/kyc/document/:id/review`
+- **Path**: `/admin/document/:documentId/review`
 - **Body**:
 
 | Field | Type | Description | Required |
@@ -27,7 +27,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Admin"] -- "PATCH /kyc/document/:id/review" --> B["API"]
+    A["Admin"] -- "PATCH /admin/document/:documentId/review" --> B["API"]
     B --> C{"Is Admin?"}
     C -- "No" --> D["Return 403 Forbidden"]
     C -- "Yes" --> E{"Status?"}

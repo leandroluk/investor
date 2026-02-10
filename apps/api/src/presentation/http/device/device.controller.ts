@@ -36,7 +36,7 @@ export class DeviceController {
     @GetMeta() meta: GetMeta, //
     @Body() body: RegisterDeviceBodyDTO
   ): Promise<void> {
-    await this.commandBus.execute(new RegisterDeviceCommand({...meta, ...body}));
+    await this.commandBus.execute(RegisterDeviceCommand.new({...meta, ...body}));
   }
   // #endregion
 
@@ -50,7 +50,7 @@ export class DeviceController {
     @GetMeta() meta: GetMeta, //
     @Param('id') id: string
   ): Promise<void> {
-    await this.commandBus.execute(new RevokeDeviceCommand({...meta, id}));
+    await this.commandBus.execute(RevokeDeviceCommand.new({...meta, id}));
   }
   // #endregion
 
@@ -62,8 +62,8 @@ export class DeviceController {
   async getListActiveDevice(
     @GetMeta() meta: GetMeta //
   ): Promise<ListActiveDeviceResultDTO> {
-    const result = await this.queryBus.execute(new ListActiveDeviceQuery({...meta}));
-    return {items: result};
+    const result = await this.queryBus.execute(ListActiveDeviceQuery.new({...meta}));
+    return result;
   }
   // #endregion
 }

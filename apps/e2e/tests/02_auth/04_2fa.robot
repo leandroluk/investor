@@ -54,7 +54,7 @@ Enable User And Set To Use 2FA On Database
     [Arguments]    ${email}
 
     Postgres Execute
-    ...    UPDATE "user" SET "two_factor_enabled" = true, "status" = 'ACTIVE' WHERE email = '${email}'
+    ...    UPDATE "tb_user" SET "two_factor_enabled" = true, "status" = 'active' WHERE email = '${email}'
 
 Login With Activated Account
     [Documentation]    Logins and validates JWT tokens
@@ -80,9 +80,9 @@ Get ChallengeId From Postgres
     [Arguments]    ${email}    ${otp}
     ${query} =    Catenate
     ...    SELECT "id"
-    ...    FROM "challenge"
-    ...    WHERE "user_id" = (SELECT "id" FROM "user" WHERE "email" = '${email}')
-    ...    AND "status" = 'PENDING'
+    ...    FROM "tb_challenge"
+    ...    WHERE "user_id" = (SELECT "id" FROM "tb_user" WHERE "email" = '${email}')
+    ...    AND "status" = 'pending'
     ...    AND "expires_at" > NOW()
     ...    AND "code" = '${otp}'
     ...    LIMIT 1

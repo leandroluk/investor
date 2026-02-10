@@ -1,4 +1,5 @@
 import {Command} from '#/application/_shared/bus';
+import {authorizationTokenSchema} from '#/application/_shared/types';
 import {createClass} from '#/domain/_shared/factories';
 import {HasherPort, TokenPort} from '#/domain/_shared/ports';
 import {DeviceEntity, UserEntity} from '#/domain/account/entities';
@@ -20,8 +21,10 @@ export class RefreshTokenCommand extends createClass(
   })
 ) {}
 
+export class RefreshTokenCommandResult extends createClass(authorizationTokenSchema) {}
+
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand, TokenPort.Authorization> {
+export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand, RefreshTokenCommandResult> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly sessionStore: SessionStore,
@@ -56,10 +59,10 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
   private async refreshSession(
     userId: UserEntity['id'],
     sessionKey: string,
-    fingerprint: DeviceEntity['fingerprint']
+    deviceFingerprint: DeviceEntity['fingerprint']
   ): Promise<void> {
     try {
-      await this.sessionStore.refresh(userId, sessionKey, fingerprint);
+      await this.sessionStore.refresh({userId, sessionKey, deviceFingerprint});
     } catch {
       throw new AuthSessionExpiredError();
     }
@@ -84,7 +87,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
     });
   }
 
-  async execute(command: RefreshTokenCommand): Promise<TokenPort.Authorization> {
+  async execute(command: RefreshTokenCommand): Promise<RefreshTokenCommandResult> {
     const decoded = await this.decodeToken(command.refreshToken);
     const user = await this.getUser(decoded.claims.id);
     await this.refreshSession(user.id, decoded.sessionKey, command.fingerprint);

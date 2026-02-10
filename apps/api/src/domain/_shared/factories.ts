@@ -3,8 +3,8 @@ import {z} from 'zod';
 export type ZodConstructor<T extends z.ZodTypeAny> = new (...args: any[]) => z.output<T>;
 
 export interface ZodDomainStatic<T extends z.ZodTypeAny> extends ZodConstructor<T> {
-  create(input: z.input<T>): z.output<T>;
   schema: T;
+  ['new'](input: z.input<T>): z.output<T>;
 }
 
 function getUnderlyingObject(schema: z.ZodTypeAny): z.ZodObject<any> {
@@ -27,7 +27,7 @@ function getUnderlyingObject(schema: z.ZodTypeAny): z.ZodObject<any> {
   }
 }
 
-export function createClass<T extends z.ZodObject<any>>(schema: T): ZodDomainStatic<T>;
+export function createClass<T extends z.ZodTypeAny>(schema: T): ZodDomainStatic<T>;
 
 export function createClass<Base extends ZodDomainStatic<z.ZodObject<any>>, Extension extends z.ZodObject<any>>(
   parent: Base,
@@ -36,7 +36,7 @@ export function createClass<Base extends ZodDomainStatic<z.ZodObject<any>>, Exte
 
 export function createClass(schemaOrParent: any, maybeSchema: any = z.object({})): any {
   let finalSchema: z.ZodObject<any>;
-  let ParentClass: any = null;
+  let ParentClass: any = Object;
 
   if (typeof schemaOrParent === 'function' && 'schema' in schemaOrParent) {
     ParentClass = schemaOrParent;
@@ -46,12 +46,12 @@ export function createClass(schemaOrParent: any, maybeSchema: any = z.object({})
     finalSchema = schemaOrParent;
   }
 
-  class GeneratedClass extends (ParentClass || Object) {
+  class GeneratedClass extends ParentClass {
     static schema = finalSchema;
 
-    static create(input: any): any {
+    static new(input: any): any {
       const parsed = finalSchema.parse(input);
-      const instance = new GeneratedClass();
+      const instance = new this();
       Object.assign(instance, parsed);
       return instance;
     }

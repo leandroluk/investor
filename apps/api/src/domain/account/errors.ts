@@ -85,3 +85,16 @@ export class UserInvalidCredentialsError extends DomainError {
   }
 }
 // #endregion
+
+// #region Document
+export class DocumentNotFoundError extends DomainError {
+  constructor(message = 'Document not found') {
+    super(message, 'document.not_found');
+  }
+}
+export class DocumentStatusError extends DomainError {
+  constructor(message = 'Incorrect Document status') {
+    super(message, 'document.status');
+  }
+}
+// #endregion

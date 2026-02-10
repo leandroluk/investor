@@ -47,7 +47,10 @@ export class RevokeDeviceHandler implements ICommandHandler<RevokeDeviceCommand,
 
     await this.deviceRepository.update(device);
     if (device.fingerprint) {
-      await this.deviceStore.delete(device.userId, device.fingerprint);
+      await this.deviceStore.delete({
+        userId: device.userId,
+        deviceFingerprint: device.fingerprint,
+      });
     }
   }
 }

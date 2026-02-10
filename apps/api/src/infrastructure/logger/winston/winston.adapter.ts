@@ -19,10 +19,10 @@ export class LoggerWinstonAdapter implements LoggerPort {
   constructor(private readonly loggerWinstonConfig: LoggerWinstonConfig) {
     const loggerTransports: any[] = [new transports.Console()];
 
-    if (this.loggerWinstonConfig.lokiUrl) {
+    if (this.loggerWinstonConfig.lokiURL) {
       loggerTransports.push(
         new LokiTransport({
-          host: this.loggerWinstonConfig.lokiUrl,
+          host: this.loggerWinstonConfig.lokiURL,
           labels: {app: 'investor-api'},
           json: true,
           format: format.json(),

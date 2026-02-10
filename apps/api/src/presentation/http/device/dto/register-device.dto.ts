@@ -1,4 +1,11 @@
 import {RegisterDeviceCommand} from '#/application/device/command';
-import {PickType} from '@nestjs/swagger';
+import {createDTO} from '../../_shared/factories';
 
-export class RegisterDeviceBodyDTO extends PickType(RegisterDeviceCommand, ['platform', 'brand', 'model', 'name']) {}
+export class RegisterDeviceBodyDTO extends createDTO(
+  RegisterDeviceCommand.schema.pick({
+    platform: true,
+    brand: true,
+    model: true,
+    name: true,
+  })
+) {}

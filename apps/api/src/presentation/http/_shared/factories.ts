@@ -12,10 +12,17 @@ const primitiveMap: Record<string, any> = {
   bigint: Number,
 };
 
+function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function createNestedDTO(schema: z.ZodObject<any>, parentName: string, fieldName: string): Type<any> {
   class NestedDto {}
 
-  const uniqueName = parentName && fieldName ? `${parentName}_${fieldName}` : `Nested${uuidv7().split('-')[0]}Dto`;
+  let uniqueName = `Nested${uuidv7().split('-')[0]}DTO`;
+  if (parentName && fieldName) {
+    uniqueName = `${parentName.replace(/DTO$/, '')}${capitalize(fieldName)}DTO`;
+  }
 
   Object.defineProperty(NestedDto, 'name', {value: uniqueName});
 
@@ -60,7 +67,6 @@ function extractMetadata(schema: z.ZodTypeAny, parentName?: string, fieldName?: 
       options.required = false;
       curr = curr.unwrap();
     } else if (type === 'default') {
-      options.required = false;
       curr = def.innerType;
     } else if (type === 'effect') {
       curr = def.schema;

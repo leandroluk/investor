@@ -13,7 +13,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `GET`
-- **Path**: `/account/check/email/:email`
+- **Path**: `/auth/check/email/:email`
 - **Parameters**:
     - `email`: The email address to check.
 
@@ -22,7 +22,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "GET /account/check/email/:email" --> B["API"]
+    A["Client"] -- "GET /auth/check/email/:email" --> B["API"]
     B --> C{"Validate Email Format"}
     C -- "Invalid" --> D["Return 422 Unprocessable Entity"]
     C -- "Valid" --> E{"Check Repository"}

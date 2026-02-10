@@ -34,10 +34,13 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
       existingDevice.name = command.name;
       existingDevice.updatedAt = new Date();
       await this.deviceRepository.update(existingDevice);
-      return await this.deviceStore.save(existingDevice.userId, existingDevice.fingerprint);
+      return await this.deviceStore.save({
+        userId: existingDevice.userId,
+        deviceFingerprint: existingDevice.fingerprint,
+      });
     }
 
-    const newDevice = DeviceEntity.create({
+    const newDevice = DeviceEntity.new({
       userId: command.userId,
       platform: command.platform,
       fingerprint: command.fingerprint,
@@ -45,11 +48,16 @@ export class RegisterDeviceHandler implements ICommandHandler<RegisterDeviceComm
       brand: command.brand,
       model: command.model,
       name: command.name,
+      pushToken: null,
+      metadata: null,
     });
 
     await this.deviceRepository.create(newDevice);
     if (newDevice.fingerprint) {
-      await this.deviceStore.save(newDevice.userId, newDevice.fingerprint);
+      await this.deviceStore.save({
+        userId: newDevice.userId,
+        deviceFingerprint: newDevice.fingerprint,
+      });
     }
   }
 }

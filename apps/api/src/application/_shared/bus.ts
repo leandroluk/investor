@@ -26,8 +26,13 @@ export type Command = InstanceType<typeof Command>;
 
 export const Query = createClass(
   z.object({
-    description: 'Unique identifier for the request',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    correlationId: z
+      .uuid()
+      .default(() => uuid.v7())
+      .meta({
+        description: 'Unique identifier for the request',
+        example: '123e4567-e89b-12d3-a456-426614174000',
+      }),
   })
 );
 

@@ -15,7 +15,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 
-`POST /account/register`
+`POST /auth/register`
 
 ### Body
 
@@ -30,7 +30,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "POST /account/register" --> B["API"]
+    A["Client"] -- "POST /auth/register" --> B["API"]
     B --> C{"Email exists in DB?"}
     C -- "Yes" --> D["Return 409 Conflict"]
     D --> End([End])

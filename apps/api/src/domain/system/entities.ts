@@ -16,5 +16,9 @@ export class ConfigEntity extends createClass(
         example: 'false',
         description: 'The value associated with the configuration key, stored as a string',
       }),
+      description: z.string().nullable().meta({
+        example: 'Toggles system-wide maintenance mode.',
+        description: 'Explanation of what this config key controls',
+      }),
     })
 ) {}

@@ -1,7 +1,7 @@
 ---
-title: List Documents to Approve (Admin)
+title: List Document to Review
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -13,7 +13,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 ## Request
 
 - **Method**: `GET`
-- **Path**: `/admin/kyc/document`
+- **Path**: `/admin/document`
 - **Query Params**:
     - `page`: number (default 1)
     - `limit`: number (default 20)
@@ -25,7 +25,7 @@ import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Admin"] -- "GET /admin/kyc/document" --> B["API"]
+    A["Admin"] -- "GET /admin/document" --> B["API"]
     B --> C{"Is Admin?"}
     C -- "No" --> D["Return 403 Forbidden"]
     C -- "Yes" --> E["Query Documents (with User join)"]
@@ -43,15 +43,16 @@ flowchart TD
   "items": [
     {
       "id": "018b7c86-8a9d-72c0-8339-2c7c5a5a7e3d",
+      "createdAt": "2024-01-01T10:00:00.000Z",
+      "updatedAt": "2024-01-01T10:00:00.000Z",
+      "userId": "018b7c86-8a9d-72c0-8339-2c7c5a5a7e3d",
       "type": "rg_front",
       "status": "pending",
-      "createdAt": "2024-01-01T10:00:00.000Z",
-      "user": {
-        "id": "user-123",
-        "name": "John Doe",
-        "email": "john@example.com"
-      },
-      "url": "https://storage.example.com/bucket/doc1?token=..."
+      "rejectReason": null,
+      "storageKey": "documents/018b7c86-8a9d-72c0-8339-2c7c5a5a7e3d/rg_front.jpg",
+      "userName": "John Doe",
+      "userEmail": "john@example.com",
+      "userKycStatus": "pending"
     }
   ],
   "total": 50,

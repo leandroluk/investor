@@ -16,7 +16,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Request
 
-`PATCH /account/activate`
+`PUT /auth/activate`
 
 ### Body
 
@@ -30,7 +30,7 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 <MermaidZoom>
 ```mermaid
 flowchart TD
-    A["Client"] -- "PATCH /account/activate" --> B["API"]
+    A["Client"] -- "PUT /auth/activate" --> B["API"]
     B --> C{"User exists?"}
     C -- "No" --> D["Return 404 Not Found"]
     D --> End([End])

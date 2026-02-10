@@ -14,12 +14,14 @@ export class DatabasePostgresDeviceRepository extends Repository<Entity> impleme
     super('tb_device', {
       id: 'id',
       userId: 'user_id',
-      platform: 'platform',
-      fingerprint: 'fingerprint',
-      isActive: 'is_active',
-      brand: 'brand',
-      model: 'model',
       name: 'name',
+      brand: 'brand',
+      fingerprint: 'fingerprint',
+      platform: 'platform',
+      pushToken: 'push_token',
+      isActive: 'is_active',
+      model: 'model',
+      metadata: 'metadata',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     });
@@ -71,24 +73,13 @@ export class DatabasePostgresDeviceRepository extends Repository<Entity> impleme
        WHERE "user_id" = $1 AND "is_active" = true`,
       [userId]
     );
-    return rows.map(row => ({
-      id: row.id,
-      userId: row.user_id,
-      platform: row.platform,
-      fingerprint: row.fingerprint,
-      isActive: row.is_active,
-      brand: row.brand,
-      model: row.model,
-      name: row.name,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    }));
+    return rows;
   }
 
   async listFingerprintByUserId(userId: string): Promise<Array<Entity['fingerprint']>> {
     const rows = await this.database.query<any>(
       `SELECT "fingerprint"
-       FROM "device"
+       FROM "${this.tableName}"
        WHERE "user_id" = $1 AND "is_active" = true`,
       [userId]
     );

@@ -19,23 +19,25 @@ export class CacheRedisSessionStore implements SessionStore {
     return `session:${key}:userId:${userId}:deviceFingerprint:${deviceFingerprint}`;
   }
 
-  async create(userId: UserEntity['id'], deviceFingerprint: DeviceEntity['fingerprint']): Promise<string> {
+  async create(args: {userId: UserEntity['id']; deviceFingerprint: DeviceEntity['fingerprint']}): Promise<string> {
     const sessionKey = uuid.v7();
     const value = new Date(Date.now() + this.cacheRedisConfig.refreshTokenTTL * 1000).getTime();
     // delete any existing session for this fingerprint
-    await this.cacheRedisAdapter.delete(this.key('*', userId, deviceFingerprint));
+    await this.cacheRedisAdapter.delete(this.key('*', args.userId, args.deviceFingerprint));
     // create specific session
-    const key = this.key(sessionKey, userId, deviceFingerprint);
+    const key = this.key(sessionKey, args.userId, args.deviceFingerprint);
     await this.cacheRedisAdapter.set<number>(key, value, this.cacheRedisConfig.refreshTokenTTL);
     return sessionKey;
   }
 
-  async refresh(
-    sessionKey: string,
-    userId: UserEntity['id'],
-    deviceFingerprint: DeviceEntity['fingerprint']
-  ): Promise<void> {
-    const {key, value} = await this.cacheRedisAdapter.get<number>(this.key(sessionKey, userId, deviceFingerprint));
+  async refresh(args: {
+    sessionKey: string;
+    userId: UserEntity['id'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void> {
+    const {key, value} = await this.cacheRedisAdapter.get<number>(
+      this.key(args.sessionKey, args.userId, args.deviceFingerprint)
+    );
     if (value && new Date() < new Date(value)) {
       const result = await this.cacheRedisAdapter.set<number>(key, value, this.cacheRedisConfig.refreshTokenTTL);
       return result;
@@ -43,11 +45,11 @@ export class CacheRedisSessionStore implements SessionStore {
     throw new CacheRedisError('Invalid session');
   }
 
-  async revoke(
-    sessionKey: string,
-    userId: UserEntity['id'],
-    deviceFingerprint: DeviceEntity['fingerprint']
-  ): Promise<void> {
-    await this.cacheRedisAdapter.delete(this.key(sessionKey, userId, deviceFingerprint));
+  async revoke(args: {
+    sessionKey: string;
+    userId: UserEntity['id'];
+    deviceFingerprint: DeviceEntity['fingerprint'];
+  }): Promise<void> {
+    await this.cacheRedisAdapter.delete(this.key(args.sessionKey, args.userId, args.deviceFingerprint));
   }
 }

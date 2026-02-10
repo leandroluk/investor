@@ -12,7 +12,7 @@ export class CoinbaseAxiosAdapter implements CoinbasePort {
 
   constructor(private readonly coinbaseAxiosConfig: CoinbaseAxiosConfig) {
     this.http = axios.create({
-      baseURL: this.coinbaseAxiosConfig.apiUrl,
+      baseURL: this.coinbaseAxiosConfig.apiURL,
       headers: this.coinbaseAxiosConfig.apiKey ? {'x-cg-demo-api-key': this.coinbaseAxiosConfig.apiKey} : {},
     });
   }

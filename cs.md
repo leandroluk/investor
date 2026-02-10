@@ -20,7 +20,7 @@
 - Para acessar a aplicação o usuário precisa se registrar. Para isso ele precisa informar seu nome, e-mail e senha.
 - O sistema irá verificar se se o email é único na base. Caso contrário, ele irá retornar um erro de conflito. Também irá ver se a senha atende aos requisitos mínimos de complexidade.
 - Se não houverem problemas, o sistema irá criar o usuário com o status "PENDING" e enviar um e-mail de ativação.
-- A senha deve ser processada com hashing (bcrypt ou argon2) antes de persistir no banco.
+- A senha deve ser processada com hashing antes de persistir no banco.
 ##### 01.03.🔄✔️🌎`[auth]` dispatch send email after register
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
 - Para isso deve-se gerar um código OTP e enviar para o email do usuário. 
@@ -90,13 +90,13 @@
 - Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
 ##### 01.20.🔍✅🔒`[user]` get user profile
 - Retorna dados básicos, status de segurança e carteira vinculada.
-##### 01.21.⚡⛔🔒`[user]` upload user document
+##### 01.21.⚡✅🔒`[user]` upload user document
 - Permite que o usuário envie arquivos para comprovação de identidade e residência (RG, CNH, Selfie, comprovante de endereço).
 - O sistema deve validar o formato (JPG, PNG, PDF) e o tamanho máximo do arquivo antes de gerar uma URL de upload seguro para o storage.
 - Cada documento enviado é registrado com um identificador único, data de expiração (se aplicável) e status inicial como PENDING.
 - Transição de Estado: Se o status global de KYC do usuário for NONE, ele deve ser alterado automaticamente para PENDING assim que o primeiro documento obrigatório for recebido.
 - O sistema deve garantir que arquivos sensíveis não sejam acessíveis publicamente, utilizando links temporários (presigned URLs) para visualização administrativa.
-##### 01.22.🔍⛔🔒`[user]` list user documents
+##### 01.22.🔍✅🔒`[user]` list user documents
 - Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
 - Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
 - Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
@@ -125,22 +125,21 @@
 - **Fase 1 (Setup)**: 
   - Cria configurações padrão de perfil e notificações.
   - Envia e-mail de boas-vindas.
-  - Altera status interno para `ONBOARDING_KYC_PENDING`.
+  - Altera status interno para `KycStatusEnum.PENDING`.
 - **Fase 2 (KYC)**: 
   - Aguarda o evento `KycApprovedEvent` (disparado pelo Admin em 01.22).
   - Ao receber, envia notificação "Sua conta foi aprovada! Agora vincule sua carteira".
-  - Altera status interno para `ONBOARDING_WALLET_PENDING`.
 - **Fase 3 (Wallet)**: 
   - Aguarda o evento `WalletLinkedEvent` (disparado em 01.24).
   - Ao receber, envia e-mail "Tudo pronto para investir!".
-  - Marca o registro como `onboarding_completed`.
+  - Marca o registro como `onboard_completed`.
 - **Resiliência**: A saga deve persistir seu estado para sobreviver a reinícios do sistema e continuar ouvindo eventos por tempo indeterminado.
-##### 01.27.🔍⛔🔒`[admin]` list admin document to approve (admin)
+##### 01.27.🔍✅🔒`[admin]` list document to review (admin)
 - Permite que administradores listem documentos pendentes de análise globalmente.
 - **Filtros**: Deve permitir filtrar por status (padrão: PENDING), tipo de documento e intervalo de datas.
 - **Paginação**: Obrigatória, dado o volume potencial de documentos.
 - **Dados Retornados**: Deve incluir metadados do documento e dados básicos do usuário (ID, Nome, Email) para contexto da análise.
-##### 01.28.⚡⛔🔒`[admin]` approve/reject admin document (admin)
+##### 01.28.⚡✅🔒`[admin]` review document (admin)
 - Interface de back-office que permite a um administrador revisar a validade dos documentos enviados pelo usuário.
 - Fluxo de Aprovação: Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED.
 - Fluxo de Rejeição: Caso o documento seja inválido (ex: foto ilegível), o administrador deve obrigatoriamente informar o motivo da rejeição.

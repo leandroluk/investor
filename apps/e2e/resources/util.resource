@@ -45,7 +45,7 @@ Postgres Execute
 Postgres Delete User By Email
     [Documentation]    Deletes a user from the database using their email address
     [Arguments]    ${email}
-    Postgres Execute    DELETE FROM "user" WHERE email = '${email}'
+    Postgres Execute    DELETE FROM "tb_user" WHERE email = '${email}'
 
 Postgres Create Test User
     [Documentation]    Creates a test user in the database with password "Test@123"
@@ -53,10 +53,10 @@ Postgres Create Test User
     ${name} =    Evaluate    faker.Faker().name()    modules=faker
     ${email} =    Evaluate    faker.Faker().email()    modules=faker
     ${query} =    Catenate
-    ...    INSERT INTO "user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "name",
+    ...    INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "name",
     ...    "status", "wallet_address", "wallet_verified_at", "wallet_seed_encrypted", "kyc_status", "kyc_verified_at",
     ...    "two_factor_enabled", "language", "timezone") VALUES ('${id}', NOW(), NOW(), NULL, '${email}',
-    ...    'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', '${name}', 'active', null, null, null, 'active', null,
+    ...    'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', '${name}', 'active', null, null, null, 'none', null,
     ...    false, 'en', 'UTC');
     Postgres Execute    ${query}
     RETURN    ${email}

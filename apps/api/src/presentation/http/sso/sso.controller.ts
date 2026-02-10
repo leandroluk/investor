@@ -27,10 +27,10 @@ export class SsoController {
   async getRedirect(
     @GetMeta() meta: GetMeta, //
     @Param() params: GetSsoRedirectParamsDTO,
-    @Query() {callback_url: callbackURL}: GetSsoRedirectQueryDTO,
+    @Query() query: GetSsoRedirectQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const url = await this.queryBus.execute(new GetSsoRedirectQuery({...meta, ...params, callbackURL}));
+    const url = await this.queryBus.execute(GetSsoRedirectQuery.new({...meta, ...params, ...query}));
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     reply.redirect(url, HttpStatus.TEMPORARY_REDIRECT);
   }
@@ -54,7 +54,7 @@ export class SsoController {
     @Query() query: SsoCallbackQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
-    const callbackURL = await this.commandBus.execute(new SsoCallbackCommand({...meta, ...params, ...query}));
+    const callbackURL = await this.commandBus.execute(SsoCallbackCommand.new({...meta, ...params, ...query}));
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     reply.redirect(callbackURL, HttpStatus.TEMPORARY_REDIRECT);
   }

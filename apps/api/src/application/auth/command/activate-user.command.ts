@@ -42,9 +42,9 @@ export class ActivateUserCommandHandler implements ICommandHandler<ActivateUserC
     return user;
   }
 
-  private async verifyOtp(email: string, otp: string): Promise<void> {
-    const otpEmail = await this.otpStore.verify(otp);
-    if (otpEmail !== email) {
+  private async verifyOTP(id: UserEntity['id'], otp: string): Promise<void> {
+    const verifiedUserId = await this.otpStore.verify(otp);
+    if (verifiedUserId !== id) {
       throw new UserInvalidOtpError();
     }
   }
@@ -57,16 +57,12 @@ export class ActivateUserCommandHandler implements ICommandHandler<ActivateUserC
   }
 
   private async publishEvent(correlationId: string, user: UserEntity): Promise<void> {
-    await this.brokerPort.publish(
-      new UserActivatedEvent(correlationId, user.createdAt, {
-        userId: user.id,
-      })
-    );
+    await this.brokerPort.publish(new UserActivatedEvent(correlationId, user.createdAt, {userId: user.id}));
   }
 
   async execute(command: ActivateUserCommand): Promise<void> {
     const user = await this.getUserByEmail(command.email);
-    await this.verifyOtp(command.email, command.otp);
+    await this.verifyOTP(user.id, command.otp);
     const newUser = await this.activateUser(user);
     await this.publishEvent(command.correlationId, newUser);
   }

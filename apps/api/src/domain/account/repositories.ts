@@ -46,5 +46,6 @@ export abstract class UserRepository {
   abstract update(user: UserEntity): Promise<void>;
   abstract existsByEmail(email: string): Promise<boolean>;
   abstract findByEmail(email: string): Promise<UserEntity | null>;
-  abstract findById(id: string): Promise<UserEntity | null>;
+  abstract findById(id: UserEntity['id']): Promise<UserEntity | null>;
+  abstract getEmailById(id: UserEntity['id']): Promise<UserEntity['email'] | null>;
 }

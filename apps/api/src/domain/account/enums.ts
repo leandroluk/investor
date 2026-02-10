@@ -39,6 +39,12 @@ export enum SsoProviderEnum {
 
 export enum UserStatusEnum {
   PENDING = 'pending',
-  ACTIVE = 'active',
   DELETED = 'deleted',
+  ACTIVE = 'active',
+  READY_TO_INVEST = 'ready_to_invest',
+}
+
+export enum LoginStrategyEnum {
+  PASSWORD = 'password',
+  TOKEN = 'token',
 }

@@ -6,30 +6,30 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
                       http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
-  <changeSet id="create-table-asset" author="leandroluk@gmail.com">
+  <changeSet id="create-table-ledger" author="leandroluk@gmail.com">
     <sql splitStatements="false" endDelimiter=";"><![CDATA[
-      CREATE TABLE "tb_asset" (
+      CREATE TABLE "tb_ledger" (
         "id"            UUID           NOT NULL,
         "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
-        "deleted_at"    TIMESTAMPTZ(3)     NULL,
-        "name"          VARCHAR(100)   NOT NULL,
-        "symbol"        VARCHAR(20)    NOT NULL,
-        "type"          VARCHAR(20)    NOT NULL,
-        "contract"      CHAR(42)           NULL,
-        "decimals"      INTEGER        NOT NULL DEFAULT 18,
+        "user_id"       UUID           NOT NULL,
+        "asset_id"      UUID               NULL,
+        "type"          VARCHAR(50)    NOT NULL,
+        "amount"        DECIMAL(19, 4) NOT NULL,
+        "reference_id"  UUID               NULL,
+        "description"   TEXT               NULL,
         ---
         PRIMARY KEY ("id"),
-        UNIQUE      ("symbol")
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("asset_id") REFERENCES "tb_asset"("id") ON DELETE SET NULL
       );
     ]]></sql>
 
     <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
-      DROP TABLE "tb_asset";
+      DROP TABLE "tb_ledger";
     ]]></sql></rollback>
   </changeSet>
 
   <changeSet id="tag" author="leandroluk@gmail.com">
-    <tagDatabase tag="008" />
+    <tagDatabase tag="004" />
   </changeSet>
 </databaseChangeLog>

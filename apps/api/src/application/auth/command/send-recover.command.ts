@@ -8,12 +8,13 @@ import {UserRepository} from '#/domain/account/repositories';
 import {OtpStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import path from 'node:path';
+import z from 'zod';
 import {AuthConfig} from '../auth.config';
 
 export class SendRecoverCommand extends createClass(
   Command,
-  UserEntity.schema.pick({
-    email: true,
+  z.object({
+    email: UserEntity.schema.shape.email,
   })
 ) {}
 
@@ -27,7 +28,7 @@ export class SendRecoverCommandHandler implements ICommandHandler<SendRecoverCom
     private readonly mailerPort: MailerPort
   ) {}
 
-  private async checkUserEmail(email: string): Promise<void> {
+  private async getUserByEmail(email: UserEntity['id']): Promise<UserEntity> {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new UserNotFoundError();
@@ -35,10 +36,11 @@ export class SendRecoverCommandHandler implements ICommandHandler<SendRecoverCom
     if (user.status !== UserStatusEnum.ACTIVE) {
       throw new UserStatusError('User is not active');
     }
+    return user;
   }
 
   private async renderTemplate(otp: string): Promise<{html: string; text: string}> {
-    const url = path.posix.join(this.authConfig.webBaseUrl, this.authConfig.webRecoverCallback, `?otp=${otp}`);
+    const url = path.posix.join(this.authConfig.webBaseURL, this.authConfig.webRecoverPath, `?otp=${otp}`);
     const [html, text] = await Promise.all([
       this.templatePort.render('recover.html', {otp, url}),
       this.templatePort.render('recover.text', {otp, url}),
@@ -46,10 +48,14 @@ export class SendRecoverCommandHandler implements ICommandHandler<SendRecoverCom
     return {html, text};
   }
 
+  private async sendEmail(email: string, html: string, text: string): Promise<void> {
+    await this.mailerPort.send({to: [email], subject: 'Password Reset', text, html});
+  }
+
   async execute(command: SendRecoverCommand): Promise<void> {
-    await this.checkUserEmail(command.email);
-    const otp = await this.otpStore.create(command.email);
+    const user = await this.getUserByEmail(command.email);
+    const otp = await this.otpStore.create(user.id);
     const {html, text} = await this.renderTemplate(otp);
-    await this.mailerPort.send({to: [command.email], subject: 'Password Reset', text, html});
+    await this.sendEmail(user.email, html, text);
   }
 }
