@@ -27,10 +27,7 @@ export class RequestWalletNonceHandler implements ICommandHandler<
 
   async execute(command: RequestWalletNonceCommand): Promise<RequestWalletNonceCommandResult> {
     const nonce = `Sign this message to prove you own this wallet: ${uuid.v7()}`;
-    await this.nonceStore.save({
-      userId: command.userId,
-      nonce,
-    });
-    return {nonce};
+    await this.nonceStore.save({userId: command.userId, nonce});
+    return RequestWalletNonceCommandResult.new({nonce});
   }
 }

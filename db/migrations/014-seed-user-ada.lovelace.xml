@@ -37,7 +37,7 @@
         /* wallet_address        */ null,
         /* wallet_verified_at    */ null,
         /* wallet_seed_encrypted */ null,
-        /* kyc_status            */ 'active',
+        /* kyc_status            */ 'approved',
         /* kyc_verified_at       */ null,
         /* two_factor_enabled    */ false,
         /* language              */ 'en',

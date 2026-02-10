@@ -23,7 +23,6 @@ export class ListActiveDeviceHandler implements IQueryHandler<ListActiveDeviceQu
   constructor(private readonly deviceRepository: DeviceRepository) {}
 
   async execute(query: ListActiveDeviceQuery): Promise<ListActiveDeviceQueryResult> {
-    const items = await this.deviceRepository.listActiveByUserId(query.userId);
-    return {items};
+    return ListActiveDeviceQueryResult.new({items: await this.deviceRepository.listActiveByUserId(query.userId)});
   }
 }

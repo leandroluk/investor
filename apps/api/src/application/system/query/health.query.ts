@@ -42,8 +42,6 @@ export class HealthQueryHandler implements IQueryHandler<HealthQuery, HealthQuer
       throw new UnhealthyError(failureMessage);
     }
 
-    return {
-      uptime: ms(process.uptime()),
-    };
+    return HealthQueryResult.new({uptime: ms(process.uptime())});
   }
 }

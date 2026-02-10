@@ -28,7 +28,7 @@ import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {
   ActivateUserBodyDTO,
   Authorize2FABodyDTO,
-  CheckEmailParamsDTO,
+  CheckEmailParamDTO,
   LoginUsingCredentialBodyDTO,
   LoginUsingTokenBodyDTO,
   RefreshTokenBodyDTO,
@@ -57,7 +57,7 @@ export class AuthController {
   })
   async getCheckEmail(
     @GetMeta() meta: GetMeta, //
-    @Param() params: CheckEmailParamsDTO
+    @Param() params: CheckEmailParamDTO
   ): Promise<void> {
     const result = await this.queryBus.execute(CheckEmailQuery.new({...meta, ...params}));
     return result;

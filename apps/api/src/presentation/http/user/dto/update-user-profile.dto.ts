@@ -1,13 +1,4 @@
-import {UserEntity} from '#/domain/account/entities';
+import {UpdateUserProfileCommand} from '#/application/user/command';
 import {createDTO} from '../../_shared/factories';
 
-export class UpdateUserProfileBodyDTO extends createDTO(
-  UserEntity.schema
-    .pick({
-      name: true,
-      twoFactorEnabled: true,
-      language: true,
-      timezone: true,
-    })
-    .partial()
-) {}
+export class UpdateUserProfileBodyDTO extends createDTO(UpdateUserProfileCommand.schema.shape.changes) {}

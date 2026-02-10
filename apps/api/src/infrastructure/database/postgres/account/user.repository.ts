@@ -15,7 +15,7 @@ export class DatabasePostgresUserRepository extends Repository<Entity> implement
       id: 'id',
       email: 'email',
       name: 'name',
-      passwordHash: 'password_hash',
+      passwordHash: 'password_hash', // NOSONAR
       walletAddress: 'wallet_address',
       walletVerifiedAt: 'wallet_verified_at',
       walletSeedEncrypted: 'wallet_seed_encrypted',

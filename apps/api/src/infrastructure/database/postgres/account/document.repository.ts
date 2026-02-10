@@ -69,7 +69,8 @@ export class DatabasePostgresDocumentRepository extends Repository<Entity> imple
     const rows = await this.database.query<Entity>(
       `SELECT ${this.selectAsPart}
        FROM "${this.tableName}"
-       WHERE "user_id" = $1`,
+       WHERE "user_id" = $1
+       ORDER BY "updated_at" DESC`,
       [userId]
     );
     return rows;

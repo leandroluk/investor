@@ -18,7 +18,7 @@ export class UploadDocumentCommand extends createClass(
       description: 'File content type',
       example: 'image/jpeg',
     }),
-    size: z.number().positive().meta({
+    size: z.coerce.number().positive().meta({
       description: 'File size in bytes',
       example: 1024,
     }),
@@ -102,6 +102,6 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
     const {document, uploadURL, expiresAt} = await this.createDocumentWithUploadURL(command.type, user);
     await this.updateUserKycStatus(user);
     await this.publishDocumentUploadedEvent(command.correlationId, new Date(), document);
-    return {id: document.id, uploadURL, expiresAt};
+    return UploadDocumentCommandResult.new({id: document.id, uploadURL, expiresAt});
   }
 }

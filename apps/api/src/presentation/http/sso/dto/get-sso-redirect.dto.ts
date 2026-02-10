@@ -1,7 +1,7 @@
 import {GetSsoRedirectQuery} from '#/application/sso/query';
 import {createDTO} from '../../_shared/factories';
 
-export class GetSsoRedirectParamsDTO extends createDTO(
+export class GetSsoRedirectParamDTO extends createDTO(
   GetSsoRedirectQuery.schema.pick({
     provider: true,
   })

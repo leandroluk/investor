@@ -46,7 +46,7 @@ export class SendKycNoneHandler implements ICommandHandler<SendKycNoneCommand> {
     await this.mailerPort.send({to: [email], subject: 'Start your KYC process', text, html});
   }
 
-  async execute(command: SendKycNoneCommand): Promise<any> {
+  async execute(command: SendKycNoneCommand): Promise<void> {
     const email = await this.getEmail(command.userId);
     const {html, text} = await this.renderTemplate();
     await this.sendEmail(email, html, text);

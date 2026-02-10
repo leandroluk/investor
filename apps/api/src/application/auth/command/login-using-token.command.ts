@@ -156,7 +156,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
 
       await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
 
-      return result;
+      return LoginUsingTokenCommandResult.new(result);
     } catch (error) {
       void this.createLogin(command.ip, user, false);
       throw error;

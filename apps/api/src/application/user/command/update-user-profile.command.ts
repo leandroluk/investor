@@ -10,19 +10,12 @@ export class UpdateUserProfileCommand extends createClass(
   Command,
   z.object({
     userId: z.uuid(),
-    name: z.string().min(1).max(100).optional(),
-    language: z.string().length(2).optional(),
-    timezone: z
-      .string()
-      .refine(value => {
-        try {
-          Intl.DateTimeFormat(undefined, {timeZone: value});
-          return true;
-        } catch {
-          return false;
-        }
-      })
-      .optional(),
+    changes: UserEntity.schema.pick({
+      name: true,
+      language: true,
+      timezone: true,
+      twoFactorEnabled: true,
+    }),
   })
 ) {}
 
@@ -47,17 +40,8 @@ export class UpdateUserProfileHandler implements ICommandHandler<
     return user;
   }
 
-  private async updateUser(user: UserEntity, command: UpdateUserProfileCommand): Promise<UserEntity> {
-    if (command.name) {
-      user.name = command.name;
-    }
-    if (command.language) {
-      user.language = command.language;
-    }
-    if (command.timezone) {
-      user.timezone = command.timezone;
-    }
-
+  private async updateUser(user: UserEntity, changes: UpdateUserProfileCommand['changes']): Promise<UserEntity> {
+    Object.assign(user, changes);
     user.updatedAt = new Date();
     await this.userRepository.update(user);
     return user;
@@ -65,8 +49,8 @@ export class UpdateUserProfileHandler implements ICommandHandler<
 
   async execute(command: UpdateUserProfileCommand): Promise<UpdateUserProfileCommandResult> {
     const user = await this.getUser(command.userId);
-    const updatedUser = await this.updateUser(user, command);
+    const updatedUser = await this.updateUser(user, command.changes);
     const {passwordHash: _, ...result} = updatedUser;
-    return result;
+    return UpdateUserProfileCommandResult.new(result);
   }
 }

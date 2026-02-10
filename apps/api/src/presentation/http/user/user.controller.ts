@@ -1,9 +1,10 @@
 import {RequestWalletNonceCommand, UpdateUserProfileCommand, UploadDocumentCommand} from '#/application/user/command';
-import {GetUserProfileQuery, ListUserDocumentQuery, ListUserDocumentResult} from '#/application/user/query';
+import {GetUserDocumentQuery, GetUserProfileQuery, ListUserDocumentQuery} from '#/application/user/query';
 import {AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/errors';
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Res, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiTemporaryRedirectResponse} from '@nestjs/swagger';
+import {FastifyReply} from 'fastify';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {AuthGuard, ChallengeGuard} from '../_shared/guards';
 import {
@@ -13,6 +14,8 @@ import {
   UploadDocumentBodyDTO,
   UploadDocumentResultDTO,
 } from './dto';
+import {GetUserDocumentParamDTO} from './dto/get-user-document.dto';
+import {ListUserDocumentResultDTO} from './dto/list-user-document.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -36,22 +39,36 @@ export class UserController {
 
   // #region postUploadDocument
   @Post('document')
-  @ApiCreatedResponse({type: UploadDocumentResultDTO})
+  @ApiCreatedResponse({description: 'Document uploaded successfully.', type: UploadDocumentResultDTO})
   async postUploadDocument(
-    @Body() body: UploadDocumentBodyDTO,
-    @GetMeta() meta: GetMeta
+    @GetMeta() meta: GetMeta,
+    @Body() body: UploadDocumentBodyDTO
   ): Promise<UploadDocumentResultDTO> {
     const result = await this.commandBus.execute(UploadDocumentCommand.new({...meta, ...body}));
     return result;
   }
   // #endregion
 
+  // #region redirectToUserDocument
+  @Get('document/:documentId')
+  @ApiTemporaryRedirectResponse({description: 'Redirects to document url.'})
+  async redirectToUserDocument(
+    @GetMeta() meta: GetMeta, //
+    @Param() params: GetUserDocumentParamDTO,
+    @Res({passthrough: true}) reply: FastifyReply
+  ): Promise<void> {
+    const url = await this.queryBus.execute(GetUserDocumentQuery.new({...meta, ...params}));
+    reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    reply.redirect(url, HttpStatus.TEMPORARY_REDIRECT);
+  }
+  // #endregion
+
   // #region getListUserDocument
   @Get('document')
-  @ApiOkResponse({type: ListUserDocumentResult})
+  @ApiOkResponse({description: 'User document list retrieved successfully.', type: ListUserDocumentResultDTO})
   async getListUserDocument(
     @GetMeta() meta: GetMeta //
-  ): Promise<ListUserDocumentResult> {
+  ): Promise<ListUserDocumentResultDTO> {
     return await this.queryBus.execute(ListUserDocumentQuery.new({...meta}));
   }
   // #endregion
@@ -62,9 +79,9 @@ export class UserController {
   @ApiOkResponse({description: 'User profile updated successfully.', type: GetUserProfileResultDTO})
   async putUpdateUserProfile(
     @GetMeta() meta: GetMeta, //
-    @Body() body: UpdateUserProfileBodyDTO
+    @Body() changes: UpdateUserProfileBodyDTO
   ): Promise<GetUserProfileResultDTO> {
-    const result = await this.commandBus.execute(UpdateUserProfileCommand.new({...meta, ...body}));
+    const result = await this.commandBus.execute(UpdateUserProfileCommand.new({...meta, changes}));
     return result;
   }
   // #endregion

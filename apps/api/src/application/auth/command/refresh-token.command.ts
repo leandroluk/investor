@@ -92,6 +92,6 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
     const user = await this.getUser(decoded.claims.id);
     await this.refreshSession(user.id, decoded.sessionKey, command.fingerprint);
     const result = await this.createToken(decoded.sessionKey, user, command.fingerprint);
-    return result;
+    return RefreshTokenCommandResult.new(result);
   }
 }

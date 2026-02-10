@@ -55,11 +55,11 @@ export class ListDocumentToReviewHandler implements IQueryHandler<
     const offset = (query.page - 1) * query.limit;
     const {items, total} = await this.documentRepository.findByStatus(query.status, query.limit, offset);
 
-    return {
+    return ListDocumentToReviewResult.new({
       items,
       total,
       page: query.page,
       limit: query.limit,
-    };
+    });
   }
 }

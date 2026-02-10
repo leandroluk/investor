@@ -3,10 +3,10 @@ import {GetSsoRedirectQuery} from '#/application/sso/query';
 import {SsoInvalidOAuthCodeError, SsoInvalidProviderError, SsoInvalidStateError} from '#/domain/account/errors';
 import {Controller, Get, HttpCode, HttpStatus, Param, Query, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiResponse, ApiTags} from '@nestjs/swagger';
+import {ApiResponse, ApiTags, ApiTemporaryRedirectResponse} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
-import {GetSsoRedirectParamsDTO, GetSsoRedirectQueryDTO, SsoCallbackQueryDTO} from './dto';
+import {GetSsoRedirectParamDTO, GetSsoRedirectQueryDTO, SsoCallbackQueryDTO} from './dto';
 
 @ApiTags('sso')
 @Controller('sso')
@@ -20,13 +20,10 @@ export class SsoController {
   @Get(':provider')
   @HttpCode(HttpStatus.TEMPORARY_REDIRECT)
   @MapDomainError([SsoInvalidProviderError, HttpStatus.UNPROCESSABLE_ENTITY])
-  @ApiResponse({
-    status: HttpStatus.TEMPORARY_REDIRECT,
-    description: 'Redirects to identity provider.',
-  })
+  @ApiTemporaryRedirectResponse({description: 'Redirects to identity provider.'})
   async getRedirect(
     @GetMeta() meta: GetMeta, //
-    @Param() params: GetSsoRedirectParamsDTO,
+    @Param() params: GetSsoRedirectParamDTO,
     @Query() query: GetSsoRedirectQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {
@@ -50,7 +47,7 @@ export class SsoController {
   })
   async getCallback(
     @GetMeta() meta: GetMeta, //
-    @Param() params: GetSsoRedirectParamsDTO,
+    @Param() params: GetSsoRedirectParamDTO,
     @Query() query: SsoCallbackQueryDTO,
     @Res({passthrough: true}) reply: FastifyReply
   ): Promise<void> {

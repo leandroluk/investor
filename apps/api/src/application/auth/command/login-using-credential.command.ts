@@ -157,7 +157,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
 
       await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
 
-      return result;
+      return LoginUsingCredentialCommandResult.new(result);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       void this.createLogin(command.ip, user, false, device.id, errorMessage);
