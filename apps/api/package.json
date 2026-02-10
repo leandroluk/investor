@@ -11,6 +11,7 @@
     "docker:up": "pnpm -w docker:up",
     "docker:d": "pnpm -w docker:d",
     "docker": "pnpm -w docker",
+    "docker:build": "docker build -f Dockerfile ../..",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

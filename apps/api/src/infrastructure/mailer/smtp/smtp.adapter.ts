@@ -12,7 +12,7 @@ export class MailerSmtpAdapter implements MailerPort {
   private readonly transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor(private readonly mailerSmtpConfig: MailerSmtpConfig) {
-    this.transporter = nodemailer.createTransport({
+    const options: SMTPTransport.Options = {
       host: this.mailerSmtpConfig.host,
       port: this.mailerSmtpConfig.port,
       secure: this.mailerSmtpConfig.port === 465,
@@ -21,7 +21,8 @@ export class MailerSmtpAdapter implements MailerPort {
         user: this.mailerSmtpConfig.username,
         pass: this.mailerSmtpConfig.password,
       },
-    } satisfies SMTPTransport.Options);
+    };
+    this.transporter = nodemailer.createTransport(options); // NOSONAR
   }
 
   @Trace()

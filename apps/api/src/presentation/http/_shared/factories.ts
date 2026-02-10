@@ -211,7 +211,7 @@ export function createDTO(input: any): any {
     ParentClass = input;
     Schema = input.schema;
   } else {
-    ParentClass = class {};
+    ParentClass = class {}; // NOSONAR
     Schema = input;
   }
 

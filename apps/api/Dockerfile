@@ -4,8 +4,11 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 FROM base AS pruner
-COPY . .
-RUN pnpm dlx turbo prune --scope=@apps/api-deploy --docker
+COPY .env eslint.config.mjs package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json turbo.json ./
+COPY apps/api ./apps/api
+COPY libs ./libs
+COPY tools ./tools
+RUN pnpm dlx turbo prune --scope=@apps/api --docker
 
 FROM base AS installer
 COPY --from=pruner /app/out/json/ ./
@@ -18,8 +21,8 @@ WORKDIR /work
 COPY --from=installer /app/ /work/
 COPY --from=pruner /app/out/full/ /work/
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-  pnpm dlx turbo build --filter=@apps/api-deploy && \
-  pnpm deploy --filter @apps/api-deploy --prod --legacy /out
+  pnpm dlx turbo build --filter=@apps/api && \
+  pnpm deploy --filter @apps/api --prod --legacy /out
 
 FROM gcr.io/distroless/nodejs20-debian12:nonroot AS runner
 WORKDIR /app

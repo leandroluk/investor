@@ -1,17 +1,19 @@
-.git
+# Dependências e Builds locais
 node_modules
 dist
-pnpm-store
-.pnpm-store
-.turbo
-.next
-.cache
+build
 coverage
-*.log
-.DS_Store
-**/node_modules
-**/dist
-**/.turbo
-**/.next
-**/.cache
-**/coverage
+
+# Git
+.git
+.gitignore
+
+# Arquivos de Ambiente e Segredos (CRÍTICO para o Sonar)
+.env*
+*.local
+npm-debug.log*
+pnpm-debug.log*
+docker-compose*
+Dockerfile*
+README.md
+sonar-project.properties

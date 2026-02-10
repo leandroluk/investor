@@ -148,7 +148,7 @@ export class LoginEntity extends createClass(
         format: 'uuid',
       }),
       ip: z.string().meta({
-        example: '192.168.1.1',
+        example: '::1',
         description: 'IP address of the login attempt',
         maxLength: 45,
       }),

@@ -2,6 +2,7 @@ import {Throws} from '#/application/_shared/decorators';
 import {UserEntity} from '#/domain/account/entities';
 import {OtpStore} from '#/domain/account/stores';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
+import crypto from 'node:crypto';
 import {CacheRedisAdapter} from '../redis.adapter';
 import {CacheRedisConfig} from '../redis.config';
 import {CacheRedisError} from '../redis.error';
@@ -20,7 +21,7 @@ export class CacheRedisOtpStore implements OtpStore {
 
   async create(userId: UserEntity['id']): Promise<string> {
     await this.cacheRedisAdapter.delete(this.key(userId, '*'));
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 999999).toString();
     await this.cacheRedisAdapter.set(this.key(userId, otp), 1, this.cacheRedisConfig.otpTokenTTL);
     return otp;
   }
