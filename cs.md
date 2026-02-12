@@ -104,10 +104,10 @@
 ##### 01.23.🔍✔️🔒`[user]` redirect to signed url user document
 - Quando o usuário enviar o id do documento ele deverá ser redirecionado para a url assinada do documento
 - Caso o documento não exista então deve retornar 404
-##### 01.24.⚡⛔🔒`[user]` link user wallet address (web3 signature)
+##### 01.24.⚡⛔🔒`[user]` link user wallet address (web3 signature - EIP-4361)
 - Permite que o usuário vincule uma carteira criptográfica (ex: Ethereum) ao seu perfil provando a posse da chave privada sem expô-la.
 - O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto). O usuário deve informar um apelido (name) para a carteira.
-- O usuário deve assinar uma mensagem padronizada contendo este nonce usando sua carteira (ex: via Metamask ou WalletConnect).
+- O usuário deve assinar uma mensagem padronizada seguindo o padrão **EIP-4361 (Sign-In with Ethereum)** contendo este nonce, timestamp e domínio da aplicação para evitar phishing.
 - A API realiza a recuperação da chave pública (ecrecover) a partir da assinatura recebida para validar se o endereço recuperado coincide com o endereço informado.
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
