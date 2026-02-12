@@ -1,0 +1,104 @@
+---
+title: Link User Wallet (Web3 - EIP-4361)
+---
+
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import {Web3SignatureDemo} from '#/components/molecules/Web3SignatureDemo'
+
+
+## Rules
+
+- **Uniqueness**: A wallet address can only be linked to **one** user account. Attempting to link an address already in use by another user will return `409 Conflict`.
+- **Proof of Ownership**: The user must prove ownership of the wallet private key by signing a message.
+- **Phishing Protection (EIP-4361)**: The message to be signed must follow the EIP-4361 standard, including the domain, address, statement, URI, version, chain ID, nonce, and issued-at timestamp.
+- **Nonce Security**: 
+  - A cryptographic nonce must be requested from the backend before signing.
+  - The nonce is short-lived (TTL) and single-use (invalidated after verification attempt).
+
+## Interactive Demo
+
+<Web3SignatureDemo />
+
+## Request
+
+- **Method**: `POST`
+- **Path**: `/account/wallet/link`
+- **Headers**:
+    - `Authorization`: `Bearer <token>`
+
+### Body
+
+```json
+{
+  "walletAddress": "0x123...",
+  "signature": "0x999...",
+  "message": "...", // The full EIP-4361 message string that was signed
+  "nonce": "abc-123",
+  "name": "My Main Wallet"
+}
+```
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant Blockchain (Valid)
+
+    User->>Frontend: Click "Connect Wallet"
+    Frontend->>API: GET /auth/nonce
+    API-->>Frontend: Returns "nonce-123" (cached)
+    
+    Frontend->>Frontend: Construct EIP-4361 Message
+    Frontend->>User: Request Signature (MetaMask)
+    User->>Frontend: Signs Message (0xSignature...)
+    
+    Frontend->>API: POST /account/wallet/link
+    Note right of Frontend: { walletAddress, signature, message, nonce, name }
+    
+    API->>API: Validate Nonce (exists & matches)
+    API->>Blockchain (Valid): ecrecover(message, signature)
+    Blockchain (Valid)-->>API: Returns Recovered Address
+    
+    alt Address Matches & Unique
+        API->>API: Link Wallet to User Profile
+        API->>API: Invalidate Nonce
+        API-->>Frontend: 201 Created
+        Frontend-->>User: Success Message
+    else Invalid Signature / Nonce Missing
+        API-->>Frontend: 400 Bad Request
+    else Details Mismatch (Address in specific)
+        API-->>Frontend: 422 Unprocessable Entity
+    else Wallet Already Linked (To another)
+        API-->>Frontend: 409 Conflict
+    end
+```
+</MermaidZoom>
+
+## Success Case
+
+- **Status**: `201 Created`
+
+```json
+{
+  "id": "wallet-uuid",
+  "address": "0x71C765...d8976f",
+  "name": "My Main Wallet",
+  "network": "ethereum",
+  "linkedAt": "2023-10-27T10:00:00Z"
+}
+```
+
+## Error Case
+
+- **Status**: `409 Conflict` (Wallet already in use)
+
+```json
+{
+  "code": "WALLET_ALREADY_LINKED",
+  "message": "The wallet address 0x71C... is already linked to another account."
+}
+```
