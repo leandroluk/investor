@@ -168,8 +168,8 @@ export class KycEntity extends createClass(
         example: 'User looks suspicious',
         description: 'Internal notes about the KYC process',
       }),
-      riskScore: z.number().nullable().default(0.0).meta({
-        example: 0.0,
+      riskScore: z.number().nullable().default(0).meta({
+        example: '0.0',
         description: 'Risk score calculated for the user',
       }),
     })

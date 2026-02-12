@@ -1,8 +1,10 @@
-import {Injectable, type ScopeOptions, type Type} from '@nestjs/common';
+import {Injectable, type Abstract, type ScopeOptions, type Type} from '@nestjs/common';
 
-function decorator(tokenOrTokens: any | any[], options?: ScopeOptions): <C extends Type<any>>(target: C) => void {
+type Token = string | symbol | Type<any> | Abstract<any>;
+
+function decorator(tokenOrTokens: Token, options?: ScopeOptions): <C extends Type<any>>(target: C) => void {
   return <C extends Type<any>>(target: C) => {
-    const tokens = [].concat(tokenOrTokens);
+    const tokens = [tokenOrTokens].flat();
     Reflect.defineMetadata(InjectableExisting.KEY, {tokens}, target);
     Injectable(options)(target);
   };
@@ -10,7 +12,7 @@ function decorator(tokenOrTokens: any | any[], options?: ScopeOptions): <C exten
 
 export const InjectableExisting = Object.assign(decorator, {
   KEY: Symbol('InjectableExisting'),
-  getMetadata(target: Type<any>): Type<any>[] | undefined {
+  getMetadata(target: Token): Token[] | undefined {
     return Reflect.getMetadata(InjectableExisting.KEY, target)?.tokens;
   },
 });
