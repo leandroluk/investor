@@ -82,11 +82,18 @@ os diretórios deverão ser perguntados ao usuário
     *   **Handler** (`<use_case>.ts`): Implementar a lógica de negócio, injetando repositórios e devolvendo erros de domínio ou sucesso. A assinatura deve ser conforme os arquivos em @[apps/api/src/application]
     *   **Validação**: Utilizar a biblioteca *zod* para validar o struct de entrada. Para facilitar mantenha o schema dentro de uma propriedade interna da classe e execute no new da classe como nesse exemplo
         ```ts
+        import {Query} from '#/application/_shared/bus';
+        import {createClass} from '#/domain/_shared/factories';
+        import z from 'zod';
         export class HealthQuery extends Query {}
-        export class HealthQueryResult {
-            @ApiProperty({ description: "..." })
-            uptime!: string
-        }
+        export class HealthQueryResult extends createClass(
+          z.object({
+            uptime: z.string().meta({
+              description: 'Application uptime',
+              example: '10m 30s',
+            }),
+          })
+        ) {}
         @QueryHandler(HealthQuery)
         export class HealthQueryHandler implements IQueryHandler<HealthQuery, HealthQueryResult> {
             constructor ( ... ) {}
@@ -111,58 +118,53 @@ os diretórios deverão ser perguntados ao usuário
         import {Controller, Post, Req} from '@nestjs/common';
         import {CommandBus} from '@nestjs/cqrs';
         import {ApiTags} from '@nestjs/swagger';
-        import {ApiDomainResponse, GetDomainEvent} from '../_shared/decorator';
-        import {ExampleRequest} from './request';
-        import {ExampleResponse} from './response';
+        import {GetMeta, MapDomainError} from '../_shared/decorator';
+        import {RegisterUserBodyDTO, RegisterUserParamsDTO, RegisterUserResultDTO} from './dto';
 
         @ApiTags('example')
         @Controller('example')
+        @MapDomainError([SomeError, HttpStatus.BAD_REQUEST])
         export class ExampleController {
           constructor(private readonly commandBus: CommandBus) {}
           
           @Post('example')
-          @ApiDomainResponse(SomeError)
           async postExample(
-            @Req() {params: {id}, body: changes}: ExampleRequest,
-            @GetDomainEvent() domainEvent: DomainEvent
-          ): Promise<ExampleResponse> {
-            return await this.commandBus.execute(ExampleCommand.create({...domainEvent, id, changes}));
+            @GetMeta() meta: GetMeta,
+            @Body() body: RegisterUserBodyDTO,
+            @Param() params: RegisterUserParamsDTO
+          ): Promise<RegisterUserResultDTO> {
+            return await this.commandBus.execute(ExampleCommand.new({...meta, ...body, ...params}));
           }
         }
         ```    
         
-        > nota, veja que temos o ExampleRequest, ele seria uma estrutura baseada no request que viria do front, e multi nivel para evitar o uso de @Query, @Body, @Header, @Param que não da pra ter uma declarativa mais objetiva
+        > nota, os DTO's devem ficar em `apps/api/src/presentation/http/<context>/dto/<use-case>.dto.ts` e exportados no `index.ts` do diretório DTO. Não deve existir mais o diretório `request` ou `response` dentro do controller.
 
         ```ts
         import { ApiProperty } from '@nestjs/swagger';
         import { ApiEntityProperty } from '../../_shared/decorator';
         import { UserEntity } from '#/domain/account/entity';
+        import { ExampleCommand } from '#/application/example/command';
+        import { createDTO } from '../_shared/factories';
 
-        export class RegisterUserParams {
-          @ApiEntityProperty(UserEntity, 'id')
-          readonly userId!: string;
-        }
+        export class RegisterUserParamsDTO extends createDTO(
+          z.object({
+             userId: z.string().uuid()
+          })
+        ) {}
 
-        export class RegisterUserBody {
-          @ApiProperty({ example: 'investor@example.com', description: 'User email' })
-          readonly email!: string;
+        export class RegisterUserBodyDTO extends createDTO(
+          ExampleCommand.schema.pick({
+            email: true,
+            password: true,
+            language: true,
+            timezone: true
+          })
+        ) {}
 
-          @ApiProperty({ example: 'Test@123', description: 'Plain text password' })
-          readonly password!: string;
-
-          @ApiProperty({ example: 'en', description: 'ISO 639-1 language code' })
-          readonly language!: string;
-
-          @ApiProperty({ example: 'America/Sao_Paulo', description: 'IANA Timezone' })
-          readonly timezone!: string;
-        }
-
-        export class RegisterUserRequest {
-          @ApiProperty({ type: RegisterUserParams })
-          readonly params!: RegisterUserParams;
-
-          @ApiProperty({ type: RegisterUserBody })
-          readonly body!: RegisterUserBody;
+        export class RegisterUserResultDTO {
+          @ApiProperty({ example: 'uuid', description: 'User ID' })
+          id: string;
         }
         ```
 
