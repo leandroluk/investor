@@ -198,7 +198,7 @@ services:
       SONAR_JDBC_URL: "jdbc:postgresql://investor-postgres:5432/sonarqube"
       SONAR_JDBC_USERNAME: "${DOCKER_POSTGRES_USERNAME}"
       SONAR_JDBC_PASSWORD: "${DOCKER_POSTGRES_PASSWORD}"
-      SONAR_AUTH_FORCEPASSWORDCHANGE: false
+      SONAR_FORCEAUTHENTICATION: "false"
     ulimits:
       nofile:
         soft: 65536
