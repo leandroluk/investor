@@ -198,7 +198,6 @@ services:
       SONAR_JDBC_URL: "jdbc:postgresql://investor-postgres:5432/sonarqube"
       SONAR_JDBC_USERNAME: "${DOCKER_POSTGRES_USERNAME}"
       SONAR_JDBC_PASSWORD: "${DOCKER_POSTGRES_PASSWORD}"
-      SONAR_FORCEAUTHENTICATION: "false"
     ulimits:
       nofile:
         soft: 65536
@@ -209,3 +208,20 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s      
+        
+  investor-sonarqube-bootstrap:
+    image: "curlimages/curl:latest"
+    container_name: "investor-sonarqube-bootstrap"
+    networks: ["investor"]
+    depends_on:
+      investor-sonarqube:
+        condition: "service_healthy"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until curl -s -f -u admin:admin "http://investor-sonarqube:9000/api/system/status" | grep -q '"status":"UP"'; do
+          sleep 5
+        done
+        curl -v -u admin:admin -X POST \
+          "http://investor-sonarqube:9000/api/users/change_password?login=admin&previousPassword=admin&password=${DOCKER_SONARQUBE_ADMIN_PASSWORD:-Password@123}" \
+          2>&1
