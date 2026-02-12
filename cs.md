@@ -12,7 +12,10 @@
 >   - ⚡ command
 >   - 🔍 query
 >   - 🔄 saga
- 
+> - is auditable
+>   - 📜 yes
+>   - 💨 no
+
 ### 01. Account (Identity and Access Management)
 ##### 01.01.🔍✔️🌎`[auth]` check if email is available
 - Verifica a existência do email. Retorna 409 (Conflict) se em uso ou 202 (Accepted) se disponível.
@@ -48,6 +51,7 @@
 - Valida complexidade da nova senha (mesmo padrão do registro).
 - Atualiza hash da senha no banco.
 - Invalida todas as sessões ativas do usuário (logout forçado).
+- **Auditoria**: Registra em `tb_activity` com `action='RESET_PASSWORD'` e `metadata={}`.
 ##### 01.09.⚡✔️🌎`[auth]` login using credential
 - Para acessar a aplicação o usuário precisa fornecer seu email e senha.
 - O sistema irá verificar as credenciais. Se o 2FA estiver ativo, o sistema cria um desafio (Challenge) pendente.
@@ -82,12 +86,14 @@
 - Caso o dispositivo suporte notificações, o token de push (FCM/APNs) também é vinculado a este registro para permitir o envio de alertas transacionais.
 ##### 01.17.⚡✔️🔒`[device]` revoke device (remote logout)
 - Inativa o dispositivo, impedindo novas notificações e invalidando a sessão atual.
+- **Auditoria**: Registra em `tb_activity` com `action='REVOKE_DEVICE'` e `metadata={revokedDeviceId: uuid, reason?: string}`.
 ##### 01.18.🔍✔️🔒`[device]` list active device
 - Lista todos os dispositivos onde a sessão ainda é válida.
 ##### 01.19.⚡✔️🔒`[user]` update user profile
 - Permite que o usuário autenticado atualize informações básicas de seu perfil (tb_profile), como nome de exibição e preferências de idioma.
 - Bloqueio de Campos Críticos: Por segurança, o sistema impede a alteração direta de e-mail e endereços de carteira vinculada através deste fluxo comum, exigindo processos específicos de validação para essas trocas.
 - Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
+- **Auditoria (Condicional)**: Se `twoFactorEnabled` for alterado, registra em `tb_activity` com `action='TOGGLE_2FA'` e `metadata={enabled: boolean, previousState: boolean}`.
 ##### 01.20.🔍✔️🔒`[user]` get user profile
 - Retorna dados combinados de login (tb_user) e perfil (tb_profile).
 - **Atenção**: Não retorna dados sensíveis de auditoria ou status detalhado de KYC (ver 01.30).
@@ -111,18 +117,20 @@
 - A API realiza a recuperação da chave pública (ecrecover) a partir da assinatura recebida para validar se o endereço recuperado coincide com o endereço informado.
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
-- Após a validação bem-sucedida, o endereço é persistido no perfil do usuário e o evento é registrado no log de auditoria.
-##### 01.25.⚡⛔🔒`[user]` generate user wallet
+- Após a validação bem-sucedida, o endereço é persistido no perfil do usuário.
+- **Auditoria**: Registra em `tb_activity` com `action='LINK_WALLET'` e `metadata={walletId: uuid, address: string, network: string}`.
+##### 01.25.⚡✅🔒`[user]` generate user wallet
 - Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança. O usuário pode fornecer um apelido (name).
 - Deriva a chave privada e o endereço público para a rede Ethereum utilizando o derivation path padrão m/44'/60'/0'/0/0.
 - Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM (CipherPort) com uma chave do sistema antes da persistência. Isso permite a automação de investimentos sem custódia total da senha do usuário, mas mantém a segurança dos fundos.
 - O sistema armazena o endereço público, a seed criptografada e o Initialization Vector (IV) no banco de dados.
 - Regra de Limite: O sistema pode impor um limite máximo de carteiras custodiais por usuário nas configurações globais.
-##### 01.26.🔍⛔🔒`[user]` reveal user wallet seed phrase
+##### 01.26.⚡⛔🔒`[user]` reveal user wallet seed phrase (via POST)
 - Permite que o usuário visualize as 12 palavras (mnemonic) de sua carteira gerada internamente.
+- Segurança de Dados em Trânsito: A operação deve ser realizada via POST para garantir que a senha e o código 2FA trafeguem no corpo da requisição criptografada, e não na URL.
 - Re-autenticação Obrigatória: Exige que o usuário forneça sua senha atual e o código 2FA ativo no momento exato da solicitação, independentemente de já estar logado.
-- Auditoria Rígida: Cada acesso a essa funcionalidade deve gerar um registro imutável no log de auditoria (ledger), contendo o IP, ID do dispositivo e timestamp para fins de conformidade e segurança.
-- Restrição de Acesso: O sistema deve bloquear essa funcionalidade caso a conta esteja em processo de recuperação de senha ou apresente comportamento suspeito detectado pelo módulo de segurança.
+- **Auditoria**: Registra em `tb_activity` com `action='REVEAL_SEED'` e `metadata={walletId: uuid}`. Cada acesso gera um registro imutável contendo o IP, ID do dispositivo de origem, ação executada e timestamp.
+- Restrição de Acesso: O sistema deve bloquear essa funcionalidade caso a conta esteja em processo de recuperação de senha (Challenge PASSWORD_RESET ativo) ou apresente comportamento suspeito detectado pelo módulo de segurança.
 ##### 01.27.🔄⛔🌎`[user]` dispatch coordination between registration, welcome email and initial notice
 - Atua como uma Saga de Longa Duração (Long-Running Process) que orquestra todo o ciclo de vida inicial do usuário até que ele esteja apto a operar.
 - **Gatilho Inicial**: Escuta o evento `UserActivatedEvent`.
@@ -148,6 +156,7 @@
 - Fluxo de Aprovação: Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED.
 - Fluxo de Rejeição: Caso o documento seja inválido (ex: foto ilegível), o administrador deve obrigatoriamente informar o motivo da rejeição.
 - Notificação de Feedback: O sistema dispara automaticamente um alerta (e-mail/push) informando o usuário sobre o resultado da análise e os passos necessários para correção, se houver rejeição.
+- **Auditoria**: Registra em `tb_activity` (vinculado ao usuário do documento) com `action='REVIEW_DOCUMENT_ADMIN'` e `metadata={documentId: uuid, previousStatus: string, newStatus: string, reviewerId: uuid, rejectReason?: string}`.
 ##### 01.30.🔍✅🔒`[user]` get user kyc
 - Retorna os dados detalhados do processo de Know Your Customer (KYC).
 - Inclui: Status atual (PENDING, APPROVED, REJECTED), Nível de verificação (Tier), Data de verificação e Motivo de rejeição (se houver).
@@ -208,6 +217,7 @@
 - O sistema aplica as regras de limites globais (mínimos e máximos por transação) definidos nas configurações do sistema.
 - Estado de Bloqueio: Ao criar a intenção, o valor é marcado como "Locked", impedindo o uso simultâneo desses fundos em novos investimentos.
 - A solicitação é criada com o status PENDING_CONFIRMATION, aguardando obrigatoriamente a validação de 2FA para seguir para o processamento em blockchain.
+- **Auditoria**: Registra em `tb_activity` com `action='CREATE_WITHDRAWAL'` e `metadata={withdrawalId: uuid, amount: number, amountUsd: number, assetId: uuid, destinationAddress: string}`.
 ##### 04.02. ⚡⛔🔒`[withdrawal]` process withdrawal payout
 - Realiza a transferência efetiva dos fundos para a carteira de destino após todas as validações de segurança.
 - Integração Blockchain: O sistema comunica-se com o nó da rede ou serviço de custódia para transmitir a transação assinada.
@@ -218,6 +228,7 @@
 - Desafio de Segundo Fator: Exige que o usuário forneça o código OTP (via app ou e-mail) vinculado especificamente àquela intenção de saque.
 - Validação de Janela de Tempo: O código de confirmação deve ser validado dentro de um período restrito para garantir que a operação ainda é desejada pelo usuário.
 - Promoção de Status: Uma vez validado, o saque é movido de PENDING_CONFIRMATION para READY_FOR_PAYOUT.
+- **Auditoria**: Registra em `tb_activity` com `action='CONFIRM_WITHDRAWAL'` e `metadata={withdrawalId: uuid, amount: number, amountUsd: number, challengeId: uuid}`.
 ##### 04.04. 🔍⛔🔒`[withdrawal]` list withdrawals
 - Recupera o histórico completo de solicitações de saque realizadas pelo usuário.
 - Filtros e Status: Permite visualizar saques por período ou estado, como PENDING, PROCESSING, COMPLETED ou FAILED.
