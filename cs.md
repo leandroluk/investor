@@ -19,7 +19,7 @@
 ##### 01.02.⚡✔️🌎`[auth]` register user using email and password
 - Para acessar a aplicação o usuário precisa se registrar. Para isso ele precisa informar seu nome, e-mail e senha.
 - O sistema irá verificar se se o email é único na base. Caso contrário, ele irá retornar um erro de conflito. Também irá ver se a senha atende aos requisitos mínimos de complexidade.
-- Se não houverem problemas, o sistema irá criar o usuário com o status "PENDING" e enviar um e-mail de ativação.
+- Se não houverem problemas, o sistema irá criar o registro de login (tb_user) e o perfil básico (tb_profile) com o status "PENDING" e enviar um e-mail de ativação.
 - A senha deve ser processada com hashing antes de persistir no banco.
 ##### 01.03.🔄✔️🌎`[auth]` dispatch send email after register
 - Após um evento de registro de conta, deve-se fazer o envio do email de ativação. 
@@ -85,38 +85,39 @@
 ##### 01.18.🔍✔️🔒`[device]` list active device
 - Lista todos os dispositivos onde a sessão ainda é válida.
 ##### 01.19.⚡✔️🔒`[user]` update user profile
-- Permite que o usuário autenticado atualize informações básicas de sua conta, como nome de exibição e preferências de idioma.
+- Permite que o usuário autenticado atualize informações básicas de seu perfil (tb_profile), como nome de exibição e preferências de idioma.
 - Bloqueio de Campos Críticos: Por segurança, o sistema impede a alteração direta de e-mail e endereços de carteira vinculada através deste fluxo comum, exigindo processos específicos de validação para essas trocas.
 - Sanitização: Realiza a limpeza e validação de tamanho de caracteres para evitar a persistência de dados malformatados no banco de dados.
 ##### 01.20.🔍✔️🔒`[user]` get user profile
-- Retorna dados básicos, status de segurança e carteira vinculada.
-##### 01.21.⚡✅🔒`[user]` upload user document
+- Retorna dados combinados de login (tb_user) e perfil (tb_profile).
+- **Atenção**: Não retorna dados sensíveis de auditoria ou status detalhado de KYC (ver 01.30).
+##### 01.21.⚡✔️🔒`[user]` upload user document
 - Permite que o usuário envie arquivos para comprovação de identidade e residência (RG, CNH, Selfie, comprovante de endereço).
 - O sistema deve validar o formato (JPG, PNG, PDF) e o tamanho máximo do arquivo antes de gerar uma URL de upload seguro para o storage.
 - Cada documento enviado é registrado com um identificador único, data de expiração (se aplicável) e status inicial como PENDING.
 - Transição de Estado: Se o status global de KYC do usuário for NONE, ele deve ser alterado automaticamente para PENDING assim que o primeiro documento obrigatório for recebido.
 - O sistema deve garantir que arquivos sensíveis não sejam acessíveis publicamente, utilizando links temporários (presigned URLs) para visualização administrativa.
-##### 01.22.🔍✅🔒`[user]` list user documents without signed url
+##### 01.22.🔍✔️🔒`[user]` list user documents without signed url
 - Recupera a lista de todos os arquivos enviados pelo usuário para o processo de verificação de identidade.
 - Segurança de Acesso: Para documentos armazenados de forma privada, o sistema gera presigned URLs com validade curtíssima (ex: 5 minutos) para permitir a visualização segura.
 - Metadados: Retorna o status atual de cada documento (PENDING, APPROVED, REJECTED) e a data da última atualização para acompanhamento do usuário ou suporte.
-##### 01.23.🔍✅🔒`[user]` redirect to signed url user document
+##### 01.23.🔍✔️🔒`[user]` redirect to signed url user document
 - Quando o usuário enviar o id do documento ele deverá ser redirecionado para a url assinada do documento
 - Caso o documento não exista então deve retornar 404
 ##### 01.24.⚡⛔🔒`[user]` link user wallet address (web3 signature)
 - Permite que o usuário vincule uma carteira criptográfica (ex: Ethereum) ao seu perfil provando a posse da chave privada sem expô-la.
-- O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto).
+- O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto). O usuário deve informar um apelido (name) para a carteira.
 - O usuário deve assinar uma mensagem padronizada contendo este nonce usando sua carteira (ex: via Metamask ou WalletConnect).
 - A API realiza a recuperação da chave pública (ecrecover) a partir da assinatura recebida para validar se o endereço recuperado coincide com o endereço informado.
 - Regra de Unicidade: O sistema verifica se o endereço já está vinculado a outra conta; em caso positivo, retorna um erro de conflito (409).
 - O nonce é invalidado imediatamente após o uso (sucesso ou falha) para prevenir ataques de replay.
 - Após a validação bem-sucedida, o endereço é persistido no perfil do usuário e o evento é registrado no log de auditoria.
 ##### 01.25.⚡⛔🔒`[user]` generate user wallet
-- Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança.
+- Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança. O usuário pode fornecer um apelido (name).
 - Deriva a chave privada e o endereço público para a rede Ethereum utilizando o derivation path padrão m/44'/60'/0'/0/0.
 - Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM antes da persistência. A chave de criptografia deve ser derivada da senha do usuário (ex: via PBKDF2 ou Argon2), garantindo que a plataforma não possua custódia total sem a interação do usuário.
 - O sistema armazena o endereço público, a seed criptografada e o Initialization Vector (IV) no banco de dados.
-- Regra de Idempotência: O sistema deve impedir a geração de uma nova carteira se o usuário já possuir uma vinculada ao perfil, retornando erro de conflito caso tentado.
+- Regra de Limite: O sistema pode impor um limite máximo de carteiras custodiais por usuário nas configurações globais.
 ##### 01.26.🔍⛔🔒`[user]` reveal user wallet seed phrase
 - Permite que o usuário visualize as 12 palavras (mnemonic) de sua carteira gerada internamente.
 - Re-autenticação Obrigatória: Exige que o usuário forneça sua senha atual e o código 2FA ativo no momento exato da solicitação, independentemente de já estar logado.
@@ -147,6 +148,10 @@
 - Fluxo de Aprovação: Ao marcar um documento como válido, o sistema verifica se todos os requisitos de KYC foram atendidos; em caso positivo, o status global do usuário é promovido para APPROVED.
 - Fluxo de Rejeição: Caso o documento seja inválido (ex: foto ilegível), o administrador deve obrigatoriamente informar o motivo da rejeição.
 - Notificação de Feedback: O sistema dispara automaticamente um alerta (e-mail/push) informando o usuário sobre o resultado da análise e os passos necessários para correção, se houver rejeição.
+##### 01.30.🔍✅🔒`[user]` get user kyc
+- Retorna os dados detalhados do processo de Know Your Customer (KYC).
+- Inclui: Status atual (PENDING, APPROVED, REJECTED), Nível de verificação (Tier), Data de verificação e Motivo de rejeição (se houver).
+- Utilizado para exibir o status de conformidade do usuário e bloquear/liberar funcionalidades no frontend.
 ### 02. Catalog (Market Data & Public Info)
 ##### 02.01. 🔍⛔🌎`[assets]` list supported assets
 - Retorna a lista de ativos (criptomoedas/tokens) que possuem integração ativa e estão habilitados para negociação no sistema.
@@ -166,7 +171,7 @@
 ##### 03.01. ⚡⛔🔒`[investment]` create investment intent
 - Inicia o processo de investimento capturando a "foto" (snapshot) atual das condições da estratégia selecionada (taxas, APY estimado e cotação do ativo).
 - Trava de Cotação: O sistema garante as condições exibidas ao usuário por um tempo determinado (ex: 10 minutos) para que ele finalize o aporte.
-- Cria um registro de intenção com status PENDING, vinculando o ID do usuário, o ID da estratégia e o valor pretendido.
+- Cria um registro de intenção com status PENDING, vinculando o ID do usuário, o ID da estratégia, o ID da Carteira (wallet_id) de origem e o valor pretendido.
 - Verifica se a estratégia ainda possui "capacidade" ou limite disponível para novos aportes antes de confirmar a criação da intenção.
 ##### 03.02. ⚡⛔🔒`[investment]` confirm investment
 - Altera o status de uma intenção de investimento de PENDING para ACTIVE após a confirmação do aporte.
@@ -198,7 +203,7 @@
 - Tratamento de Falhas: Se a assinatura for inválida ou a transação falhar na rede, a saga dispara o rollback do saldo e marca o investimento para revisão manual.
 ### 04. Treasury (Financial Operations)
 ##### 04.01. ⚡⛔🔒`[withdrawal]` create withdrawal request
-- Inicia o fluxo de resgate validando se o saldo disponível (líquido de investimentos ativos e outros saques pendentes) é suficiente para cobrir o valor e as taxas.
+- Inicia o fluxo de resgate validando se o saldo disponível na carteira específicada (wallet_id) é suficiente para cobrir o valor e as taxas.
 - Cálculo de Taxas: O sistema calcula a taxa de rede estimada e a taxa de serviço da plataforma, apresentando o valor líquido que chegará à carteira de destino.
 - O sistema aplica as regras de limites globais (mínimos e máximos por transação) definidos nas configurações do sistema.
 - Estado de Bloqueio: Ao criar a intenção, o valor é marcado como "Locked", impedindo o uso simultâneo desses fundos em novos investimentos.

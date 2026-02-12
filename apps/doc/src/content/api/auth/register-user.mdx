@@ -11,6 +11,8 @@ import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 - The email must be unique in the system.
 - The password must meet complexity requirements (e.g., minimum length, special characters).
 - The user is created with status `PENDING`.
+- A basic Profile is created.
+- A KYC record is created with status `NONE`.
 - An activation email is sent to the user.
 
 ## Request
@@ -35,10 +37,11 @@ flowchart TD
     C -- "Yes" --> D["Return 409 Conflict"]
     D --> End([End])
     C -- "No" --> E["Hash Password"]
-    E --> F["Create User in DB"]
-    F --> G["Send Activation Email"]
-    G --> H["Return 201 Created"]
-    H --> End
+    E --> F["Create User (PENDING)"]
+    F --> G["Create Profile & KYC (NONE)"]
+    G --> H["Send Activation Email"]
+    H --> I["Return 201 Created"]
+    I --> End
 ```
 </MermaidZoom>
 

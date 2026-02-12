@@ -2,11 +2,11 @@ import {Command} from '#/application/_shared/bus';
 import {authorizationTokenSchema} from '#/application/_shared/types';
 import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort, HasherPort, TokenPort} from '#/domain/_shared/ports';
-import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entities';
+import {DeviceEntity, LoginEntity, ProfileEntity, UserEntity} from '#/domain/account/entities';
 import {DeviceTypeEnum, LoginStrategyEnum} from '#/domain/account/enums';
 import {UserInvalidCredentialsError} from '#/domain/account/errors';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/events';
-import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repositories';
+import {DeviceRepository, LoginRepository, ProfileRepository, UserRepository} from '#/domain/account/repositories';
 import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import uuid from 'uuid';
@@ -35,6 +35,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   constructor(
     private readonly userRepository: UserRepository,
     private readonly loginRepository: LoginRepository,
+    private readonly profileRepository: ProfileRepository,
     private readonly deviceRepository: DeviceRepository,
     private readonly hasherPort: HasherPort,
     private readonly brokerPort: BrokerPort,
@@ -42,12 +43,16 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     private readonly tokenPort: TokenPort
   ) {}
 
-  private async getUserByEmail(email: string): Promise<UserEntity> {
+  private async getUserAndProfileByEmail(email: string): Promise<{user: UserEntity; profile: ProfileEntity}> {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new UserInvalidCredentialsError();
     }
-    return user;
+    const profile = await this.profileRepository.findByUserId(user.id);
+    if (!profile) {
+      throw new UserInvalidCredentialsError();
+    }
+    return {user, profile};
   }
 
   private async validatePassword(plain: string, hash: string): Promise<void> {
@@ -60,9 +65,12 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   private async upsertDevice(user: UserEntity, fingerprint: DeviceEntity['fingerprint']): Promise<DeviceEntity> {
     const existingDevice = await this.deviceRepository.findByFingerprint(user.id, fingerprint);
     if (existingDevice) {
-      existingDevice.isActive = true;
-      existingDevice.updatedAt = new Date();
-      await this.deviceRepository.update(existingDevice);
+      await this.deviceRepository.update(
+        Object.assign(existingDevice, {
+          isActive: true,
+          updatedAt: new Date(),
+        })
+      );
       return existingDevice;
     } else {
       const newDevice = DeviceEntity.new({
@@ -102,15 +110,22 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
     await this.loginRepository.create(login);
   }
 
-  private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
+  private async createToken(
+    user: UserEntity,
+    profile: ProfileEntity,
+    device: DeviceEntity
+  ): Promise<Required<TokenPort.Authorization>> {
     return this.tokenPort.create<true>({
-      sessionKey: await this.sessionStore.create({userId: user.id, deviceFingerprint: device.fingerprint}),
+      sessionKey: await this.sessionStore.create({
+        userId: user.id,
+        deviceFingerprint: device.fingerprint,
+      }),
       claims: {
         id: user.id,
         email: user.email,
-        name: user.name,
-        language: user.language,
-        timezone: user.timezone,
+        name: profile.name,
+        language: profile.language,
+        timezone: profile.timezone,
         hash: this.hasherPort.hash(device.fingerprint),
       },
       complete: true,
@@ -144,14 +159,14 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   }
 
   async execute(command: LoginUsingCredentialCommand): Promise<LoginUsingCredentialCommandResult> {
-    const user = await this.getUserByEmail(command.email);
+    const {user, profile} = await this.getUserAndProfileByEmail(command.email);
     const device = await this.upsertDevice(user, command.fingerprint);
     try {
       await this.validatePassword(command.password, user.passwordHash);
       await this.createLogin(command.ip, user, true, device.id);
-      const result = await this.createToken(user, device);
+      const result = await this.createToken(user, profile, device);
 
-      if (user.twoFactorEnabled) {
+      if (profile.twoFactorEnabled) {
         await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
       }
 

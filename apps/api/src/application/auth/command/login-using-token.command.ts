@@ -2,11 +2,11 @@ import {Command} from '#/application/_shared/bus';
 import {authorizationTokenSchema} from '#/application/_shared/types';
 import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort, CipherPort, HasherPort, TokenPort} from '#/domain/_shared/ports';
-import {DeviceEntity, LoginEntity, UserEntity} from '#/domain/account/entities';
+import {DeviceEntity, LoginEntity, ProfileEntity, UserEntity} from '#/domain/account/entities';
 import {DeviceTypeEnum, LoginStrategyEnum, SsoProviderEnum} from '#/domain/account/enums';
 import {UserInvalidCredentialsError} from '#/domain/account/errors';
 import {UserLoggedInEvent, UserRequestChallengeEvent} from '#/domain/account/events';
-import {DeviceRepository, LoginRepository, UserRepository} from '#/domain/account/repositories';
+import {DeviceRepository, LoginRepository, ProfileRepository, UserRepository} from '#/domain/account/repositories';
 import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
@@ -30,6 +30,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
   constructor(
     private readonly userRepository: UserRepository,
     private readonly loginRepository: LoginRepository,
+    private readonly profileRepository: ProfileRepository,
     private readonly deviceRepository: DeviceRepository,
     private readonly cipherPort: CipherPort,
     private readonly tokenPort: TokenPort,
@@ -57,20 +58,27 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     throw new UserInvalidCredentialsError('Invalid or expired token');
   }
 
-  private async getUserById(id: string): Promise<UserEntity> {
+  private async getUserAndProfileById(id: string): Promise<{user: UserEntity; profile: ProfileEntity}> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new UserInvalidCredentialsError();
     }
-    return user;
+    const profile = await this.profileRepository.findByUserId(id);
+    if (!profile) {
+      throw new UserInvalidCredentialsError();
+    }
+    return {user, profile};
   }
 
   private async upsertDevice(user: UserEntity, fingerprint: DeviceEntity['fingerprint']): Promise<DeviceEntity> {
     const existingDevice = await this.deviceRepository.findByFingerprint(user.id, fingerprint);
     if (existingDevice) {
-      existingDevice.isActive = true;
-      existingDevice.updatedAt = new Date();
-      await this.deviceRepository.update(existingDevice);
+      await this.deviceRepository.update(
+        Object.assign(existingDevice, {
+          isActive: true,
+          updatedAt: new Date(),
+        })
+      );
       return existingDevice;
     } else {
       const newDevice = DeviceEntity.new({
@@ -101,15 +109,22 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
     await this.loginRepository.create(login);
   }
 
-  private async createToken(user: UserEntity, device: DeviceEntity): Promise<Required<TokenPort.Authorization>> {
+  private async createToken(
+    user: UserEntity,
+    profile: ProfileEntity,
+    device: DeviceEntity
+  ): Promise<Required<TokenPort.Authorization>> {
     return this.tokenPort.create<true>({
-      sessionKey: await this.sessionStore.create({userId: user.id, deviceFingerprint: device.fingerprint}),
+      sessionKey: await this.sessionStore.create({
+        userId: user.id,
+        deviceFingerprint: device.fingerprint,
+      }),
       claims: {
         id: user.id,
         email: user.email,
-        name: user.name,
-        language: user.language,
-        timezone: user.timezone,
+        name: profile.name,
+        language: profile.language,
+        timezone: profile.timezone,
         hash: this.hasherPort.hash(device.fingerprint),
       },
       complete: true,
@@ -144,22 +159,18 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
 
   async execute(command: LoginUsingTokenCommand): Promise<LoginUsingTokenCommandResult> {
     const {userId} = await this.decryptToken(command.token);
-    const user = await this.getUserById(userId);
-    try {
-      const device = await this.upsertDevice(user, command.fingerprint);
-      await this.createLogin(command.ip, user, device.id);
-      const result = await this.createToken(user, device);
+    const {user, profile} = await this.getUserAndProfileById(userId);
 
-      if (user.twoFactorEnabled) {
-        await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
-      }
+    const device = await this.upsertDevice(user, command.fingerprint);
+    await this.createLogin(command.ip, user, device.id);
+    const result = await this.createToken(user, profile, device);
 
-      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
-
-      return LoginUsingTokenCommandResult.new(result);
-    } catch (error) {
-      void this.createLogin(command.ip, user, false);
-      throw error;
+    if (profile.twoFactorEnabled) {
+      await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
     }
+
+    await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
+
+    return LoginUsingTokenCommandResult.new(result);
   }
 }

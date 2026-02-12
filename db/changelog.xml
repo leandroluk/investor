@@ -6,5 +6,22 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
                       http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
                       http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
-  <includeAll path="./migrations" relativeToChangelogFile="true" />
+  <changeSet id="create-extensions" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE EXTENSION IF NOT EXISTS "pg_trgm"; 
+      CREATE EXTENSION IF NOT EXISTS "fuzzystrmatch";
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP EXTENSION IF EXISTS "pg_trgm";
+      DROP EXTENSION IF EXISTS "fuzzystrmatch";
+    ]]></sql></rollback>
+  </changeSet>
+  
+  <includeAll path="./v1" relativeToChangelogFile="true" />
+  
+  <changeSet id="tag-v1" author="leandroluk@gmail.com">
+    <tagDatabase tag="v1" />
+  </changeSet>
+
 </databaseChangeLog>

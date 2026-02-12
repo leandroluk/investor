@@ -50,16 +50,41 @@ Postgres Delete User By Email
 Postgres Create Test User
     [Documentation]    Creates a test user in the database with password "Test@123"
     ${id} =       Evaluate    uuid.uuid4()             modules=uuid
-    ${name} =    Evaluate    faker.Faker().name()    modules=faker
-    ${email} =    Evaluate    faker.Faker().email()    modules=faker
-    ${query} =    Catenate
-    ...    INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "name",
-    ...    "status", "wallet_address", "wallet_verified_at", "wallet_seed_encrypted", "kyc_status", "kyc_verified_at",
-    ...    "two_factor_enabled", "language", "timezone") VALUES ('${id}', NOW(), NOW(), NULL, '${email}',
-    ...    'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', '${name}', 'active', null, null, null, 'none', null,
-    ...    false, 'en', 'UTC');
-    Postgres Execute    ${query}
+    ${email} =    Postgres Create Test User Step Query User    ${id}
+    Postgres Create Test User Step Query Profile    ${id}
+    Postgres Create Test User Step Query Kyc    ${id}
     RETURN    ${email}
+
+Postgres Create Test User Step Query User
+    [Documentation]    Creates a test user in the database with password "Test@123"
+    [Arguments]    ${id}
+    ${email} =    Evaluate    faker.Faker().email()    modules=faker
+    ${query_user} =    Catenate
+    ...    INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "role",
+    ...    "status") VALUES ('${id}', NOW(), NOW(), NULL, '${email}',
+    ...    'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', 'USER', 'active');
+    Postgres Execute    ${query_user}
+    RETURN    ${email}
+
+Postgres Create Test User Step Query Profile
+    [Documentation]    Creates a test user in the database with password "Test@123"
+    [Arguments]    ${user_id}
+    ${profile_id} =    Evaluate    uuid.uuid4()    modules=uuid
+    ${name} =    Evaluate    faker.Faker().name()    modules=faker
+    ${query_profile} =    Catenate
+    ...    INSERT INTO "tb_profile" ("id", "user_id", "updated_at", "name",
+    ...    "language", "timezone", "two_factor_enabled")
+    ...    VALUES ('${profile_id}', '${user_id}', NOW(), '${name}', 'en', 'UTC', false);
+    Postgres Execute    ${query_profile}
+
+Postgres Create Test User Step Query Kyc
+    [Documentation]    Creates a test user in the database with password "Test@123"
+    [Arguments]    ${user_id}
+    ${kyc_id} =    Evaluate    uuid.uuid4()    modules=uuid
+    ${query_kyc} =    Catenate
+    ...    INSERT INTO "tb_kyc" ("id", "user_id", "created_at", "updated_at", "status", "level", "verified_at")
+    ...    VALUES ('${kyc_id}', '${user_id}', NOW(), NOW(), 'PENDING', 'TIER_1', NULL);
+    Postgres Execute    ${query_kyc}
 
 Mailbox Connect
     [Documentation]    Centralizes the mailbox opening

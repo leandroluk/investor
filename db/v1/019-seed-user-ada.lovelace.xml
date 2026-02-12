@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="seed-user-ada.lovelace" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      INSERT INTO "tb_user" (
+        "id",
+        "created_at",
+        "updated_at",
+        "deleted_at",
+        "email",
+        "password_hash",
+        "role",
+        "status"
+      ) VALUES (
+        /* id                    */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* created_at            */ NOW(),
+        /* updated_at            */ NOW(),
+        /* deleted_at            */ NULL,
+        /* email                 */ 'ada.lovelace@email.com',
+        /* password_hash         */ 'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4',
+        /* role                  */ 'ADMIN',
+        /* status                */ 'ACTIVE'
+      );
+
+      INSERT INTO "tb_profile" (
+        "id",
+        "user_id",
+        "updated_at",
+        "name",
+        "phone",
+        "birthdate",
+        "language",
+        "timezone",
+        "theme",
+        "two_factor_enabled",
+        "marketing_email",
+        "push_notification",
+        "currency_display"
+      ) VALUES (
+        /* id              */ '019c247b-93e1-76bb-9d0a-d13a572c8af9',
+        /* user_id         */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* updated_at      */ NOW(),
+        /* name            */ 'Ada Lovelace',
+        /* phone           */ NULL,
+        /* birthdate       */ '1815-12-10',
+        /* language        */ 'en',
+        /* timezone        */ 'UTC',
+        /* theme           */ 'SYSTEM',
+        /* two_factor_enabled*/ false,
+        /* marketing_email */ true,
+        /* push_notification*/ true,
+        /* currency_display*/ 'USD'
+      );
+
+      INSERT INTO "tb_kyc" (
+        "id",
+        "user_id",
+        "created_at",
+        "updated_at",
+        "status",
+        "level",
+        "verified_at",
+        "risk_score"
+      ) VALUES (
+        /* id              */ '019c247b-93e1-76bb-9d0a-d13a572c8af7',
+        /* user_id         */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* created_at      */ NOW(),
+        /* updated_at      */ NOW(),
+        /* status          */ 'APPROVED',
+        /* level           */ 'TIER_2',
+        /* verified_at     */ NOW(),
+        /* risk_score      */ 0.00
+      );
+
+      /* INSERT INTO "tb_wallet" IS OPTIONAL IN SEED BUT GOOD FOR TESTING */
+      INSERT INTO "tb_wallet" (
+        "id",
+        "created_at",
+        "updated_at",
+        "user_id",
+        "name",
+        "network",
+        "address",
+        "seed_encrypted",
+        "is_custodial",
+        "is_active",
+        "verified_at"
+      ) VALUES (
+        /* id              */ '019c247b-93e1-76bb-9d0a-d13a572c8af0',
+        /* created_at      */ NOW(),
+        /* updated_at      */ NOW(),
+        /* user_id         */ '019c247b-93e1-76bb-9d0a-d13a572c8af8',
+        /* name            */ 'Ada Wallet',
+        /* network         */ 'ETHEREUM',
+        /* address         */ '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        /* seed_encrypted  */ NULL,
+        /* is_custodial    */ false,
+        /* is_active       */ true,
+        /* verified_at     */ NOW()
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DELETE FROM "tb_wallet" WHERE "user_id" = '019c247b-93e1-76bb-9d0a-d13a572c8af8';
+      DELETE FROM "tb_kyc" WHERE "user_id" = '019c247b-93e1-76bb-9d0a-d13a572c8af8';
+      DELETE FROM "tb_profile" WHERE "user_id" = '019c247b-93e1-76bb-9d0a-d13a572c8af8';
+      DELETE FROM "tb_user" WHERE "id" = '019c247b-93e1-76bb-9d0a-d13a572c8af8';
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>

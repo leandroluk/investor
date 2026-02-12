@@ -1,11 +1,11 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort, StoragePort} from '#/domain/_shared/ports';
-import {DocumentEntity, UserEntity} from '#/domain/account/entities';
+import {DocumentEntity, KycEntity, UserEntity} from '#/domain/account/entities';
 import {DocumentStatusEnum, KycStatusEnum} from '#/domain/account/enums';
-import {UserNotFoundError} from '#/domain/account/errors';
+import {KycNotFoundError, UserNotFoundError} from '#/domain/account/errors';
 import {DocumentUploadedEvent} from '#/domain/account/events';
-import {DocumentRepository, UserRepository} from '#/domain/account/repositories';
+import {DocumentRepository, KycRepository, UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
@@ -43,25 +43,35 @@ export class UploadDocumentCommandResult extends createClass(
 export class UploadDocumentHandler implements ICommandHandler<UploadDocumentCommand, UploadDocumentCommandResult> {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly kycRepository: KycRepository,
     private readonly documentRepository: DocumentRepository,
     private readonly storagePort: StoragePort,
     private readonly brokerPort: BrokerPort
   ) {}
 
-  private async getUserById(userId: UserEntity['id']): Promise<UserEntity> {
-    const user = await this.userRepository.findById(userId);
+  private async getUserAndKyc(userId: UserEntity['id']): Promise<{user: UserEntity; kyc: KycEntity}> {
+    const [user, kyc] = await Promise.all([
+      this.userRepository.findById(userId),
+      this.kycRepository.findByUserId(userId),
+    ]);
+
     if (!user) {
       throw new UserNotFoundError();
     }
-    return user;
+    if (!kyc) {
+      throw new KycNotFoundError();
+    }
+    return {user, kyc};
   }
 
   private async createDocumentWithUploadURL(
     type: DocumentEntity['type'],
-    user: UserEntity
+    user: UserEntity,
+    kyc: KycEntity
   ): Promise<{document: DocumentEntity; uploadURL: string; expiresAt: Date}> {
     const document = DocumentEntity.new({
       userId: user.id,
+      kycId: kyc.id,
       type,
       status: DocumentStatusEnum.PENDING,
       rejectReason: null,
@@ -76,11 +86,10 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
     };
   }
 
-  private async updateUserKycStatus(user: UserEntity): Promise<void> {
-    if (user.kycStatus === KycStatusEnum.NONE) {
-      user.kycStatus = KycStatusEnum.PENDING;
-      user.updatedAt = new Date();
-      await this.userRepository.update(user);
+  private async updateKycStatus(kyc: KycEntity): Promise<void> {
+    if (kyc.status === KycStatusEnum.NONE) {
+      kyc.status = KycStatusEnum.PENDING;
+      await this.kycRepository.update(kyc);
     }
   }
 
@@ -98,10 +107,17 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
   }
 
   async execute(command: UploadDocumentCommand): Promise<UploadDocumentCommandResult> {
-    const user = await this.getUserById(command.userId);
-    const {document, uploadURL, expiresAt} = await this.createDocumentWithUploadURL(command.type, user);
-    await this.updateUserKycStatus(user);
-    await this.publishDocumentUploadedEvent(command.correlationId, new Date(), document);
-    return UploadDocumentCommandResult.new({id: document.id, uploadURL, expiresAt});
+    const {userId, type, correlationId, occurredAt} = command;
+    const {user, kyc} = await this.getUserAndKyc(userId);
+
+    const {document, uploadURL, expiresAt} = await this.createDocumentWithUploadURL(type, user, kyc);
+    await this.updateKycStatus(kyc);
+    await this.publishDocumentUploadedEvent(correlationId, occurredAt, document);
+
+    return UploadDocumentCommandResult.new({
+      id: document.id,
+      uploadURL,
+      expiresAt,
+    });
   }
 }

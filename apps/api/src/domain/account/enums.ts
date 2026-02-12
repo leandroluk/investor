@@ -41,10 +41,19 @@ export enum UserStatusEnum {
   PENDING = 'pending',
   DELETED = 'deleted',
   ACTIVE = 'active',
-  READY_TO_INVEST = 'ready_to_invest',
+}
+
+export enum UserRoleEnum {
+  USER = 'user',
+  ADMIN = 'admin',
 }
 
 export enum LoginStrategyEnum {
   PASSWORD = 'password',
   TOKEN = 'token',
+}
+
+export enum WalletNetworkEnum {
+  ETHEREUM = 'ethereum',
+  BSC = 'bsc',
 }

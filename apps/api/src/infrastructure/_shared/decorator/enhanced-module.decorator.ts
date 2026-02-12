@@ -23,9 +23,11 @@ function resolveItems<T>(items: any[] | undefined, factory: (token: any, item: a
 
   return items.reduce((acc, item) => {
     if (typeof item === 'function') {
-      const token = InjectableExisting.getMetadata(item);
-      if (token) {
-        acc.push(factory(token, item));
+      const tokens = InjectableExisting.getMetadata(item);
+      if (tokens) {
+        for (const token of tokens) {
+          acc.push(factory(token, item));
+        }
       }
     }
     return acc;

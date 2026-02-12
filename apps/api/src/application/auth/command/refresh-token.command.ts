@@ -2,10 +2,10 @@ import {Command} from '#/application/_shared/bus';
 import {authorizationTokenSchema} from '#/application/_shared/types';
 import {createClass} from '#/domain/_shared/factories';
 import {HasherPort, TokenPort} from '#/domain/_shared/ports';
-import {DeviceEntity, UserEntity} from '#/domain/account/entities';
+import {DeviceEntity, ProfileEntity, UserEntity} from '#/domain/account/entities';
 import {UserStatusEnum} from '#/domain/account/enums';
 import {AuthSessionExpiredError, AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/errors';
-import {UserRepository} from '#/domain/account/repositories';
+import {ProfileRepository, UserRepository} from '#/domain/account/repositories';
 import {SessionStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
@@ -27,6 +27,7 @@ export class RefreshTokenCommandResult extends createClass(authorizationTokenSch
 export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand, RefreshTokenCommandResult> {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly profileRepository: ProfileRepository,
     private readonly sessionStore: SessionStore,
     private readonly tokenPort: TokenPort,
     private readonly hasherPort: HasherPort
@@ -42,10 +43,13 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
     return decoded;
   }
 
-  private async getUser(userId: UserEntity['id']): Promise<UserEntity> {
-    const user = await this.userRepository.findById(userId);
+  private async getUserAndProfile(userId: UserEntity['id']): Promise<{user: UserEntity; profile: ProfileEntity}> {
+    const [user, profile] = await Promise.all([
+      this.userRepository.findById(userId),
+      this.profileRepository.findByUserId(userId),
+    ]);
 
-    if (!user) {
+    if (!user || !profile) {
       throw new UserNotFoundError();
     }
 
@@ -53,7 +57,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
       throw new AuthUnauthorizedError();
     }
 
-    return user;
+    return {user, profile};
   }
 
   private async refreshSession(
@@ -71,6 +75,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
   private async createToken(
     sessionKey: string,
     user: UserEntity,
+    profile: ProfileEntity,
     fingerprint: string
   ): Promise<TokenPort.Authorization> {
     return this.tokenPort.create<true>({
@@ -78,9 +83,9 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
       claims: {
         id: user.id,
         email: user.email,
-        name: user.name,
-        language: user.language,
-        timezone: user.timezone,
+        name: profile.name,
+        language: profile.language,
+        timezone: profile.timezone,
         hash: this.hasherPort.hash(fingerprint),
       },
       complete: true,
@@ -89,9 +94,9 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand,
 
   async execute(command: RefreshTokenCommand): Promise<RefreshTokenCommandResult> {
     const decoded = await this.decodeToken(command.refreshToken);
-    const user = await this.getUser(decoded.claims.id);
+    const {user, profile} = await this.getUserAndProfile(decoded.claims.id);
     await this.refreshSession(user.id, decoded.sessionKey, command.fingerprint);
-    const result = await this.createToken(decoded.sessionKey, user, command.fingerprint);
+    const result = await this.createToken(decoded.sessionKey, user, profile, command.fingerprint);
     return RefreshTokenCommandResult.new(result);
   }
 }

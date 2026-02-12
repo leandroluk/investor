@@ -1,13 +1,27 @@
 import {RequestWalletNonceCommand, UpdateUserProfileCommand, UploadDocumentCommand} from '#/application/user/command';
-import {GetUserDocumentQuery, GetUserProfileQuery, ListUserDocumentQuery} from '#/application/user/query';
-import {AuthUnauthorizedError, UserNotFoundError} from '#/domain/account/errors';
+import {GetKycQuery, GetUserDocumentQuery, GetUserProfileQuery, ListUserDocumentQuery} from '#/application/user/query';
+import {
+  AuthUnauthorizedError,
+  DocumentNotFoundError,
+  KycNotFoundError,
+  ProfileNotFoundError,
+  UserNotFoundError,
+} from '#/domain/account/errors';
 import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Res, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiTemporaryRedirectResponse} from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiTemporaryRedirectResponse,
+} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {AuthGuard, ChallengeGuard} from '../_shared/guards';
 import {
+  GetKycResultDTO,
   GetUserProfileResultDTO,
   RequestWalletNonceResultDTO,
   UpdateUserProfileBodyDTO,
@@ -21,7 +35,13 @@ import {ListUserDocumentResultDTO} from './dto/list-user-document.dto';
 @Controller('user')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, ChallengeGuard)
-@MapDomainError([AuthUnauthorizedError, HttpStatus.UNAUTHORIZED], [UserNotFoundError, HttpStatus.NOT_FOUND])
+@MapDomainError(
+  [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
+  [UserNotFoundError, HttpStatus.NOT_FOUND],
+  [KycNotFoundError, HttpStatus.NOT_FOUND],
+  [ProfileNotFoundError, HttpStatus.NOT_FOUND],
+  [DocumentNotFoundError, HttpStatus.NOT_FOUND]
+)
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -30,6 +50,7 @@ export class UserController {
 
   // #region postRequestWalletNonce
   @Post('wallet/nonce')
+  @ApiOperation({summary: 'Request wallet nonce'})
   @ApiCreatedResponse({type: RequestWalletNonceResultDTO})
   async postRequestWalletNonce(@GetMeta() meta: GetMeta): Promise<RequestWalletNonceResultDTO> {
     const result = await this.commandBus.execute(RequestWalletNonceCommand.new({...meta}));
@@ -39,7 +60,8 @@ export class UserController {
 
   // #region postUploadDocument
   @Post('document')
-  @ApiCreatedResponse({description: 'Document uploaded successfully.', type: UploadDocumentResultDTO})
+  @ApiOperation({summary: 'Upload a document'})
+  @ApiCreatedResponse({description: 'Document uploaded successfully', type: UploadDocumentResultDTO})
   async postUploadDocument(
     @GetMeta() meta: GetMeta,
     @Body() body: UploadDocumentBodyDTO
@@ -51,6 +73,7 @@ export class UserController {
 
   // #region redirectToUserDocument
   @Get('document/:documentId')
+  @ApiOperation({summary: 'Get document URL'})
   @ApiTemporaryRedirectResponse({description: 'Redirects to document url.'})
   async redirectToUserDocument(
     @GetMeta() meta: GetMeta, //
@@ -65,7 +88,8 @@ export class UserController {
 
   // #region getListUserDocument
   @Get('document')
-  @ApiOkResponse({description: 'User document list retrieved successfully.', type: ListUserDocumentResultDTO})
+  @ApiOperation({summary: 'List user documents'})
+  @ApiOkResponse({description: 'User document list retrieved successfully', type: ListUserDocumentResultDTO})
   async getListUserDocument(
     @GetMeta() meta: GetMeta //
   ): Promise<ListUserDocumentResultDTO> {
@@ -76,7 +100,8 @@ export class UserController {
   // #region putUpdateUserProfile
   @Put('profile')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({description: 'User profile updated successfully.', type: GetUserProfileResultDTO})
+  @ApiOperation({summary: 'Update user profile'})
+  @ApiOkResponse({description: 'User profile updated successfully', type: GetUserProfileResultDTO})
   async putUpdateUserProfile(
     @GetMeta() meta: GetMeta, //
     @Body() changes: UpdateUserProfileBodyDTO
@@ -89,11 +114,25 @@ export class UserController {
   // #region getGetUserProfile
   @Get('profile')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({description: 'Get user profile.', type: GetUserProfileResultDTO})
+  @ApiOperation({summary: 'Get user profile'})
+  @ApiOkResponse({description: 'Get user profile', type: GetUserProfileResultDTO})
   async getGetUserProfile(
     @GetMeta() meta: GetMeta //
   ): Promise<GetUserProfileResultDTO> {
     const result = await this.queryBus.execute(GetUserProfileQuery.new({...meta}));
+    return result;
+  }
+  // #endregion
+
+  // #region getGetKyc
+  @Get('kyc')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Get user KYC status'})
+  @ApiOkResponse({description: 'Get user kyc', type: GetKycResultDTO})
+  async getGetKyc(
+    @GetMeta() meta: GetMeta //
+  ): Promise<GetKycResultDTO> {
+    const result = await this.queryBus.execute(GetKycQuery.new({...meta}));
     return result;
   }
   // #endregion

@@ -1,11 +1,11 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort} from '#/domain/_shared/ports';
-import {DocumentEntity, UserEntity} from '#/domain/account/entities';
+import {DocumentEntity, KycEntity, UserEntity} from '#/domain/account/entities';
 import {DocumentStatusEnum, DocumentTypeEnum, KycStatusEnum} from '#/domain/account/enums';
 import {DocumentNotFoundError, DocumentStatusError} from '#/domain/account/errors';
 import {DocumentReviewedEvent, UserKycStatusChangedEvent} from '#/domain/account/events';
-import {DocumentRepository, UserRepository} from '#/domain/account/repositories';
+import {DocumentRepository, KycRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
@@ -23,7 +23,7 @@ export class ReviewDocumentCommand extends createClass(
 export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentCommand, void> {
   constructor(
     private readonly documentRepository: DocumentRepository,
-    private readonly userRepository: UserRepository,
+    private readonly kycRepository: KycRepository,
     private readonly brokerPort: BrokerPort
   ) {}
 
@@ -40,10 +40,13 @@ export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentComm
     status: DocumentStatusEnum,
     rejectReason: string | null
   ): Promise<void> {
-    document.status = status;
-    document.rejectReason = rejectReason;
-    document.updatedAt = new Date();
-    await this.documentRepository.update(document);
+    await this.documentRepository.update(
+      Object.assign(document, {
+        status: status,
+        rejectReason: rejectReason,
+        updatedAt: new Date(),
+      })
+    );
   }
 
   private async publishDocumentReviewedEvent(
@@ -65,9 +68,7 @@ export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentComm
     return await this.documentRepository.findByUserId(userId);
   }
 
-  private consolidateDocumentStatus(
-    documentList: DocumentEntity[]
-  ): [generalStatus: boolean, approvalMap: Partial<Record<DocumentStatusEnum, boolean>>] {
+  private consolidateStatus(documentList: DocumentEntity[]): [boolean, Partial<Record<DocumentStatusEnum, boolean>>] {
     const approvalMap: Partial<Record<DocumentStatusEnum, boolean>> = {};
     let generalStatus = true;
     for (const {type, status} of documentList) {
@@ -77,27 +78,26 @@ export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentComm
     return [generalStatus, approvalMap];
   }
 
-  private async approveUserKycStatus(userId: DocumentEntity['userId']): Promise<UserEntity | undefined> {
-    const user = await this.userRepository.findById(userId);
-    if (user && user.kycStatus !== KycStatusEnum.APPROVED) {
-      user.kycStatus = KycStatusEnum.APPROVED;
-      user.kycVerifiedAt = new Date();
-      user.updatedAt = new Date();
-      await this.userRepository.update(user);
-      return user;
+  private async approveKycStatus(userId: DocumentEntity['userId']): Promise<KycEntity | undefined> {
+    const kyc = await this.kycRepository.findByUserId(userId);
+    if (kyc && kyc.status !== KycStatusEnum.APPROVED) {
+      kyc.status = KycStatusEnum.APPROVED;
+      kyc.verifiedAt = new Date();
+      await this.kycRepository.update(kyc);
+      return kyc;
     }
   }
 
   private async publishUserKycStatusChangedEvent(
     correlationId: string,
     occurredAt: Date,
-    user: UserEntity
+    kyc: KycEntity
   ): Promise<void> {
     await this.brokerPort.publish(
       new UserKycStatusChangedEvent(correlationId, occurredAt, {
-        userId: user.id,
-        userKycStatus: user.kycStatus,
-        userKycVerifiedAt: user.kycVerifiedAt,
+        userId: kyc.userId,
+        status: kyc.status,
+        verifiedAt: kyc.verifiedAt,
       })
     );
   }
@@ -115,7 +115,7 @@ export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentComm
 
     if (command.status === DocumentStatusEnum.APPROVED) {
       const documentList = await this.getDocumentListByUserId(document.userId);
-      const [generalStatus, approvalMap] = this.consolidateDocumentStatus(documentList);
+      const [generalStatus, approvalMap] = this.consolidateStatus(documentList);
 
       if (generalStatus) {
         const selfieApproved = approvalMap[DocumentTypeEnum.SELFIE];
@@ -123,10 +123,10 @@ export class ReviewDocumentHandler implements ICommandHandler<ReviewDocumentComm
         const cnhApproved = approvalMap[DocumentTypeEnum.CNH_FRONT] && approvalMap[DocumentTypeEnum.CNH_BACK];
 
         if (selfieApproved && (rgApproved || cnhApproved)) {
-          const user = await this.approveUserKycStatus(document.userId);
+          const kyc = await this.approveKycStatus(document.userId);
 
-          if (user) {
-            await this.publishUserKycStatusChangedEvent(command.correlationId, command.occurredAt, user);
+          if (kyc) {
+            await this.publishUserKycStatusChangedEvent(command.correlationId, command.occurredAt, kyc);
           }
         }
       }

@@ -1,7 +1,7 @@
 import {Query} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
+import {DocumentGateway} from '#/domain/account';
 import {DocumentStatusEnum} from '#/domain/account/enums';
-import {DocumentRepository} from '#/domain/account/repositories';
 import {DocumentView} from '#/domain/account/views';
 import {IQueryHandler, QueryHandler} from '@nestjs/cqrs';
 import z from 'zod';
@@ -49,11 +49,11 @@ export class ListDocumentToReviewHandler implements IQueryHandler<
   ListDocumentToReviewQuery,
   ListDocumentToReviewResult
 > {
-  constructor(private readonly documentRepository: DocumentRepository) {}
+  constructor(private readonly documentGateway: DocumentGateway) {}
 
   async execute(query: ListDocumentToReviewQuery): Promise<ListDocumentToReviewResult> {
     const offset = (query.page - 1) * query.limit;
-    const {items, total} = await this.documentRepository.findByStatus(query.status, query.limit, offset);
+    const {items, total} = await this.documentGateway.findByStatus(query.status, query.limit, offset);
 
     return ListDocumentToReviewResult.new({
       items,

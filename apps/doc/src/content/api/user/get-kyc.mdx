@@ -1,0 +1,71 @@
+---
+title: Get User KYC
+---
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+
+## Rules
+
+- **Authenticated Access**: Only authenticated users can retrieve their KYC status.
+- **Data Privacy**: Returns detailed KYC status, level, and verification history.
+- **Verification Levels**:
+    - `TIER_1`: Basic verification (Email/Phone).
+    - `TIER_2`: Document verification.
+
+## Request
+
+- **Method**: `GET`
+- **Path**: `/user/kyc`
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["Client"] -- "GET /user/kyc" --> B["API"]
+    B --> C{"Is Authenticated?"}
+    C -- "No" --> D["Return 401 Unauthorized"]
+    C -- "Yes" --> E["Fetch KYC Data from DB"]
+    E --> F{"Found?"}
+    F -- "No" --> G["Return 404 Not Found"]
+    F -- "Yes" --> H["Return 200 OK"]
+```
+</MermaidZoom>
+
+## Success Case
+
+- **Status**: `200 OK`
+- **Body**:
+
+```json
+{
+  "id": "kyc_123...",
+  "status": "APPROVED",
+  "level": "TIER_1",
+  "verifiedAt": "2024-01-01T12:00:00.000Z",
+  "rejectReason": null,
+  "createdAt": "2024-01-01T10:00:00.000Z",
+  "updatedAt": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## Error Cases
+
+- **Status**: `401 Unauthorized`
+- **Body**:
+
+```json
+{
+  "code": "UNAUTHORIZED",
+  "message": "Missing or invalid token"
+}
+```
+
+- **Status**: `404 Not Found`
+- **Body**:
+
+```json
+{
+  "code": "KYC_NOT_FOUND",
+  "message": "KYC record not found"
+}
+```

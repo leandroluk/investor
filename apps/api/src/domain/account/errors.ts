@@ -86,6 +86,36 @@ export class UserInvalidCredentialsError extends DomainError {
 }
 // #endregion
 
+// #region Profile
+export class ProfileNotFoundError extends DomainError {
+  constructor(message = 'Profile not found') {
+    super(message, 'profile.not_found');
+  }
+}
+// #endregion
+
+// #region Kyc
+export class KycNotFoundError extends DomainError {
+  constructor(message = 'KYC record not found') {
+    super(message, 'kyc.not_found');
+  }
+}
+// #endregion
+
+// #region Wallet
+export class WalletNotFoundError extends DomainError {
+  constructor(message = 'Wallet not found') {
+    super(message, 'wallet.not_found');
+  }
+}
+
+export class WalletAlreadyExistsError extends DomainError {
+  constructor(message = 'Wallet already exists') {
+    super(message, 'wallet.already_exists');
+  }
+}
+// #endregion
+
 // #region Document
 export class DocumentNotFoundError extends DomainError {
   constructor(message = 'Document not found') {

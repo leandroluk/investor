@@ -1,4 +1,4 @@
-import {type UserEntity} from '../account/entities';
+import {type ProfileEntity, type UserEntity} from '../account/entities';
 import {type DomainEvent} from './events';
 
 // #region BlockchainPort
@@ -210,9 +210,9 @@ export namespace TokenPort {
   export interface Claims {
     id: UserEntity['id'];
     email: UserEntity['email'];
-    name: UserEntity['name'];
-    language: UserEntity['language'];
-    timezone: UserEntity['timezone'];
+    name: ProfileEntity['name'];
+    language: ProfileEntity['language'];
+    timezone: ProfileEntity['timezone'];
     hash: string;
   }
   export interface Authorization {

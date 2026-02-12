@@ -23,7 +23,14 @@ import {
 } from '#/domain/account/errors';
 import {Body, Controller, Get, HttpCode, HttpStatus, Ip, Param, Post, Put} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiCreatedResponse, ApiHeader, ApiNoContentResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {
   ActivateUserBodyDTO,
@@ -52,6 +59,7 @@ export class AuthController {
   @Get('check/email/:email')
   @HttpCode(HttpStatus.NO_CONTENT)
   @MapDomainError([UserEmailInUseError, HttpStatus.CONFLICT])
+  @ApiOperation({summary: 'Check if email is available'})
   @ApiNoContentResponse({
     description: 'Email is available.',
   })
@@ -68,6 +76,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @MapDomainError([UserEmailInUseError, HttpStatus.CONFLICT])
+  @ApiOperation({summary: 'Register a new user'})
   @ApiCreatedResponse({
     description: 'User registered successfully.',
   })
@@ -86,6 +95,7 @@ export class AuthController {
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserStatusError, HttpStatus.CONFLICT]
   )
+  @ApiOperation({summary: 'Send activation email'})
   @ApiOkResponse({description: 'Activation email sent.'})
   async postSendActivationEmail(
     @GetMeta() meta: GetMeta, //
@@ -103,6 +113,7 @@ export class AuthController {
     [UserNotPendingError, HttpStatus.CONFLICT],
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
+  @ApiOperation({summary: 'Activate user account'})
   @ApiOkResponse({
     description: 'User activated successfully.',
   })
@@ -118,6 +129,7 @@ export class AuthController {
   @Post('recover')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserNotFoundError, HttpStatus.NOT_FOUND])
+  @ApiOperation({summary: 'Send password recovery email'})
   @ApiOkResponse({
     description: 'Password reset email sent.',
   })
@@ -136,6 +148,7 @@ export class AuthController {
     [UserNotFoundError, HttpStatus.NOT_FOUND], //
     [UserInvalidOtpError, HttpStatus.FORBIDDEN]
   )
+  @ApiOperation({summary: 'Reset password'})
   @ApiOkResponse({
     description: 'Password reset successfully.',
   })
@@ -151,6 +164,7 @@ export class AuthController {
   @Post('2fa')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserNotFoundError, HttpStatus.NOT_FOUND])
+  @ApiOperation({summary: 'Send 2FA code'})
   @ApiOkResponse({
     description: '2FA email sent.',
   })
@@ -166,6 +180,7 @@ export class AuthController {
   @Put('2fa')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserInvalidOtpError, HttpStatus.FORBIDDEN], [UserNotFoundError, HttpStatus.NOT_FOUND])
+  @ApiOperation({summary: 'Verify 2FA code'})
   @ApiOkResponse({description: 'User authenticated successfully.'})
   async putAuthorize2FA(
     @GetMeta() meta: GetMeta, //
@@ -179,6 +194,7 @@ export class AuthController {
   @Post('login/credential')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @ApiOperation({summary: 'Login using credentials'})
   @ApiHeader({name: 'x-fingerprint', required: false})
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingCredential(
@@ -195,6 +211,7 @@ export class AuthController {
   @Post('login/token')
   @HttpCode(HttpStatus.OK)
   @MapDomainError([UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED])
+  @ApiOperation({summary: 'Login using token'})
   @ApiHeader({name: 'x-fingerprint', required: false})
   @ApiOkResponse({description: 'Returns the final authorization token.'})
   async postLoginUsingToken(
@@ -215,6 +232,7 @@ export class AuthController {
     [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
     [AuthSessionExpiredError, HttpStatus.UNAUTHORIZED]
   )
+  @ApiOperation({summary: 'Refresh authorization token'})
   @ApiOkResponse({
     description: 'Returns the new authorization tokens.',
     type: RefreshTokenResultDTO,

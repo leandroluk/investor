@@ -44,7 +44,7 @@ flowchart TD
     I -- "No" --> J["Return 400 Bad Request"]
     J --> End
     I -- "Yes" --> K["Get user claims from provider"]
-    K --> L["Upsert user in database by email"]
+    K --> L["Upsert user (Create Profile/KYC if new)"]
     L --> M["Generate encrypted token with 1min TTL"]
     M --> N["Publish UserLoggedInEvent"]
     N --> O["Return 302 Redirect to callback_url with token"]

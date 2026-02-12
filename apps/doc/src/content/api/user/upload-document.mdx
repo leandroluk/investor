@@ -33,8 +33,8 @@ flowchart TD
     B --> C{"Validate Input"}
     C -- "Invalid" --> D["Return 400"]
     C -- "Valid" --> E["Generate Presigned URL"]
-    E --> F["Register Document (PENDING)"]
-    F --> G["Update User KYC Status (if NONE -> PENDING)"]
+    E --> F["Register Document (Linked to KYC)"]
+    F --> G["Update KYC Status (if NONE -> PENDING)"]
     G --> H["Return URL + ID"]
 ```
 </MermaidZoom>

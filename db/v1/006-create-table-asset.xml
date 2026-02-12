@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-asset" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "tb_asset" (
+        "id"            UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "deleted_at"    TIMESTAMPTZ(3)     NULL,
+        "name"          VARCHAR(100)   NOT NULL,
+        "symbol"        VARCHAR(10)    NOT NULL,
+        "slug"          VARCHAR(100)   NOT NULL,
+        "logo_url"      VARCHAR(255)       NULL,
+        "network"       VARCHAR(50)    NOT NULL,
+        "contract"      CHAR(42)           NULL,
+        "decimals"      INTEGER        NOT NULL DEFAULT 18,
+        "is_active"     BOOLEAN        NOT NULL DEFAULT TRUE,
+        ---
+        PRIMARY KEY ("id"),
+        UNIQUE      ("symbol"),
+        UNIQUE      ("slug")
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "tb_asset";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>

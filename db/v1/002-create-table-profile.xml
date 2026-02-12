@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-profile" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "tb_profile" (
+        "id"              UUID           NOT NULL,
+        "user_id"         UUID           NOT NULL,
+        "updated_at"        TIMESTAMPTZ(3) NOT NULL,
+        "name"              VARCHAR(100)   NOT NULL,
+        "phone"             VARCHAR(20)        NULL,
+        "birthdate"         DATE               NULL,
+        "language"          VARCHAR(10)    NOT NULL,
+        "timezone"          VARCHAR(100)   NOT NULL,
+        "theme"             VARCHAR(20)    NOT NULL DEFAULT 'SYSTEM',
+        "two_factor_enabled" BOOLEAN       NOT NULL DEFAULT FALSE,
+        "marketing_email"   BOOLEAN        NOT NULL DEFAULT TRUE,
+        "push_notification" BOOLEAN        NOT NULL DEFAULT TRUE,
+        "currency_display"  VARCHAR(50)    NOT NULL DEFAULT 'USD',
+        ---
+        PRIMARY KEY ("id"),
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "tb_profile";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>

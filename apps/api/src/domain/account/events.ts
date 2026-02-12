@@ -1,11 +1,12 @@
 import {DomainEvent} from '#/domain/_shared/events';
-import {type DocumentEntity, type UserEntity} from './entities';
+import {type DocumentEntity, type KycEntity, type UserEntity, type WalletEntity} from './entities';
 import {type LoginStrategyEnum} from './enums';
 
 // #region User
 export class UserRegisteredEvent extends DomainEvent<{
   userId: UserEntity['id'];
   userEmail: UserEntity['email'];
+  userRole: UserEntity['role'];
 }> {}
 
 export class UserActivatedEvent extends DomainEvent<{
@@ -25,11 +26,21 @@ export class UserRequestChallengeEvent extends DomainEvent<{
   userId: UserEntity['id'];
   userEmail: UserEntity['email'];
 }> {}
+// #endregion
 
+// #region Kyc
 export class UserKycStatusChangedEvent extends DomainEvent<{
   userId: UserEntity['id'];
-  userKycStatus: UserEntity['kycStatus'];
-  userKycVerifiedAt: UserEntity['kycVerifiedAt'];
+  status: KycEntity['status'];
+  verifiedAt: KycEntity['verifiedAt'];
+}> {}
+// #endregion
+
+// #region Wallet
+export class WalletCreatedEvent extends DomainEvent<{
+  walletId: WalletEntity['id'];
+  userId: WalletEntity['userId'];
+  walletAddress: WalletEntity['address'];
 }> {}
 // #endregion
 

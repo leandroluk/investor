@@ -8,7 +8,9 @@ import {
   DocumentTypeEnum,
   KycStatusEnum,
   LoginStrategyEnum,
+  UserRoleEnum,
   UserStatusEnum,
+  WalletNetworkEnum,
 } from './enums';
 
 export class ChallengeEntity extends createClass(
@@ -112,6 +114,11 @@ export class DocumentEntity extends createClass(
         description: 'User ID who uploaded this document',
         format: 'uuid',
       }),
+      kycId: z.uuid().nullable().default(null).meta({
+        example: '018f3b5e-9012-7000-8000-000000000000',
+        description: 'The KYC process this document belongs to',
+        format: 'uuid',
+      }),
       type: z.enum(DocumentTypeEnum).meta({
         example: DocumentTypeEnum.RG_FRONT,
         description: 'Document type',
@@ -129,6 +136,41 @@ export class DocumentEntity extends createClass(
       }),
       rejectReason: z.string().nullable().meta({
         description: 'Reason for rejection if status is REJECTED',
+      }),
+    })
+) {}
+
+export class KycEntity extends createClass(
+  indexableSchema
+    .extend(creatableSchema.shape)
+    .extend(updatableSchema.shape)
+    .extend({
+      userId: z.uuid().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'The user who owns this KYC record',
+        format: 'uuid',
+      }),
+      status: z.enum(KycStatusEnum).default(KycStatusEnum.PENDING).meta({
+        example: KycStatusEnum.PENDING,
+        description: 'Current status of the KYC process',
+        maxLength: 20,
+      }),
+      level: z.string().default('TIER_1').meta({
+        example: 'TIER_1',
+        description: 'KYC Level (e.g. TIER_1, TIER_2)',
+        maxLength: 20,
+      }),
+      verifiedAt: z.date().nullable().default(null).meta({
+        example: new Date(),
+        description: 'Timestamp when the KYC was verified',
+      }),
+      internalNote: z.string().nullable().default(null).meta({
+        example: 'User looks suspicious',
+        description: 'Internal notes about the KYC process',
+      }),
+      riskScore: z.number().nullable().default(0.0).meta({
+        example: 0.0,
+        description: 'Risk score calculated for the user',
       }),
     })
 ) {}
@@ -182,51 +224,117 @@ export class UserEntity extends createClass(
         description: 'Bcrypt or Argon2 hashed password',
         writeOnly: true,
       }),
-      name: z.string().meta({
-        example: 'John Doe',
-        description: 'Full name of the user',
-        maxLength: 100,
+      role: z.enum(UserRoleEnum).default(UserRoleEnum.USER).meta({
+        example: UserRoleEnum.USER,
+        description: 'User permission level',
+        maxLength: 20,
       }),
       status: z.enum(UserStatusEnum).meta({
         example: UserStatusEnum.ACTIVE,
         description: 'Current account lifecycle status',
         maxLength: 20,
       }),
-      walletAddress: z.string().nullable().meta({
-        example: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-        description: 'Ethereum-compatible wallet address',
-        maxLength: 42,
+    })
+) {}
+
+export class ProfileEntity extends createClass(
+  indexableSchema //
+    .extend(updatableSchema.shape)
+    .extend({
+      userId: z.uuid().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'The user owner of this profile',
+        format: 'uuid',
       }),
-      walletVerifiedAt: z.date().nullable().meta({
-        example: new Date(),
-        description: 'Timestamp when the wallet ownership was verified via signature',
+      name: z.string().meta({
+        example: 'John Doe',
+        description: 'Full name of the user',
+        maxLength: 100,
       }),
-      walletSeedEncrypted: z.string().nullable().meta({
-        description: 'Encrypted BIP39 seed phrase for wallet recovery',
-        writeOnly: true,
-      }),
-      kycStatus: z.enum(KycStatusEnum).meta({
-        example: KycStatusEnum.APPROVED,
-        description: 'KYC verification status',
+      phone: z.string().nullable().default(null).meta({
+        example: '+5511999999999',
+        description: 'Phone number',
         maxLength: 20,
       }),
-      kycVerifiedAt: z.date().nullable().meta({
-        example: new Date(),
-        description: 'Timestamp when KYC was verified',
+      birthdate: z.date().nullable().default(null).meta({
+        example: '1990-01-01',
+        description: 'Date of birth',
       }),
-      twoFactorEnabled: z.boolean().meta({
-        example: false,
-        description: 'Whether the user has enabled Two-Factor Authentication',
-      }),
-      language: z.string().meta({
+      language: z.string().default('en').meta({
         example: 'en',
         description: 'User preferred language (ISO 639-1 code)',
         maxLength: 10,
       }),
-      timezone: z.string().meta({
+      timezone: z.string().default('UTC').meta({
         example: 'America/Sao_Paulo',
         description: 'User preferred timezone (IANA format)',
         maxLength: 100,
+      }),
+      theme: z.string().default('SYSTEM').meta({
+        example: 'DARK',
+        description: 'Preferred interface theme',
+        maxLength: 20,
+      }),
+      twoFactorEnabled: z.boolean().default(false).meta({
+        example: false,
+        description: 'Whether 2FA is enabled',
+      }),
+      marketingEmail: z.boolean().default(true).meta({
+        example: true,
+        description: 'Accepts marketing emails',
+      }),
+      pushNotification: z.boolean().default(true).meta({
+        example: true,
+        description: 'Accepts push notifications',
+      }),
+      currencyDisplay: z.string().default('USD').meta({
+        example: 'BRL',
+        description: 'Preferred currency for display',
+        maxLength: 50,
+      }),
+    })
+) {}
+
+export class WalletEntity extends createClass(
+  indexableSchema
+    .extend(creatableSchema.shape)
+    .extend(updatableSchema.shape)
+    .extend({
+      userId: z.uuid().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'The user owner of this wallet',
+        format: 'uuid',
+      }),
+      name: z.string().default('Minha Carteira').meta({
+        example: 'Metamask Principal',
+        description: 'User-friendly name/label for the wallet',
+        maxLength: 50,
+      }),
+      network: z.enum(WalletNetworkEnum).meta({
+        example: WalletNetworkEnum.ETHEREUM,
+        description: 'Blockchain network',
+        maxLength: 50,
+      }),
+      address: z.string().meta({
+        example: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        description: 'Wallet public address',
+        maxLength: 42,
+      }),
+      seedEncrypted: z.string().nullable().meta({
+        description: 'Encrypted BIP39 seed phrase (only for custodial)',
+        writeOnly: true,
+      }),
+      isCustodial: z.boolean().meta({
+        example: false,
+        description: 'True if keys are managed by the system',
+      }),
+      isActive: z.boolean().default(true).meta({
+        example: true,
+        description: 'Soft delete status',
+      }),
+      verifiedAt: z.date().nullable().meta({
+        example: new Date(),
+        description: 'Timestamp when ownership was verified',
       }),
     })
 ) {}

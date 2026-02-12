@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-kyc" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "tb_kyc" (
+        "id"            UUID           NOT NULL,
+        "user_id"       UUID           NOT NULL,
+        "created_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"    TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "status"        VARCHAR(20)    NOT NULL DEFAULT 'PENDING',
+        "level"         VARCHAR(20)    NOT NULL DEFAULT 'TIER_1',
+        "verified_at"   TIMESTAMPTZ(3)     NULL,
+        "internal_note" TEXT               NULL,
+        "risk_score"    DECIMAL(5,2)       NULL DEFAULT 0.00,
+        ---
+        PRIMARY KEY ("id"),
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        UNIQUE      ("user_id") -- 1:1 relationship
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "tb_kyc";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>

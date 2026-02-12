@@ -31,6 +31,7 @@ export class DeviceController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiHeader({name: 'x-fingerprint', required: true, example: 'fingerprint...'})
+  @ApiOperation({summary: 'Register a new device'})
   @ApiCreatedResponse({description: 'Device registered successfully'})
   async postRegisterDevice(
     @GetMeta() meta: GetMeta, //

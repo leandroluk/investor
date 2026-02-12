@@ -1,0 +1,1279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.2 on win32)" generated="2026-02-10T18:32:19.793231" rpa="false" schemaversion="5">
+<suite id="s1" name="01 Device &amp; 04 2Fa">
+<suite id="s1-s1" name="01 Device" source="c:\dev\leandroluk\investor\apps\e2e\tests\03_device\01_device.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:20.019439" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:32:20.019041" elapsed="0.000704"/>
+</kw>
+<kw name="Postgres Connect" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.021528" level="INFO">${p} = ParseResult(scheme='postgres', netloc='username:password@localhost:25432', path='/investor', params='', query='sslmode=disable', fragment='')</msg>
+<var>${p}</var>
+<arg>urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)</arg>
+<arg>modules=urllib.parse</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.020390" elapsed="0.001205"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:20.026611" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-02-10T18:32:20.026700" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-02-10T18:32:20.042235" level="INFO">Connect to DB using : psycopg2.connect(database='investor', user='username', password=***, host='localhost', port=25432)</msg>
+<arg>db_module=psycopg2</arg>
+<arg>db_name=${{$p.path[1:]}}</arg>
+<arg>db_user=${{$p.username}}</arg>
+<arg>db_password=${{$p.password}}</arg>
+<arg>db_host=${{$p.hostname}}</arg>
+<arg>db_port=${{$p.port}}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.021833" elapsed="0.045377"/>
+</kw>
+<doc>Centralizes the database connection by parsing the URL</doc>
+<status status="PASS" start="2026-02-10T18:32:20.020054" elapsed="0.047302"/>
+</kw>
+<doc>Initializes API session and cleans IMAP inbox</doc>
+<status status="PASS" start="2026-02-10T18:32:20.017877" elapsed="0.049548"/>
+</kw>
+<test id="s1-s1-t1" name="Complete Device Flow" line="16">
+<kw name="Postgres Create Test User" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.071733" level="INFO">${id} = 84055ad3-e265-4c8f-a06c-92e40764e73a</msg>
+<var>${id}</var>
+<arg>uuid.uuid4()</arg>
+<arg>modules=uuid</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.068732" elapsed="0.003058"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.359630" level="INFO">${name} = Brittany Day</msg>
+<var>${name}</var>
+<arg>faker.Faker().name()</arg>
+<arg>modules=faker</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.071998" elapsed="0.287705"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.362844" level="INFO">${email} = chenderson@example.org</msg>
+<var>${email}</var>
+<arg>faker.Faker().email()</arg>
+<arg>modules=faker</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.360063" elapsed="0.002847"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.364286" level="INFO">${profile_id} = 19cdd56a-de2a-4a62-9235-63a7ac624d91</msg>
+<var>${profile_id}</var>
+<arg>uuid.uuid4()</arg>
+<arg>modules=uuid</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.363180" elapsed="0.001222"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.365863" level="INFO">${kyc_id} = 1b527bdb-59fa-4960-b1f6-72a62d727336</msg>
+<var>${kyc_id}</var>
+<arg>uuid.uuid4()</arg>
+<arg>modules=uuid</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.364922" elapsed="0.000983"/>
+</kw>
+<kw name="Catenate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.366536" level="INFO">${query_user} = INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "role", "status") VALUES ('84055ad3-e265-4c8f-a06c-92e40764e73a', NOW(), NOW(), NULL, 'chenderson@examp...</msg>
+<var>${query_user}</var>
+<arg>INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "role",</arg>
+<arg>"status") VALUES ('${id}', NOW(), NOW(), NULL, '${email}',</arg>
+<arg>'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', 'USER', 'active');</arg>
+<doc>Catenates the given items together and returns the resulted string.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.366080" elapsed="0.000499"/>
+</kw>
+<kw name="Catenate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.367137" level="INFO">${query_profile} = INSERT INTO "tb_profile" ("id", "user_id", "updated_at", "name", "language", "timezone", "two_factor_enabled") VALUES ('19cdd56a-de2a-4a62-9235-63a7ac624d91', '84055ad3-e265-4c8f-a06c-92e40764e73a', N...</msg>
+<var>${query_profile}</var>
+<arg>INSERT INTO "tb_profile" ("id", "user_id", "updated_at", "name",</arg>
+<arg>"language", "timezone", "two_factor_enabled")</arg>
+<arg>VALUES ('${profile_id}', '${id}', NOW(), '${name}', 'en', 'UTC', false);</arg>
+<doc>Catenates the given items together and returns the resulted string.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.366757" elapsed="0.000412"/>
+</kw>
+<kw name="Catenate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:20.367675" level="INFO">${query_kyc} = INSERT INTO "tb_kyc" ("id", "user_id", "created_at", "updated_at", "status", "level", "verified_at") VALUES ('1b527bdb-59fa-4960-b1f6-72a62d727336', '84055ad3-e265-4c8f-a06c-92e40764e73a', NOW(), NOW(...</msg>
+<var>${query_kyc}</var>
+<arg>INSERT INTO "tb_kyc" ("id", "user_id", "created_at", "updated_at", "status", "level", "verified_at")</arg>
+<arg>VALUES ('${kyc_id}', '${id}', NOW(), NOW(), 'PENDING', 'TIER_1', NULL);</arg>
+<doc>Catenates the given items together and returns the resulted string.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.367332" elapsed="0.000373"/>
+</kw>
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:20.368614" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;INSERT INTO "tb_user" ("id", "created_at", "updated_at", "deleted_at", "email", "password_hash", "role", "status") VALUES ('84055ad3-e265-4c8f-a06c-92e40764e73a', NOW(), NOW(), NULL, 'chenderson@example.org', 'h3bxCOJHqx4rMjBCwEnCZkB8gfutQb3h6N_Bu2b9Jn4', 'USER', 'active');&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:20.372638" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.368232" elapsed="0.007845"/>
+</kw>
+<arg>${query_user}</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:20.367901" elapsed="0.008347"/>
+</kw>
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:20.377526" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;INSERT INTO "tb_profile" ("id", "user_id", "updated_at", "name", "language", "timezone", "two_factor_enabled") VALUES ('19cdd56a-de2a-4a62-9235-63a7ac624d91', '84055ad3-e265-4c8f-a06c-92e40764e73a', NOW(), 'Brittany Day', 'en', 'UTC', false);&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:20.381968" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.377179" elapsed="0.007586"/>
+</kw>
+<arg>${query_profile}</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:20.376537" elapsed="0.008396"/>
+</kw>
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:20.386016" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;INSERT INTO "tb_kyc" ("id", "user_id", "created_at", "updated_at", "status", "level", "verified_at") VALUES ('1b527bdb-59fa-4960-b1f6-72a62d727336', '84055ad3-e265-4c8f-a06c-92e40764e73a', NOW(), NOW(), 'PENDING', 'TIER_1', NULL);&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:20.389273" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.385787" elapsed="0.006140"/>
+</kw>
+<arg>${query_kyc}</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:20.385267" elapsed="0.006818"/>
+</kw>
+<return>
+<value>${email}</value>
+<status status="PASS" start="2026-02-10T18:32:20.392187" elapsed="0.000092"/>
+</return>
+<msg time="2026-02-10T18:32:20.392551" level="INFO">${TEST_EMAIL} = chenderson@example.org</msg>
+<var>${TEST_EMAIL}</var>
+<doc>Creates a test user in the database with password "Test@123"</doc>
+<status status="PASS" start="2026-02-10T18:32:20.068337" elapsed="0.324277"/>
+</kw>
+<kw name="Auth Login With Credentials" owner="util">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:20.394441" level="INFO">&amp;{payload} = { email=chenderson@example.org | password=Test@123 }</msg>
+<var>email=${email}</var>
+<var>password=${password}</var>
+<status status="PASS" start="2026-02-10T18:32:20.394036" elapsed="0.000449"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.510718" level="INFO">POST Request : url=http://localhost:20000/auth/login/credential 
+ path_url=/auth/login/credential 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '59', 'Content-Type': 'application/json'} 
+ body=b'{"email": "chenderson@example.org", "password": "Test@123"}' 
+ </msg>
+<msg time="2026-02-10T18:32:22.510886" level="INFO">POST Response : url=http://localhost:20000/auth/login/credential 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4978-3c1c-719f-a0bd-30a0d9ee33d0', 'content-length': '1119', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"tokenType":"Bearer","accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg","expiresIn":90000,"refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6InJlZnJlc2gifQ.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ1NTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.mfALtuAwCeSyXN0RcPW3BWQDEjTQvkXOJMjAyUTBK_c"} 
+ </msg>
+<msg time="2026-02-10T18:32:22.511022" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>auth/login/credential</arg>
+<arg>json=${payload}</arg>
+<arg>expected_status=${expected_status}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:20.394671" elapsed="2.116373"/>
+</kw>
+<return>
+<value>${response.json()}</value>
+<status status="PASS" start="2026-02-10T18:32:22.511117" elapsed="0.000050"/>
+</return>
+<msg time="2026-02-10T18:32:22.512631" level="INFO">&amp;{auth_data} = { tokenType=Bearer | accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueS...</msg>
+<var>&amp;{auth_data}</var>
+<arg>${TEST_EMAIL}</arg>
+<arg>Test@123</arg>
+<doc>Logs in with credentials and returns auth data</doc>
+<status status="PASS" start="2026-02-10T18:32:20.393608" elapsed="2.119090"/>
+</kw>
+<kw name="List Active Device">
+<variable name="&amp;{headers}">
+<msg time="2026-02-10T18:32:22.514960" level="INFO">&amp;{headers} = { authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJs...</msg>
+<var>authorization=Bearer ${accessToken}</var>
+<status status="PASS" start="2026-02-10T18:32:22.514803" elapsed="0.000189"/>
+</variable>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.527536" level="INFO">GET Request : url=http://localhost:20000/device 
+ path_url=/device 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:32:22.527681" level="INFO">GET Response : url=http://localhost:20000/device 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4978-3c76-7379-8070-38dff3072367', 'content-length': '12', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"items":[]} 
+ </msg>
+<msg time="2026-02-10T18:32:22.527867" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>${DEVICE_PATH}</arg>
+<arg>headers=&amp;{headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.515115" elapsed="0.012794"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.530190" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.528190" elapsed="0.002122"/>
+</kw>
+<return>
+<value>${response.json()}[items]</value>
+<status status="PASS" start="2026-02-10T18:32:22.530458" elapsed="0.000186"/>
+</return>
+<msg time="2026-02-10T18:32:22.531668" level="INFO">${active_device_list} = []</msg>
+<var>${active_device_list}</var>
+<arg>${auth_data.accessToken}</arg>
+<doc>Lists active device</doc>
+<status status="PASS" start="2026-02-10T18:32:22.513351" elapsed="0.018346"/>
+</kw>
+<kw name="Should Be Empty" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.532383" level="INFO">Length is 0.</msg>
+<arg>${active_device_list}</arg>
+<doc>Verifies that the given item is empty.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.531964" elapsed="0.000461"/>
+</kw>
+<kw name="Register Device">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:22.535033" level="INFO">&amp;{payload} = { platform=ios | brand=Apple | name=My iPhone | model=iPhone 15 Pro }</msg>
+<var>platform=ios</var>
+<var>brand=Apple</var>
+<var>name=My iPhone</var>
+<var>model=iPhone 15 Pro</var>
+<status status="PASS" start="2026-02-10T18:32:22.534809" elapsed="0.000277"/>
+</variable>
+<variable name="&amp;{headers}">
+<msg time="2026-02-10T18:32:22.535403" level="INFO">&amp;{headers} = { authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJs...</msg>
+<var>authorization=Bearer ${accessToken}</var>
+<status status="PASS" start="2026-02-10T18:32:22.535171" elapsed="0.000277"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.555215" level="INFO">POST Request : url=http://localhost:20000/device 
+ path_url=/device 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg', 'Content-Length': '84', 'Content-Type': 'application/json'} 
+ body=b'{"platform": "ios", "brand": "Apple", "name": "My iPhone", "model": "iPhone 15 Pro"}' 
+ </msg>
+<msg time="2026-02-10T18:32:22.555398" level="INFO">POST Response : url=http://localhost:20000/device 
+ status=201, reason=Created 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4978-3c89-73a4-8fc2-498824b1897e', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:32:22.555665" level="INFO">${response} = &lt;Response [201]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>${DEVICE_PATH}</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>headers=&amp;{headers}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.535641" elapsed="0.020086"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.558102" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>201</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.556048" elapsed="0.002130"/>
+</kw>
+<arg>${auth_data.accessToken}</arg>
+<doc>Registers a device</doc>
+<status status="PASS" start="2026-02-10T18:32:22.532864" elapsed="0.025383"/>
+</kw>
+<kw name="List Active Device">
+<variable name="&amp;{headers}">
+<msg time="2026-02-10T18:32:22.560264" level="INFO">&amp;{headers} = { authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJs...</msg>
+<var>authorization=Bearer ${accessToken}</var>
+<status status="PASS" start="2026-02-10T18:32:22.560114" elapsed="0.000181"/>
+</variable>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.569805" level="INFO">GET Request : url=http://localhost:20000/device 
+ path_url=/device 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:32:22.569951" level="INFO">GET Response : url=http://localhost:20000/device 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4978-3ca1-7558-8738-86dfbb477518', 'content-length': '336', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"items":[{"id":"019c4978-3c26-73fc-ad92-966b7be15c9e","createdAt":"2026-02-10T21:32:22.438Z","updatedAt":"2026-02-10T21:32:22.546Z","userId":"84055ad3-e265-4c8f-a06c-92e40764e73a","name":"My iPhone","fingerprint":"unknown","platform":"unknown","pushToken":null,"isActive":true,"brand":"Apple","model":"iPhone 15 Pro","metadata":null}]} 
+ </msg>
+<msg time="2026-02-10T18:32:22.570212" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>${DEVICE_PATH}</arg>
+<arg>headers=&amp;{headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.560416" elapsed="0.009844"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.572491" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.570544" elapsed="0.002051"/>
+</kw>
+<return>
+<value>${response.json()}[items]</value>
+<status status="PASS" start="2026-02-10T18:32:22.572693" elapsed="0.000086"/>
+</return>
+<msg time="2026-02-10T18:32:22.574378" level="INFO">@{active_device_list} = [ {'id': '019c4978-3c26-73fc-ad92-966b7be15c9e', 'createdAt': '2026-02-10T21:32:22.438Z', 'updatedAt': '2026-02-10T21:32:22.546Z', 'userId': '84055ad3-e265-4c8f-a06c-92e40764e73a', 'name': 'My iPhone'...</msg>
+<var>@{active_device_list}</var>
+<arg>${auth_data.accessToken}</arg>
+<doc>Lists active device</doc>
+<status status="PASS" start="2026-02-10T18:32:22.558777" elapsed="0.015808"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.576048" level="INFO">Length is 1.</msg>
+<arg>${active_device_list}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.575445" elapsed="0.000753"/>
+</kw>
+<kw name="Revoke Device">
+<variable name="${full_path}">
+<msg time="2026-02-10T18:32:22.580288" level="INFO">${full_path} = device/019c4978-3c26-73fc-ad92-966b7be15c9e</msg>
+<var>${DEVICE_PATH}/${deviceId}</var>
+<status status="PASS" start="2026-02-10T18:32:22.580113" elapsed="0.000225"/>
+</variable>
+<variable name="&amp;{headers}">
+<msg time="2026-02-10T18:32:22.580609" level="INFO">&amp;{headers} = { authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJs...</msg>
+<var>authorization=Bearer ${accessToken}</var>
+<status status="PASS" start="2026-02-10T18:32:22.580407" elapsed="0.000239"/>
+</variable>
+<kw name="DELETE On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.600285" level="INFO">DELETE Request : url=http://localhost:20000/device/019c4978-3c26-73fc-ad92-966b7be15c9e 
+ path_url=/device/019c4978-3c26-73fc-ad92-966b7be15c9e 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg', 'Content-Length': '0'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:32:22.600383" level="INFO">DELETE Response : url=http://localhost:20000/device/019c4978-3c26-73fc-ad92-966b7be15c9e 
+ status=204, reason=No Content 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4978-3cb6-73dd-a20c-28d00ccd917e', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>${full_path}</arg>
+<arg>headers=&amp;{headers}</arg>
+<arg>expected_status=204</arg>
+<doc>Sends a DELETE request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.580803" elapsed="0.019655"/>
+</kw>
+<arg>${active_device_list[0]}[id]</arg>
+<arg>${auth_data.accessToken}</arg>
+<doc>Revokes a device</doc>
+<status status="PASS" start="2026-02-10T18:32:22.577031" elapsed="0.023508"/>
+</kw>
+<kw name="List Active Device">
+<variable name="&amp;{headers}">
+<msg time="2026-02-10T18:32:22.603383" level="INFO">&amp;{headers} = { authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJs...</msg>
+<var>authorization=Bearer ${accessToken}</var>
+<status status="PASS" start="2026-02-10T18:32:22.603141" elapsed="0.000297"/>
+</variable>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.614265" level="INFO">GET Request : url=http://localhost:20000/device 
+ path_url=/device 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6Ijg0MDU1YWQzLWUyNjUtNGM4Zi1hMDZjLTkyZTQwNzY0ZTczYSIsImVtYWlsIjoiY2hlbmRlcnNvbkBleGFtcGxlLm9yZyIsIm5hbWUiOiJCcml0dGFueSBEYXkiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0MiwiZXhwIjoxNzcwODQ5MTQyLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTNjMzQtNzVjZi04YTNjLWUxOGIxYTRjNTJmNSJ9.yTANTaAQOpLsZTMnq_W6JCOqxkSuAD9OeJv8JeL4eYg'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:32:22.614540" level="INFO">GET Response : url=http://localhost:20000/device 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4978-3ccd-75d1-aa4f-48b6550e48cb', 'content-length': '12', 'Date': 'Tue, 10 Feb 2026 21:32:22 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"items":[]} 
+ </msg>
+<msg time="2026-02-10T18:32:22.614931" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>${DEVICE_PATH}</arg>
+<arg>headers=&amp;{headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.603690" elapsed="0.011302"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.617340" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.615447" elapsed="0.002038"/>
+</kw>
+<return>
+<value>${response.json()}[items]</value>
+<status status="PASS" start="2026-02-10T18:32:22.617653" elapsed="0.000087"/>
+</return>
+<msg time="2026-02-10T18:32:22.619086" level="INFO">${active_device_list} = []</msg>
+<var>${active_device_list}</var>
+<arg>${auth_data.accessToken}</arg>
+<doc>Lists active device</doc>
+<status status="PASS" start="2026-02-10T18:32:22.601104" elapsed="0.018027"/>
+</kw>
+<kw name="Should Be Empty" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.620362" level="INFO">Length is 0.</msg>
+<arg>${active_device_list}</arg>
+<doc>Verifies that the given item is empty.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.619841" elapsed="0.000605"/>
+</kw>
+<doc>Register &gt; Login &gt; Devices[0] &gt; Register Device &gt; Devices[1] &gt; Revoke &gt; Devices[0]</doc>
+<status status="PASS" start="2026-02-10T18:32:20.067497" elapsed="2.553249"/>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.622476" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:32:22.622345" elapsed="0.000284"/>
+</kw>
+<kw name="Postgres Delete User By Email" owner="util">
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:22.623806" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "tb_user" WHERE email = ''&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:22.627167" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.623641" elapsed="0.004988"/>
+</kw>
+<arg>DELETE FROM "tb_user" WHERE email = '${email}'</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:22.623249" elapsed="0.005789"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Deletes a user from the database using their email address</doc>
+<status status="PASS" start="2026-02-10T18:32:22.622846" elapsed="0.006368"/>
+</kw>
+<kw name="Postgres Disconnect" owner="util">
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.630098" elapsed="0.000358"/>
+</kw>
+<doc>Centralizes the database disconnection</doc>
+<status status="PASS" start="2026-02-10T18:32:22.629701" elapsed="0.000901"/>
+</kw>
+<doc>Closes all sessions</doc>
+<status status="PASS" start="2026-02-10T18:32:22.622017" elapsed="0.008678"/>
+</kw>
+<doc>Account registration suite using shared resources</doc>
+<status status="PASS" start="2026-02-10T18:32:19.846489" elapsed="2.784266"/>
+</suite>
+<suite id="s1-s2" name="04 2Fa" source="c:\dev\leandroluk\investor\apps\e2e\tests\02_auth\04_2fa.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:22.649830" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:32:22.649261" elapsed="0.001005"/>
+</kw>
+<kw name="Postgres Connect" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:22.651804" level="INFO">${p} = ParseResult(scheme='postgres', netloc='username:password@localhost:25432', path='/investor', params='', query='sslmode=disable', fragment='')</msg>
+<var>${p}</var>
+<arg>urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)</arg>
+<arg>modules=urllib.parse</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.650942" elapsed="0.000927"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:22.658098" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-02-10T18:32:22.658241" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-02-10T18:32:22.658457" level="INFO">Connect to DB using : psycopg2.connect(database='investor', user='username', password=***, host='localhost', port=25432)</msg>
+<arg>db_module=psycopg2</arg>
+<arg>db_name=${{$p.path[1:]}}</arg>
+<arg>db_user=${{$p.username}}</arg>
+<arg>db_password=${{$p.password}}</arg>
+<arg>db_host=${{$p.hostname}}</arg>
+<arg>db_port=${{$p.port}}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.652049" elapsed="0.025242"/>
+</kw>
+<doc>Centralizes the database connection by parsing the URL</doc>
+<status status="PASS" start="2026-02-10T18:32:22.650603" elapsed="0.026883"/>
+</kw>
+<kw name="Mailbox Delete All Emails" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:32:22.678674" elapsed="2.646353"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:32:22.678426" elapsed="2.646841"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Delete All Emails" owner="ImapLibrary2">
+<doc>Delete all emails.</doc>
+<status status="PASS" start="2026-02-10T18:32:25.325982" elapsed="1.777559"/>
+</kw>
+<arg>Delete All Emails</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-10T18:32:25.325483" elapsed="1.778188"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:22.678251" elapsed="4.425478"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:32:27.104571" elapsed="0.234135"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:32:27.104066" elapsed="0.234766"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:27.103850" elapsed="0.235039"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:22.678171" elapsed="4.660773"/>
+</try>
+<doc>Cleans the inbox to avoid state interference</doc>
+<status status="PASS" start="2026-02-10T18:32:22.677918" elapsed="4.661120"/>
+</kw>
+<doc>Initializes API session and prepares the environment</doc>
+<status status="PASS" start="2026-02-10T18:32:22.648576" elapsed="4.690538"/>
+</kw>
+<test id="s1-s2-t1" name="Complete 2FA Authentication Flow" line="16">
+<kw name="Register New Account">
+<kw name="Generate Random String" owner="String">
+<msg time="2026-02-10T18:32:27.341474" level="INFO">${random_str} = ljpulhbhgk</msg>
+<var>${random_str}</var>
+<arg>10</arg>
+<arg>[LOWER]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-02-10T18:32:27.340856" elapsed="0.000662"/>
+</kw>
+<variable name="${random_email}">
+<msg time="2026-02-10T18:32:27.341724" level="INFO">${random_email} = test_ljpulhbhgk@email.com</msg>
+<var>test_${random_str}@email.com</var>
+<status status="PASS" start="2026-02-10T18:32:27.341604" elapsed="0.000152"/>
+</variable>
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:27.342102" level="INFO">&amp;{payload} = { email=test_ljpulhbhgk@email.com | password=Test@123 | name=User ljpulhbhgk }</msg>
+<var>email=${random_email}</var>
+<var>password=Test@123</var>
+<var>name=User ${random_str}</var>
+<status status="PASS" start="2026-02-10T18:32:27.341813" elapsed="0.000345"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:29.407986" level="INFO">POST Request : url=http://localhost:20000/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '89', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_ljpulhbhgk@email.com", "password": "Test@123", "name": "User ljpulhbhgk"}' 
+ </msg>
+<msg time="2026-02-10T18:32:29.408075" level="INFO">POST Response : url=http://localhost:20000/auth/register 
+ status=201, reason=Created 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4978-573b-7049-9ef9-319013daf99f', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:32:29 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/register</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:27.342428" elapsed="2.065751"/>
+</kw>
+<return>
+<value>${random_email}</value>
+<status status="PASS" start="2026-02-10T18:32:29.408255" elapsed="0.000053"/>
+</return>
+<msg time="2026-02-10T18:32:29.408458" level="INFO">${TEST_EMAIL} = test_ljpulhbhgk@email.com</msg>
+<var>${TEST_EMAIL}</var>
+<doc>Registers user and returns random email</doc>
+<status status="PASS" start="2026-02-10T18:32:27.340133" elapsed="2.068345"/>
+</kw>
+<kw name="Enable User And Set To Use 2FA On Database">
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:29.410239" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "tb_user" SET "status" = 'active' WHERE email = 'test_ljpulhbhgk@email.com';&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:29.415630" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.410001" elapsed="0.007550"/>
+</kw>
+<arg>UPDATE "tb_user" SET "status" = 'active' WHERE email = '${email}';</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:29.409538" elapsed="0.008131"/>
+</kw>
+<kw name="Catenate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:29.418182" level="INFO">${query} = UPDATE "tb_profile" SET "two_factor_enabled" = true WHERE "user_id" = (SELECT id FROM "tb_user" WHERE email = 'test_ljpulhbhgk@email.com');</msg>
+<var>${query}</var>
+<arg>UPDATE "tb_profile" SET "two_factor_enabled" = true</arg>
+<arg>WHERE "user_id" = (SELECT id FROM "tb_user" WHERE email = '${email}');</arg>
+<doc>Catenates the given items together and returns the resulted string.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.417816" elapsed="0.000392"/>
+</kw>
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:29.418683" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "tb_profile" SET "two_factor_enabled" = true WHERE "user_id" = (SELECT id FROM "tb_user" WHERE email = 'test_ljpulhbhgk@email.com');&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:29.421138" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.418572" elapsed="0.004785"/>
+</kw>
+<arg>${query}</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:29.418345" elapsed="0.005179"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Enables 2FA on the database for the given email</doc>
+<status status="PASS" start="2026-02-10T18:32:29.409014" elapsed="0.014559"/>
+</kw>
+<kw name="Login With Activated Account">
+<kw name="Auth Login With Credentials" owner="util">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:29.425165" level="INFO">&amp;{payload} = { email=test_ljpulhbhgk@email.com | password=Test@123 }</msg>
+<var>email=${email}</var>
+<var>password=${password}</var>
+<status status="PASS" start="2026-02-10T18:32:29.424973" elapsed="0.000229"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:29.526876" level="INFO">POST Request : url=http://localhost:20000/auth/login/credential 
+ path_url=/auth/login/credential 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '62', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_ljpulhbhgk@email.com", "password": "Test@123"}' 
+ </msg>
+<msg time="2026-02-10T18:32:29.527093" level="INFO">POST Response : url=http://localhost:20000/auth/login/credential 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4978-5772-752b-a095-5d7b25bbe75d', 'content-length': '1135', 'Date': 'Tue, 10 Feb 2026 21:32:29 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"tokenType":"Bearer","accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6IjAxOWM0OTc4LTU3NDItNzBlZi1iZTBiLWZlN2QwMTliOTEyOSIsImVtYWlsIjoidGVzdF9sanB1bGhiaGdrQGVtYWlsLmNvbSIsIm5hbWUiOiJVc2VyIGxqcHVsaGJoZ2siLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0OSwiZXhwIjoxNzcwODQ5MTQ5LCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTU3ODgtNzQ1My05NGE4LWI3MWI4MDY0YzNhMyJ9.Hg7JjeVqSO7Xi8sB_bob0sZT1v_zzYQbFPeQ_wEkcMI","expiresIn":90000,"refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6InJlZnJlc2gifQ.eyJpZCI6IjAxOWM0OTc4LTU3NDItNzBlZi1iZTBiLWZlN2QwMTliOTEyOSIsImVtYWlsIjoidGVzdF9sanB1bGhiaGdrQGVtYWlsLmNvbSIsIm5hbWUiOiJVc2VyIGxqcHVsaGJoZ2siLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1OTE0OSwiZXhwIjoxNzcwODQ1NTQ5LCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc4LTU3ODgtNzQ1My05NGE4LWI3MWI4MDY0YzNhMyJ9.UAvw3jrMST6RBGFvG6rtxbGk47b2ZR_bvB65CaCftig"} 
+ </msg>
+<msg time="2026-02-10T18:32:29.527377" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>auth/login/credential</arg>
+<arg>json=${payload}</arg>
+<arg>expected_status=${expected_status}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.425337" elapsed="0.102081"/>
+</kw>
+<return>
+<value>${response.json()}</value>
+<status status="PASS" start="2026-02-10T18:32:29.527521" elapsed="0.000055"/>
+</return>
+<msg time="2026-02-10T18:32:29.529036" level="INFO">${auth_data} = {'tokenType': 'Bearer', 'accessToken': 'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6IjAxOWM0OTc4LTU3NDItNzBlZi1iZTBiLWZlN2QwMTliOTEyOSIsImVtYWlsIjoidGVzdF9sanB1bGhiaGdrQGVtYWlsLmNvbSIsIm5hbWUiOiJ...</msg>
+<var>${auth_data}</var>
+<arg>${email}</arg>
+<arg>Test@123</arg>
+<arg>200</arg>
+<doc>Logs in with credentials and returns auth data</doc>
+<status status="PASS" start="2026-02-10T18:32:29.424535" elapsed="0.104551"/>
+</kw>
+<return>
+<value>${auth_data}</value>
+<status status="PASS" start="2026-02-10T18:32:29.529174" elapsed="0.000046"/>
+</return>
+<msg time="2026-02-10T18:32:29.529443" level="INFO">${auth_data} = {'tokenType': 'Bearer', 'accessToken': 'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6IjAxOWM0OTc4LTU3NDItNzBlZi1iZTBiLWZlN2QwMTliOTEyOSIsImVtYWlsIjoidGVzdF9sanB1bGhiaGdrQGVtYWlsLmNvbSIsIm5hbWUiOiJ...</msg>
+<var>${auth_data}</var>
+<arg>${TEST_EMAIL}</arg>
+<doc>Logins and validates JWT tokens</doc>
+<status status="PASS" start="2026-02-10T18:32:29.424143" elapsed="0.105344"/>
+</kw>
+<kw name="Validate Authorization Token">
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${auth_data}</arg>
+<arg>tokenType</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.530138" elapsed="0.000159"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${auth_data}</arg>
+<arg>accessToken</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.530393" elapsed="0.000120"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${auth_data}</arg>
+<arg>expiresIn</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.530620" elapsed="0.000110"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${auth_data}</arg>
+<arg>refreshToken</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.530888" elapsed="0.000136"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${auth_data}[tokenType]</arg>
+<arg>Bearer</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.531102" elapsed="0.000269"/>
+</kw>
+<kw name="Should Not Be Equal" owner="BuiltIn">
+<arg>${auth_data}[accessToken]</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are equal.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.531449" elapsed="0.000801"/>
+</kw>
+<kw name="Should Not Be Equal" owner="BuiltIn">
+<msg time="2026-02-10T18:32:29.533424" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${auth_data}[expiresIn]</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are equal.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.532486" elapsed="0.001025"/>
+</kw>
+<kw name="Should Not Be Equal" owner="BuiltIn">
+<arg>${auth_data}[refreshToken]</arg>
+<arg>${EMPTY}</arg>
+<doc>Fails if the given objects are equal.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.533814" elapsed="0.000915"/>
+</kw>
+<arg>${auth_data}</arg>
+<doc>Validates the authorization token</doc>
+<status status="PASS" start="2026-02-10T18:32:29.529857" elapsed="0.004939"/>
+</kw>
+<kw name="Resend 2FA To Email">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:29.535518" level="INFO">&amp;{payload} = { email=test_ljpulhbhgk@email.com }</msg>
+<var>email=${email}</var>
+<status status="PASS" start="2026-02-10T18:32:29.535399" elapsed="0.000143"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:32.284879" level="INFO">POST Request : url=http://localhost:20000/auth/2fa 
+ path_url=/auth/2fa 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '38', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_ljpulhbhgk@email.com"}' 
+ </msg>
+<msg time="2026-02-10T18:32:32.285013" level="INFO">POST Response : url=http://localhost:20000/auth/2fa 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4978-57e0-7243-94cb-23e4a9018dc3', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:32:32 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>${2FA_PATH}</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:29.535636" elapsed="2.749487"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Sends PATCH to activate the account</doc>
+<status status="PASS" start="2026-02-10T18:32:29.535188" elapsed="2.750055"/>
+</kw>
+<kw name="Get OTP Code To 2FA From Email">
+<kw name="Mailbox Get OTP From Email" owner="util">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:32:32.287465" level="INFO">Starting email retrieval for: test_ljpulhbhgk@email.com</msg>
+<arg>Starting email retrieval for: ${recipient_email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:32:32.286958" elapsed="0.000583"/>
+</kw>
+<variable name="${max_attempts_int}">
+<msg time="2026-02-10T18:32:32.289120" level="INFO">${max_attempts_int} = 15</msg>
+<var>${{int($max_attempts)}}</var>
+<status status="PASS" start="2026-02-10T18:32:32.287620" elapsed="0.001560"/>
+</variable>
+<variable name="${range_end}">
+<msg time="2026-02-10T18:32:32.290343" level="INFO">${range_end} = 16</msg>
+<var>${{${max_attempts_int} + 1}}</var>
+<status status="PASS" start="2026-02-10T18:32:32.289281" elapsed="0.001119"/>
+</variable>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:32:35.291341" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:32:32.290597" elapsed="3.000908"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:32:35.292876" level="INFO">Attempt 1/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:32:35.292324" elapsed="0.000656"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:32:35.294823" elapsed="2.618467"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:32:35.294500" elapsed="2.619006"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:38.946472" level="INFO">${emails} = 255</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:32:37.913746" elapsed="1.032787"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:32:38.946639" elapsed="0.000060"/>
+</return>
+<msg time="2026-02-10T18:32:38.946894" level="INFO">${email_index} = 255</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:32:35.294098" elapsed="3.652830"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:32:38.947442" elapsed="0.000024"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:32:38.947060" elapsed="0.000449"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:38.947019" elapsed="0.000515"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.412281" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:32:38.948112" elapsed="0.464368"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:32:39.413353" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:32:39.412585" elapsed="0.000810"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.414049" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.413874" elapsed="0.000243"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.414394" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.414215" elapsed="0.000196"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:32:39.414597" elapsed="0.000013"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:32:39.414643" elapsed="0.000013"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:32:39.414477" elapsed="0.000196"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:39.414458" elapsed="0.000230"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.414889" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.414760" elapsed="0.000147"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:39.413469" elapsed="0.001463"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.415244" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.415147" elapsed="0.000114"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.415485" level="INFO">${current_payload} = Security Verification - Investor
+
+Your 2FA Code
+
+A login attempt was made to your Investor account.
+To complete the sign-in, please enter the following verification code:
+
+Code: 545941
+
+Note:...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.415326" elapsed="0.000179"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:32:39.415715" elapsed="0.000011"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:32:39.415753" elapsed="0.000010"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:32:39.415616" elapsed="0.000161"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:39.415557" elapsed="0.000234"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.415980" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.415854" elapsed="0.000147"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:39.414952" elapsed="0.001074"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.416313" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.416233" elapsed="0.000098"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:32:39.416528" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Security Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.416392" elapsed="0.000157"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:32:39.416821" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Security Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:32:39.416680" elapsed="0.000164"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:32:39.416874" elapsed="0.000031"/>
+</break>
+<status status="PASS" start="2026-02-10T18:32:39.416599" elapsed="0.000325"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:39.416587" elapsed="0.000351"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:32:39.417009" elapsed="0.000014"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:39.416045" elapsed="0.001000"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:32:39.413468" elapsed="0.003594"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:32:39.417183" elapsed="0.000010"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:32:39.417100" elapsed="0.000113"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:39.417091" elapsed="0.000136"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:32:39.417248" elapsed="0.000020"/>
+</return>
+<msg time="2026-02-10T18:32:39.417359" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Security Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:32:38.947842" elapsed="0.469536"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:32:39.418029" level="INFO">${matches} = ['545941']</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.417708" elapsed="0.000340"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:32:39.418474" level="INFO">Length is 1.</msg>
+<msg time="2026-02-10T18:32:39.418532" level="INFO">${match_count} = 1</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.418128" elapsed="0.000419"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.418627" elapsed="0.000278"/>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="PASS" start="2026-02-10T18:32:39.418945" elapsed="0.000030"/>
+</return>
+<msg time="2026-02-10T18:32:39.419724" level="INFO">${otp_code} = 545941</msg>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="PASS" start="2026-02-10T18:32:39.417504" elapsed="0.002324"/>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:32:39.419946" elapsed="1.027515"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:32:40.447588" elapsed="0.000060"/>
+</return>
+<status status="PASS" start="2026-02-10T18:32:35.293907" elapsed="5.153795"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.448363" elapsed="0.232215"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.447945" elapsed="0.232716"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:32:40.447779" elapsed="0.232911"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:35.293869" elapsed="5.386850"/>
+</try>
+<msg time="2026-02-10T18:32:40.680881" level="INFO">${otp_code} = 545941</msg>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="PASS" start="2026-02-10T18:32:35.293547" elapsed="5.387356"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:32:40.680951" elapsed="0.000040"/>
+</return>
+<status status="PASS" start="2026-02-10T18:32:35.293141" elapsed="5.387873"/>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-02-10T18:32:40.681160" elapsed="0.000047"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:32:40.681482" elapsed="0.000033"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:32:40.681052" elapsed="0.000499"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:32:35.293080" elapsed="5.388503"/>
+</try>
+<var name="${attempt}">1</var>
+<status status="PASS" start="2026-02-10T18:32:35.292151" elapsed="5.389454"/>
+</iter>
+<var>${attempt}</var>
+<value>1</value>
+<value>${range_end}</value>
+<status status="PASS" start="2026-02-10T18:32:35.291645" elapsed="5.389995"/>
+</for>
+<msg time="2026-02-10T18:32:40.681790" level="INFO">${otp} = 545941</msg>
+<var>${otp}</var>
+<arg>${email}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:32:32.286519" elapsed="8.395293"/>
+</kw>
+<return>
+<value>${otp}</value>
+<status status="PASS" start="2026-02-10T18:32:40.681854" elapsed="0.000030"/>
+</return>
+<msg time="2026-02-10T18:32:40.681974" level="INFO">${otp} = 545941</msg>
+<var>${otp}</var>
+<arg>${TEST_EMAIL}</arg>
+<doc>Retrieves the OTP code from the email</doc>
+<status status="PASS" start="2026-02-10T18:32:32.285875" elapsed="8.396117"/>
+</kw>
+<kw name="Get ChallengeId From Postgres">
+<kw name="Catenate" owner="BuiltIn">
+<msg time="2026-02-10T18:32:40.683001" level="INFO">${query} = SELECT "id" FROM "tb_challenge" WHERE "user_id" = (SELECT "id" FROM "tb_user" WHERE "email" = 'test_ljpulhbhgk@email.com') AND "status" = 'pending' AND "expires_at" &gt; NOW() AND "code" = '545941' LIMIT...</msg>
+<var>${query}</var>
+<arg>SELECT "id"</arg>
+<arg>FROM "tb_challenge"</arg>
+<arg>WHERE "user_id" = (SELECT "id" FROM "tb_user" WHERE "email" = '${email}')</arg>
+<arg>AND "status" = 'pending'</arg>
+<arg>AND "expires_at" &gt; NOW()</arg>
+<arg>AND "code" = '${otp}'</arg>
+<arg>LIMIT 1</arg>
+<doc>Catenates the given items together and returns the resulted string.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.682632" elapsed="0.000398"/>
+</kw>
+<kw name="Postgres Query" owner="util">
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:40.683571" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT "id" FROM "tb_challenge" WHERE "user_id" = (SELECT "id" FROM "tb_user" WHERE "email" = 'test_ljpulhbhgk@email.com') AND "status" = 'pending' AND "expires_at" &gt; NOW() AND "code" = '545941' LIMIT 1&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:40.686295" level="INFO">Commit the transaction</msg>
+<msg time="2026-02-10T18:32:40.687066" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;id&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;019c4978-57e9-767c-9d26-d3c0f25549b8&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-02-10T18:32:40.687317" level="INFO">${result} = [{'id': '019c4978-57e9-767c-9d26-d3c0f25549b8'}]</msg>
+<var>${result}</var>
+<arg>${query}</arg>
+<arg>return_dict=True</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.683410" elapsed="0.003932"/>
+</kw>
+<return>
+<value>${result}</value>
+<status status="PASS" start="2026-02-10T18:32:40.687410" elapsed="0.000040"/>
+</return>
+<msg time="2026-02-10T18:32:40.687562" level="INFO">${rows} = [{'id': '019c4978-57e9-767c-9d26-d3c0f25549b8'}]</msg>
+<var>${rows}</var>
+<arg>${query}</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:40.683175" elapsed="0.004404"/>
+</kw>
+<return>
+<value>${rows[0]['id']}</value>
+<status status="PASS" start="2026-02-10T18:32:40.687617" elapsed="0.000018"/>
+</return>
+<msg time="2026-02-10T18:32:40.688405" level="INFO">${challenge_id} = 019c4978-57e9-767c-9d26-d3c0f25549b8</msg>
+<var>${challenge_id}</var>
+<arg>${TEST_EMAIL}</arg>
+<arg>${otp}</arg>
+<doc>Retrieves the challenge ID from the database</doc>
+<status status="PASS" start="2026-02-10T18:32:40.682332" elapsed="0.006096"/>
+</kw>
+<kw name="Authorize 2FA">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:32:40.689422" level="INFO">&amp;{payload} = { challengeId=019c4978-57e9-767c-9d26-d3c0f25549b8 | otp=545941 }</msg>
+<var>challengeId=${challengeId}</var>
+<var>otp=${otp}</var>
+<status status="PASS" start="2026-02-10T18:32:40.689278" elapsed="0.000171"/>
+</variable>
+<kw name="PUT On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:40.708310" level="INFO">PUT Request : url=http://localhost:20000/auth/2fa 
+ path_url=/auth/2fa 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '72', 'Content-Type': 'application/json'} 
+ body=b'{"challengeId": "019c4978-57e9-767c-9d26-d3c0f25549b8", "otp": "545941"}' 
+ </msg>
+<msg time="2026-02-10T18:32:40.708437" level="INFO">PUT Response : url=http://localhost:20000/auth/2fa 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4978-8372-771f-bf2d-aa22be3882b8', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:32:40 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>${2FA_PATH}</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a PUT request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.689558" elapsed="0.019073"/>
+</kw>
+<arg>${challenge_id}</arg>
+<arg>${otp}</arg>
+<doc>Sends PATCH to activate the account</doc>
+<status status="PASS" start="2026-02-10T18:32:40.688973" elapsed="0.019784"/>
+</kw>
+<doc>Register &gt; Enable 2FA &gt; Login &gt; Validate &gt; Get OTP &gt; Authorize 2FA</doc>
+<status status="PASS" start="2026-02-10T18:32:27.339220" elapsed="13.369927"/>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:32:40.710788" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:32:40.710654" elapsed="0.000239"/>
+</kw>
+<kw name="Postgres Delete User By Email" owner="util">
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:32:40.712100" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "tb_user" WHERE email = ''&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:32:40.714264" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.711887" elapsed="0.003287"/>
+</kw>
+<arg>DELETE FROM "tb_user" WHERE email = '${email}'</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:32:40.711464" elapsed="0.003852"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Deletes a user from the database using their email address</doc>
+<status status="PASS" start="2026-02-10T18:32:40.711108" elapsed="0.004289"/>
+</kw>
+<kw name="Postgres Disconnect" owner="util">
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-02-10T18:32:40.715909" elapsed="0.000379"/>
+</kw>
+<doc>Centralizes the database disconnection</doc>
+<status status="PASS" start="2026-02-10T18:32:40.715650" elapsed="0.000734"/>
+</kw>
+<doc>Cleans up resources after suite execution</doc>
+<status status="PASS" start="2026-02-10T18:32:40.710395" elapsed="0.006063"/>
+</kw>
+<doc>Authentication token refresh test suite</doc>
+<status status="PASS" start="2026-02-10T18:32:22.632173" elapsed="18.084334"/>
+</suite>
+<status status="PASS" start="2026-02-10T18:32:19.794963" elapsed="20.923006"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="01 Device &amp; 04 2Fa" id="s1" pass="2" fail="0" skip="0">01 Device &amp; 04 2Fa</stat>
+<stat name="01 Device" id="s1-s1" pass="1" fail="0" skip="0">01 Device &amp; 04 2Fa.01 Device</stat>
+<stat name="04 2Fa" id="s1-s2" pass="1" fail="0" skip="0">01 Device &amp; 04 2Fa.04 2Fa</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

@@ -1,5 +1,5 @@
 import {createClass} from '../_shared/factories';
-import {DocumentEntity, UserEntity} from './entities';
+import {DocumentEntity, KycEntity, ProfileEntity, UserEntity} from './entities';
 
 export class DocumentView extends createClass(
   DocumentEntity.schema
@@ -14,8 +14,8 @@ export class DocumentView extends createClass(
       storageKey: true,
     })
     .extend({
-      userName: UserEntity.schema.shape.name,
+      profileName: ProfileEntity.schema.shape.name,
       userEmail: UserEntity.schema.shape.email,
-      userKycStatus: UserEntity.schema.shape.status,
+      kycStatus: KycEntity.schema.shape.status,
     })
 ) {}

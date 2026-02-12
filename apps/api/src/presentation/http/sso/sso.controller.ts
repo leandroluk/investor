@@ -3,7 +3,7 @@ import {GetSsoRedirectQuery} from '#/application/sso/query';
 import {SsoInvalidOAuthCodeError, SsoInvalidProviderError, SsoInvalidStateError} from '#/domain/account/errors';
 import {Controller, Get, HttpCode, HttpStatus, Param, Query, Res} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
-import {ApiResponse, ApiTags, ApiTemporaryRedirectResponse} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags, ApiTemporaryRedirectResponse} from '@nestjs/swagger';
 import {FastifyReply} from 'fastify';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {GetSsoRedirectParamDTO, GetSsoRedirectQueryDTO, SsoCallbackQueryDTO} from './dto';
@@ -20,6 +20,7 @@ export class SsoController {
   @Get(':provider')
   @HttpCode(HttpStatus.TEMPORARY_REDIRECT)
   @MapDomainError([SsoInvalidProviderError, HttpStatus.UNPROCESSABLE_ENTITY])
+  @ApiOperation({summary: 'Initiate SSO login'})
   @ApiTemporaryRedirectResponse({description: 'Redirects to identity provider.'})
   async getRedirect(
     @GetMeta() meta: GetMeta, //
@@ -41,6 +42,7 @@ export class SsoController {
     [SsoInvalidOAuthCodeError, HttpStatus.BAD_REQUEST],
     [SsoInvalidStateError, HttpStatus.BAD_REQUEST]
   )
+  @ApiOperation({summary: 'Handle SSO callback'})
   @ApiResponse({
     status: HttpStatus.TEMPORARY_REDIRECT,
     description: 'Redirects to frontend with token.',

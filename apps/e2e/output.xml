@@ -1,0 +1,3314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.2 on win32)" generated="2026-02-10T18:28:56.872699" rpa="false" schemaversion="5">
+<suite id="s1" name="Tests" source="C:\dev\leandroluk\investor\apps\e2e\tests">
+<suite id="s1-s1" name="01 System" source="C:\dev\leandroluk\investor\apps\e2e\tests\01_system">
+<suite id="s1-s1-s1" name="01 Health" source="C:\dev\leandroluk\investor\apps\e2e\tests\01_system\01_health.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:28:57.044533" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:28:57.044227" elapsed="0.000586"/>
+</kw>
+<kw name="Mailbox Delete All Emails" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:28:57.045381" elapsed="2.892488"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:28:57.045268" elapsed="2.892721"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Delete All Emails" owner="ImapLibrary2">
+<doc>Delete all emails.</doc>
+<status status="PASS" start="2026-02-10T18:28:59.938563" elapsed="0.735633"/>
+</kw>
+<arg>Delete All Emails</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-10T18:28:59.938140" elapsed="0.736138"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:28:57.045181" elapsed="3.629124"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:00.674917" elapsed="0.232521"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:00.674516" elapsed="0.232997"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:00.674388" elapsed="0.233170"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:28:57.045146" elapsed="3.862442"/>
+</try>
+<doc>Cleans the inbox to avoid state interference</doc>
+<status status="PASS" start="2026-02-10T18:28:57.045035" elapsed="3.862611"/>
+</kw>
+<doc>Initializes API session and cleans IMAP inbox</doc>
+<status status="PASS" start="2026-02-10T18:28:57.043436" elapsed="3.864247"/>
+</kw>
+<test id="s1-s1-s1-t1" name="Verify API System Health Status" line="15">
+<kw name="Do Health Request">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:00.909114" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:29:00.908872" elapsed="0.000462"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:03.645739" level="INFO">GET Request : url=http://localhost:20000/system/health 
+ path_url=/system/health 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:29:03.645869" level="INFO">GET Response : url=http://localhost:20000/system/health 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4975-30e1-75a9-ac17-5af883606a2d', 'content-length': '26', 'Date': 'Tue, 10 Feb 2026 21:29:03 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"uptime":"202.6830792ms"} 
+ </msg>
+<msg time="2026-02-10T18:29:03.645976" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>${HEALTH_PATH}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:00.909485" elapsed="2.736510"/>
+</kw>
+<return>
+<value>${response.json()}</value>
+<status status="PASS" start="2026-02-10T18:29:03.646053" elapsed="0.000053"/>
+</return>
+<msg time="2026-02-10T18:29:03.646928" level="INFO">${json} = {'uptime': '202.6830792ms'}</msg>
+<var>${json}</var>
+<doc>Performs the health check request and returns the JSON body</doc>
+<status status="PASS" start="2026-02-10T18:29:00.908505" elapsed="2.738446"/>
+</kw>
+<kw name="Validate Health Request">
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${json}</arg>
+<arg>uptime</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.647544" elapsed="0.000141"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<msg time="2026-02-10T18:29:03.648107" level="INFO">Length is 13.</msg>
+<arg>${json}[uptime]</arg>
+<arg>msg=Uptime report is empty</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.647765" elapsed="0.000394"/>
+</kw>
+<arg>${json}</arg>
+<doc>Validates the main health keys</doc>
+<status status="PASS" start="2026-02-10T18:29:03.647263" elapsed="0.000937"/>
+</kw>
+<doc>Verify API system health status</doc>
+<status status="PASS" start="2026-02-10T18:29:00.907748" elapsed="2.740623"/>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:03.649140" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:29:03.649089" elapsed="0.000111"/>
+</kw>
+<doc>Closes all sessions</doc>
+<status status="PASS" start="2026-02-10T18:29:03.648965" elapsed="0.000269"/>
+</kw>
+<doc>E2E tests for the Control API system health status.</doc>
+<status status="PASS" start="2026-02-10T18:28:56.904191" elapsed="6.745062"/>
+</suite>
+<status status="PASS" start="2026-02-10T18:28:56.902911" elapsed="6.746963"/>
+</suite>
+<suite id="s1-s2" name="02 Auth" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth">
+<suite id="s1-s2-s1" name="01 Check-Email" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\01_check-email.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:03.659641" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:29:03.659507" elapsed="0.000245"/>
+</kw>
+<kw name="Postgres Connect" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:29:03.660353" level="INFO">${p} = ParseResult(scheme='postgres', netloc='username:password@localhost:25432', path='/investor', params='', query='sslmode=disable', fragment='')</msg>
+<var>${p}</var>
+<arg>urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)</arg>
+<arg>modules=urllib.parse</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.659969" elapsed="0.000407"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:29:03.663421" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-02-10T18:29:03.663503" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-02-10T18:29:03.671624" level="INFO">Connect to DB using : psycopg2.connect(database='investor', user='username', password=***, host='localhost', port=25432)</msg>
+<arg>db_module=psycopg2</arg>
+<arg>db_name=${{$p.path[1:]}}</arg>
+<arg>db_user=${{$p.username}}</arg>
+<arg>db_password=${{$p.password}}</arg>
+<arg>db_host=${{$p.hostname}}</arg>
+<arg>db_port=${{$p.port}}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.660483" elapsed="0.023829"/>
+</kw>
+<doc>Centralizes the database connection by parsing the URL</doc>
+<status status="PASS" start="2026-02-10T18:29:03.659858" elapsed="0.024552"/>
+</kw>
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:29:03.684894" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;TRUNCATE TABLE "tb_user" CASCADE;&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:29:03.737185" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.684779" elapsed="0.056419"/>
+</kw>
+<arg>TRUNCATE TABLE "tb_user" CASCADE;</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:29:03.684570" elapsed="0.056718"/>
+</kw>
+<kw name="Mailbox Delete All Emails" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:03.741836" elapsed="2.530335"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:03.741731" elapsed="2.530775"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Delete All Emails" owner="ImapLibrary2">
+<doc>Delete all emails.</doc>
+<status status="PASS" start="2026-02-10T18:29:06.273077" elapsed="0.744727"/>
+</kw>
+<arg>Delete All Emails</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-10T18:29:06.272683" elapsed="0.745195"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:03.741649" elapsed="3.276255"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:07.018340" elapsed="0.233767"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:07.018076" elapsed="0.234093"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:07.017962" elapsed="0.234229"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:03.741613" elapsed="3.510599"/>
+</try>
+<doc>Cleans the inbox to avoid state interference</doc>
+<status status="PASS" start="2026-02-10T18:29:03.741487" elapsed="3.510768"/>
+</kw>
+<doc>Initializes API session and cleans IMAP inbox</doc>
+<status status="PASS" start="2026-02-10T18:29:03.659324" elapsed="3.592959"/>
+</kw>
+<test id="s1-s2-s1-t1" name="Should Throw When Email In Use" line="14">
+<kw name="Register New Account">
+<kw name="Generate Random String" owner="String">
+<msg time="2026-02-10T18:29:07.253357" level="INFO">${random_str} = goyolnjgyr</msg>
+<var>${random_str}</var>
+<arg>10</arg>
+<arg>[LOWER]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-02-10T18:29:07.253138" elapsed="0.000242"/>
+</kw>
+<variable name="${random_email}">
+<msg time="2026-02-10T18:29:07.253535" level="INFO">${random_email} = test_goyolnjgyr@email.com</msg>
+<var>test_${random_str}@email.com</var>
+<status status="PASS" start="2026-02-10T18:29:07.253449" elapsed="0.000104"/>
+</variable>
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:29:07.253800" level="INFO">&amp;{payload} = { email=test_goyolnjgyr@email.com | password=Test@123 | name=User goyolnjgyr }</msg>
+<var>email=${random_email}</var>
+<var>password=Test@123</var>
+<var>name=User ${random_str}</var>
+<status status="PASS" start="2026-02-10T18:29:07.253583" elapsed="0.000235"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:09.309277" level="INFO">POST Request : url=http://localhost:20000/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '89', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_goyolnjgyr@email.com", "password": "Test@123", "name": "User goyolnjgyr"}' 
+ </msg>
+<msg time="2026-02-10T18:29:09.309352" level="INFO">POST Response : url=http://localhost:20000/auth/register 
+ status=201, reason=Created 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-49a9-755b-bcf1-a947692e2995', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:09 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/register</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:07.253892" elapsed="2.055517"/>
+</kw>
+<return>
+<value>${random_email}</value>
+<status status="PASS" start="2026-02-10T18:29:09.309468" elapsed="0.000047"/>
+</return>
+<msg time="2026-02-10T18:29:09.309641" level="INFO">${test_email} = test_goyolnjgyr@email.com</msg>
+<var>${test_email}</var>
+<doc>Registers user and returns random email</doc>
+<status status="PASS" start="2026-02-10T18:29:07.252907" elapsed="2.056751"/>
+</kw>
+<kw name="Do Check">
+<variable name="${full_path}">
+<msg time="2026-02-10T18:29:09.310510" level="INFO">${full_path} = auth/check/email/test_goyolnjgyr@email.com</msg>
+<var>${CHECK_PATH}/${email}</var>
+<status status="PASS" start="2026-02-10T18:29:09.310382" elapsed="0.000161"/>
+</variable>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:09.331301" level="INFO">GET Request : url=http://localhost:20000/auth/check/email/test_goyolnjgyr@email.com 
+ path_url=/auth/check/email/test_goyolnjgyr@email.com 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:29:09.331624" level="INFO">GET Response : url=http://localhost:20000/auth/check/email/test_goyolnjgyr@email.com 
+ status=409, reason=Conflict 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4975-49c2-73aa-8c51-679b85932e0c', 'content-length': '203', 'Date': 'Tue, 10 Feb 2026 21:29:09 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"correlationId":"019c4975-49c2-73aa-8c51-679b85932e0c","code":"user.email_in_use","message":"The provided email \"test_goyolnjgyr@email.com\" is already in use.","occurredAt":"2026-02-10T21:29:09.329Z"} 
+ </msg>
+<arg>api_session</arg>
+<arg>${full_path}</arg>
+<arg>expected_status=${expected_status}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.310674" elapsed="0.021062"/>
+</kw>
+<arg>${test_email}</arg>
+<arg>409</arg>
+<doc>Checks if email is in use</doc>
+<status status="PASS" start="2026-02-10T18:29:09.310090" elapsed="0.021725"/>
+</kw>
+<doc>Complete registration and login flow</doc>
+<status status="PASS" start="2026-02-10T18:29:07.252334" elapsed="2.079802"/>
+</test>
+<test id="s1-s2-s1-t2" name="Should Return When Email Not In Use" line="19">
+<kw name="Generate Random String" owner="String">
+<msg time="2026-02-10T18:29:09.333115" level="INFO">${random_str} = lvfwjzgccb</msg>
+<var>${random_str}</var>
+<arg>10</arg>
+<arg>[LOWER]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.332937" elapsed="0.000200"/>
+</kw>
+<variable name="${random_email}">
+<msg time="2026-02-10T18:29:09.333407" level="INFO">${random_email} = test_lvfwjzgccb@email.com</msg>
+<var>test_${random_str}@email.com</var>
+<status status="PASS" start="2026-02-10T18:29:09.333297" elapsed="0.000130"/>
+</variable>
+<kw name="Do Check">
+<variable name="${full_path}">
+<msg time="2026-02-10T18:29:09.333902" level="INFO">${full_path} = auth/check/email/test_lvfwjzgccb@email.com</msg>
+<var>${CHECK_PATH}/${email}</var>
+<status status="PASS" start="2026-02-10T18:29:09.333837" elapsed="0.000082"/>
+</variable>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:09.338981" level="INFO">GET Request : url=http://localhost:20000/auth/check/email/test_lvfwjzgccb@email.com 
+ path_url=/auth/check/email/test_lvfwjzgccb@email.com 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2026-02-10T18:29:09.339049" level="INFO">GET Response : url=http://localhost:20000/auth/check/email/test_lvfwjzgccb@email.com 
+ status=204, reason=No Content 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-49d7-7558-b7a5-3c7e2b0cb913', 'Date': 'Tue, 10 Feb 2026 21:29:09 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>${full_path}</arg>
+<arg>expected_status=${expected_status}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.333991" elapsed="0.005125"/>
+</kw>
+<arg>${random_email}</arg>
+<arg>204</arg>
+<doc>Checks if email is in use</doc>
+<status status="PASS" start="2026-02-10T18:29:09.333655" elapsed="0.005520"/>
+</kw>
+<doc>Complete registration and login flow</doc>
+<status status="PASS" start="2026-02-10T18:29:09.332626" elapsed="0.006830"/>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:09.340212" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:29:09.340154" elapsed="0.000111"/>
+</kw>
+<kw name="Postgres Disconnect" owner="util">
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.340452" elapsed="0.000277"/>
+</kw>
+<doc>Centralizes the database disconnection</doc>
+<status status="PASS" start="2026-02-10T18:29:09.340355" elapsed="0.000418"/>
+</kw>
+<doc>Closes all sessions</doc>
+<status status="PASS" start="2026-02-10T18:29:09.339995" elapsed="0.000805"/>
+</kw>
+<doc>Account registration suite using shared resources</doc>
+<status status="PASS" start="2026-02-10T18:29:03.651261" elapsed="5.689556"/>
+</suite>
+<suite id="s1-s2-s2" name="02 Register" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\02_register.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:09.351194" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:29:09.350977" elapsed="0.000326"/>
+</kw>
+<kw name="Postgres Connect" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:29:09.351884" level="INFO">${p} = ParseResult(scheme='postgres', netloc='username:password@localhost:25432', path='/investor', params='', query='sslmode=disable', fragment='')</msg>
+<var>${p}</var>
+<arg>urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)</arg>
+<arg>modules=urllib.parse</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.351520" elapsed="0.000384"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:29:09.354429" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-02-10T18:29:09.354485" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-02-10T18:29:09.354580" level="INFO">Connect to DB using : psycopg2.connect(database='investor', user='username', password=***, host='localhost', port=25432)</msg>
+<arg>db_module=psycopg2</arg>
+<arg>db_name=${{$p.path[1:]}}</arg>
+<arg>db_user=${{$p.username}}</arg>
+<arg>db_password=${{$p.password}}</arg>
+<arg>db_host=${{$p.hostname}}</arg>
+<arg>db_port=${{$p.port}}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.351983" elapsed="0.012022"/>
+</kw>
+<doc>Centralizes the database connection by parsing the URL</doc>
+<status status="PASS" start="2026-02-10T18:29:09.351413" elapsed="0.012715"/>
+</kw>
+<kw name="Mailbox Delete All Emails" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:09.364650" elapsed="2.578713"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:09.364540" elapsed="2.578946"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Delete All Emails" owner="ImapLibrary2">
+<doc>Delete all emails.</doc>
+<status status="PASS" start="2026-02-10T18:29:11.943869" elapsed="1.778200"/>
+</kw>
+<arg>Delete All Emails</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-10T18:29:11.943605" elapsed="1.778530"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:09.364464" elapsed="4.357695"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:13.722607" elapsed="0.232378"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:13.722344" elapsed="0.232703"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:13.722232" elapsed="0.232837"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:09.364437" elapsed="4.590652"/>
+</try>
+<doc>Cleans the inbox to avoid state interference</doc>
+<status status="PASS" start="2026-02-10T18:29:09.364324" elapsed="4.590805"/>
+</kw>
+<doc>Initializes API session and cleans IMAP inbox</doc>
+<status status="PASS" start="2026-02-10T18:29:09.350760" elapsed="4.604399"/>
+</kw>
+<test id="s1-s2-s2-t1" name="Complete Registration Flow" line="14">
+<kw name="Register New Account">
+<kw name="Generate Random String" owner="String">
+<msg time="2026-02-10T18:29:13.956269" level="INFO">${random_str} = zbipceebij</msg>
+<var>${random_str}</var>
+<arg>10</arg>
+<arg>[LOWER]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-02-10T18:29:13.956101" elapsed="0.000191"/>
+</kw>
+<variable name="${random_email}">
+<msg time="2026-02-10T18:29:13.956428" level="INFO">${random_email} = test_zbipceebij@email.com</msg>
+<var>test_${random_str}@email.com</var>
+<status status="PASS" start="2026-02-10T18:29:13.956336" elapsed="0.000108"/>
+</variable>
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:29:13.956609" level="INFO">&amp;{payload} = { email=test_zbipceebij@email.com | password=Test@123 | name=User zbipceebij }</msg>
+<var>email=${random_email}</var>
+<var>password=Test@123</var>
+<var>name=User ${random_str}</var>
+<status status="PASS" start="2026-02-10T18:29:13.956471" elapsed="0.000155"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:16.005712" level="INFO">POST Request : url=http://localhost:20000/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '89', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_zbipceebij@email.com", "password": "Test@123", "name": "User zbipceebij"}' 
+ </msg>
+<msg time="2026-02-10T18:29:16.005794" level="INFO">POST Response : url=http://localhost:20000/auth/register 
+ status=201, reason=Created 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-63cc-741e-89ed-53797cd1e85e', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:16 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/register</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:13.956700" elapsed="2.049316"/>
+</kw>
+<return>
+<value>${random_email}</value>
+<status status="PASS" start="2026-02-10T18:29:16.006089" elapsed="0.000039"/>
+</return>
+<msg time="2026-02-10T18:29:16.006271" level="INFO">${TEST_EMAIL} = test_zbipceebij@email.com</msg>
+<var>${TEST_EMAIL}</var>
+<doc>Registers user and returns random email</doc>
+<status status="PASS" start="2026-02-10T18:29:13.955816" elapsed="2.050476"/>
+</kw>
+<kw name="Get First Activation Code">
+<kw name="Mailbox Get OTP From Email" owner="util">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:16.007752" level="INFO">Starting email retrieval for: test_zbipceebij@email.com</msg>
+<arg>Starting email retrieval for: ${recipient_email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:16.007419" elapsed="0.000379"/>
+</kw>
+<variable name="${max_attempts_int}">
+<msg time="2026-02-10T18:29:16.008829" level="INFO">${max_attempts_int} = 12</msg>
+<var>${{int($max_attempts)}}</var>
+<status status="PASS" start="2026-02-10T18:29:16.007852" elapsed="0.001010"/>
+</variable>
+<variable name="${range_end}">
+<msg time="2026-02-10T18:29:16.009559" level="INFO">${range_end} = 13</msg>
+<var>${{${max_attempts_int} + 1}}</var>
+<status status="PASS" start="2026-02-10T18:29:16.008906" elapsed="0.000680"/>
+</variable>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:29:19.010576" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:29:16.009708" elapsed="3.000967"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:19.011402" level="INFO">Attempt 1/12 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:19.011118" elapsed="0.000319"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:19.012249" elapsed="2.548268"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:19.012103" elapsed="2.548633"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:22.598539" level="INFO">${emails} = 244</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:29:21.560982" elapsed="1.037613"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:29:22.598660" elapsed="0.000040"/>
+</return>
+<msg time="2026-02-10T18:29:22.598818" level="INFO">${email_index} = 244</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:29:19.011926" elapsed="3.586909"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:22.599166" elapsed="0.000020"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:22.598915" elapsed="0.000328"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:22.598892" elapsed="0.000372"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.064296" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:22.599734" elapsed="0.464597"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:23.065013" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:29:23.064384" elapsed="0.000661"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.065527" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.065394" elapsed="0.000151"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.065767" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.065620" elapsed="0.000163"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:23.065950" elapsed="0.000011"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:23.065992" elapsed="0.000012"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:23.065842" elapsed="0.000177"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:23.065824" elapsed="0.000208"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.066208" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.066100" elapsed="0.000123"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:23.065100" elapsed="0.001145"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.066514" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.066435" elapsed="0.000094"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.066716" level="INFO">${current_payload} = Activate your account - Investor
+
+Welcome to Investor!
+
+Thank you for registering. To activate your account and start investing, please use the link or the verification code below:
+
+Link: http:&amp;...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.066582" elapsed="0.000154"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:23.066856" elapsed="0.000011"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:23.066893" elapsed="0.000008"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:23.066781" elapsed="0.000132"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:23.066770" elapsed="0.000154"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.067080" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.066982" elapsed="0.000113"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:23.066263" elapsed="0.000852"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.067352" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.067279" elapsed="0.000088"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:23.067679" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.067420" elapsed="0.000289"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:23.067910" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:29:23.067853" elapsed="0.000077"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:29:23.067956" elapsed="0.000027"/>
+</break>
+<status status="PASS" start="2026-02-10T18:29:23.067767" elapsed="0.000233"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:23.067753" elapsed="0.000259"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:23.068109" elapsed="0.000015"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:23.067131" elapsed="0.001017"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:29:23.065098" elapsed="0.003066"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:23.068280" elapsed="0.000010"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:29:23.068200" elapsed="0.000110"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:23.068191" elapsed="0.000130"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:29:23.068342" elapsed="0.000021"/>
+</return>
+<msg time="2026-02-10T18:29:23.068447" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:22.599518" elapsed="0.468947"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:29:23.069069" level="INFO">${matches} = ['556276']</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.068788" elapsed="0.000302"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:29:23.069569" level="INFO">Length is 1.</msg>
+<msg time="2026-02-10T18:29:23.069621" level="INFO">${match_count} = 1</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.069220" elapsed="0.000440"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.069733" elapsed="0.000249"/>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="PASS" start="2026-02-10T18:29:23.070017" elapsed="0.000024"/>
+</return>
+<msg time="2026-02-10T18:29:23.070706" level="INFO">${otp_code} = 556276</msg>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="PASS" start="2026-02-10T18:29:23.068583" elapsed="0.002144"/>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:23.070828" elapsed="1.036415"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:24.107318" elapsed="0.000038"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:19.011843" elapsed="5.095539"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:24.107812" elapsed="0.232135"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:24.107524" elapsed="0.232527"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:24.107421" elapsed="0.232658"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:19.011824" elapsed="5.328286"/>
+</try>
+<msg time="2026-02-10T18:29:24.340262" level="INFO">${otp_code} = 556276</msg>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="PASS" start="2026-02-10T18:29:19.011668" elapsed="5.328618"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:24.340334" elapsed="0.000035"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:19.011500" elapsed="5.328893"/>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:24.340531" elapsed="0.000016"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:24.340710" elapsed="0.000019"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:24.340430" elapsed="0.000328"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:19.011478" elapsed="5.329301"/>
+</try>
+<var name="${attempt}">1</var>
+<status status="PASS" start="2026-02-10T18:29:19.011018" elapsed="5.329780"/>
+</iter>
+<var>${attempt}</var>
+<value>1</value>
+<value>${range_end}</value>
+<status status="PASS" start="2026-02-10T18:29:19.010747" elapsed="5.330084"/>
+</for>
+<msg time="2026-02-10T18:29:24.340942" level="INFO">${otp} = 556276</msg>
+<var>${otp}</var>
+<arg>${email}</arg>
+<arg>max_attempts=12</arg>
+<arg>wait_between_attempts=5s</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:16.007088" elapsed="8.333872"/>
+</kw>
+<return>
+<value>${otp}</value>
+<status status="PASS" start="2026-02-10T18:29:24.340997" elapsed="0.000022"/>
+</return>
+<msg time="2026-02-10T18:29:24.341098" level="INFO">${first_otp} = 556276</msg>
+<var>${first_otp}</var>
+<arg>${TEST_EMAIL}</arg>
+<doc>Fetches initial OTP from email</doc>
+<status status="PASS" start="2026-02-10T18:29:16.006679" elapsed="8.334466"/>
+</kw>
+<kw name="Resend And Get New Code">
+<kw name="Request Activation Code Resend">
+<variable name="&amp;{resend_payload}">
+<msg time="2026-02-10T18:29:24.342004" level="INFO">&amp;{resend_payload} = { email=test_zbipceebij@email.com }</msg>
+<var>email=${email}</var>
+<status status="PASS" start="2026-02-10T18:29:24.341900" elapsed="0.000128"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:27.149825" level="INFO">POST Request : url=http://localhost:20000/auth/activate 
+ path_url=/auth/activate 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '38', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_zbipceebij@email.com"}' 
+ </msg>
+<msg time="2026-02-10T18:29:27.149903" level="INFO">POST Response : url=http://localhost:20000/auth/activate 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-8477-7048-8c2e-e7ad0182e412', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:27 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/activate</arg>
+<arg>json=&amp;{resend_payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:24.342112" elapsed="2.807865"/>
+</kw>
+<arg>${email}</arg>
+<doc>Sends POST to resend activation code</doc>
+<status status="PASS" start="2026-02-10T18:29:24.341768" elapsed="2.808281"/>
+</kw>
+<kw name="Mailbox Get OTP From Email" owner="util">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:27.150929" level="INFO">Starting email retrieval for: test_zbipceebij@email.com</msg>
+<arg>Starting email retrieval for: ${recipient_email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:27.150646" elapsed="0.000323"/>
+</kw>
+<variable name="${max_attempts_int}">
+<msg time="2026-02-10T18:29:27.151873" level="INFO">${max_attempts_int} = 12</msg>
+<var>${{int($max_attempts)}}</var>
+<status status="PASS" start="2026-02-10T18:29:27.151015" elapsed="0.000888"/>
+</variable>
+<variable name="${range_end}">
+<msg time="2026-02-10T18:29:27.152485" level="INFO">${range_end} = 13</msg>
+<var>${{${max_attempts_int} + 1}}</var>
+<status status="PASS" start="2026-02-10T18:29:27.151944" elapsed="0.000561"/>
+</variable>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:29:30.153387" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:29:27.152604" elapsed="3.000889"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:30.154399" level="INFO">Attempt 1/12 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:30.154042" elapsed="0.000399"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:30.155377" elapsed="2.599651"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:30.155249" elapsed="2.599886"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:33.796732" level="INFO">${emails} = 245</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:29:32.755253" elapsed="1.041520"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:29:33.796834" elapsed="0.000044"/>
+</return>
+<msg time="2026-02-10T18:29:33.796984" level="INFO">${email_index} = 245</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:29:30.155069" elapsed="3.641932"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:33.797284" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:33.797069" elapsed="0.000256"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:33.797050" elapsed="0.000291"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.262311" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:33.797785" elapsed="0.464563"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:34.263349" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:29:34.262507" elapsed="0.000894"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.264034" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.263868" elapsed="0.000194"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.264368" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.264172" elapsed="0.000220"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:34.264597" elapsed="0.000014"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:34.264646" elapsed="0.000012"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:34.264465" elapsed="0.000211"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:34.264445" elapsed="0.000248"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.265037" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.264782" elapsed="0.000278"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:34.263472" elapsed="0.001619"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.265454" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.265352" elapsed="0.000123"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.265714" level="INFO">${current_payload} = Activate your account - Investor
+
+Welcome to Investor!
+
+Thank you for registering. To activate your account and start investing, please use the link or the verification code below:
+
+Link: http:&amp;...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.265555" elapsed="0.000183"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:34.265902" elapsed="0.000013"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:34.265944" elapsed="0.000010"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:34.265799" elapsed="0.000172"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:34.265783" elapsed="0.000203"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.266198" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.266061" elapsed="0.000156"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:34.265112" elapsed="0.001133"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.266550" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.266458" elapsed="0.000110"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:34.266781" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.266639" elapsed="0.000166"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:34.267014" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:29:34.266946" elapsed="0.000092"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:29:34.267067" elapsed="0.000028"/>
+</break>
+<status status="PASS" start="2026-02-10T18:29:34.266860" elapsed="0.000255"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:34.266845" elapsed="0.000287"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:34.267206" elapsed="0.000018"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:34.266262" elapsed="0.001023"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:29:34.263470" elapsed="0.003839"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:34.267579" elapsed="0.000014"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:29:34.267470" elapsed="0.000150"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:34.267457" elapsed="0.000180"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:29:34.267666" elapsed="0.000026"/>
+</return>
+<msg time="2026-02-10T18:29:34.267806" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:33.797576" elapsed="0.470262"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:29:34.268355" level="INFO">${matches} = ['599883']</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.268195" elapsed="0.000177"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:29:34.268652" level="INFO">Length is 1.</msg>
+<msg time="2026-02-10T18:29:34.268699" level="INFO">${match_count} = 1</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.268440" elapsed="0.000272"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.268778" elapsed="0.000226"/>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="PASS" start="2026-02-10T18:29:34.269038" elapsed="0.000020"/>
+</return>
+<msg time="2026-02-10T18:29:34.269676" level="INFO">${otp_code} = 599883</msg>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="PASS" start="2026-02-10T18:29:34.267984" elapsed="0.001715"/>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:34.269775" elapsed="1.047683"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:35.317538" elapsed="0.000043"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:30.154963" elapsed="5.162646"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.318005" elapsed="0.234919"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.317755" elapsed="0.235247"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:35.317650" elapsed="0.235378"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:30.154943" elapsed="5.398114"/>
+</try>
+<msg time="2026-02-10T18:29:35.553209" level="INFO">${otp_code} = 599883</msg>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="PASS" start="2026-02-10T18:29:30.154740" elapsed="5.398492"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:35.553283" elapsed="0.000058"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:30.154525" elapsed="5.398843"/>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:35.553521" elapsed="0.000018"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:35.553716" elapsed="0.000020"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:35.553410" elapsed="0.000354"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:30.154493" elapsed="5.399294"/>
+</try>
+<var name="${attempt}">1</var>
+<status status="PASS" start="2026-02-10T18:29:30.153910" elapsed="5.399896"/>
+</iter>
+<var>${attempt}</var>
+<value>1</value>
+<value>${range_end}</value>
+<status status="PASS" start="2026-02-10T18:29:30.153568" elapsed="5.400269"/>
+</for>
+<msg time="2026-02-10T18:29:35.553961" level="INFO">${new_otp} = 599883</msg>
+<var>${new_otp}</var>
+<arg>${email}</arg>
+<arg>max_attempts=12</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:27.150324" elapsed="8.403655"/>
+</kw>
+<kw name="Should Not Be Equal" owner="BuiltIn">
+<arg>${previous_otp}</arg>
+<arg>${new_otp}</arg>
+<arg>msg=Resent OTP must be different</arg>
+<doc>Fails if the given objects are equal.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.554053" elapsed="0.000365"/>
+</kw>
+<return>
+<value>${new_otp}</value>
+<status status="PASS" start="2026-02-10T18:29:35.554464" elapsed="0.000028"/>
+</return>
+<msg time="2026-02-10T18:29:35.554576" level="INFO">${second_otp} = 599883</msg>
+<var>${second_otp}</var>
+<arg>${TEST_EMAIL}</arg>
+<arg>${first_otp}</arg>
+<doc>Triggers resend and returns new unique OTP</doc>
+<status status="PASS" start="2026-02-10T18:29:24.341475" elapsed="11.213117"/>
+</kw>
+<kw name="Activate Account With OTP">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:29:35.555626" level="INFO">&amp;{payload} = { email=test_zbipceebij@email.com | otp=599883 }</msg>
+<var>email=${email}</var>
+<var>otp=${otp}</var>
+<status status="PASS" start="2026-02-10T18:29:35.555394" elapsed="0.000293"/>
+</variable>
+<kw name="PUT On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:35.627665" level="INFO">PUT Request : url=http://localhost:20000/auth/activate 
+ path_url=/auth/activate 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '55', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_zbipceebij@email.com", "otp": "599883"}' 
+ </msg>
+<msg time="2026-02-10T18:29:35.627800" level="INFO">PUT Response : url=http://localhost:20000/auth/activate 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-b045-74a2-b811-32b8fecedfb9', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/activate</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a PUT request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.555830" elapsed="0.072139"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<arg>${second_otp}</arg>
+<doc>Sends PATCH to activate the account</doc>
+<status status="PASS" start="2026-02-10T18:29:35.554995" elapsed="0.073071"/>
+</kw>
+<kw name="Login With Activated Account">
+<kw name="Auth Login With Credentials" owner="util">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:29:35.630903" level="INFO">&amp;{payload} = { email=test_zbipceebij@email.com | password=Test@123 }</msg>
+<var>email=${email}</var>
+<var>password=${password}</var>
+<status status="PASS" start="2026-02-10T18:29:35.630650" elapsed="0.000302"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:35.731716" level="INFO">POST Request : url=http://localhost:20000/auth/login/credential 
+ path_url=/auth/login/credential 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '62', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test_zbipceebij@email.com", "password": "Test@123"}' 
+ </msg>
+<msg time="2026-02-10T18:29:35.731829" level="INFO">POST Response : url=http://localhost:20000/auth/login/credential 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'content-type': 'application/json; charset=utf-8', 'x-request-id': '019c4975-b096-760d-95ab-1b5798f55ce1', 'content-length': '1135', 'Date': 'Tue, 10 Feb 2026 21:29:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body={"tokenType":"Bearer","accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6IjAxOWM0OTc1LTYzZDItNzdiZS1hNWY2LWY4NDM4MmZkZjU3ZSIsImVtYWlsIjoidGVzdF96YmlwY2VlYmlqQGVtYWlsLmNvbSIsIm5hbWUiOiJVc2VyIHpiaXBjZWViaWoiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1ODk3NSwiZXhwIjoxNzcwODQ4OTc1LCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc1LWIwYjQtNzNmYS05ZTVjLWUyZTcwNGI1YzJmZiJ9.gZMMoNUU857o8_fbu6uEoqvMvsIoWUR755RWTuNWS38","expiresIn":90000,"refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6InJlZnJlc2gifQ.eyJpZCI6IjAxOWM0OTc1LTYzZDItNzdiZS1hNWY2LWY4NDM4MmZkZjU3ZSIsImVtYWlsIjoidGVzdF96YmlwY2VlYmlqQGVtYWlsLmNvbSIsIm5hbWUiOiJVc2VyIHpiaXBjZWViaWoiLCJsYW5ndWFnZSI6ImVuIiwidGltZXpvbmUiOiJVVEMiLCJoYXNoIjoic2pwcWhEbkEzZVZSV0pQbnlRd2VNak80WVc1alJIRHlEY1NTaTg4MkNidyIsImlhdCI6MTc3MDc1ODk3NSwiZXhwIjoxNzcwODQ1Mzc1LCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjIwMDAwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyMDAwMCIsImp0aSI6IjAxOWM0OTc1LWIwYjQtNzNmYS05ZTVjLWUyZTcwNGI1YzJmZiJ9.NXndbL4_ZVoINZ1MDCP6gwZT1wyd8ZDDRYgO9iXLHiY"} 
+ </msg>
+<msg time="2026-02-10T18:29:35.732010" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api_session</arg>
+<arg>auth/login/credential</arg>
+<arg>json=${payload}</arg>
+<arg>expected_status=${expected_status}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.631148" elapsed="0.100897"/>
+</kw>
+<return>
+<value>${response.json()}</value>
+<status status="PASS" start="2026-02-10T18:29:35.732137" elapsed="0.000056"/>
+</return>
+<msg time="2026-02-10T18:29:35.733280" level="INFO">${auth_data} = {'tokenType': 'Bearer', 'accessToken': 'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpZCI6IjAxOWM0OTc1LTYzZDItNzdiZS1hNWY2LWY4NDM4MmZkZjU3ZSIsImVtYWlsIjoidGVzdF96YmlwY2VlYmlqQGVtYWlsLmNvbSIsIm5hbWUiOiJ...</msg>
+<var>${auth_data}</var>
+<arg>${email}</arg>
+<arg>Test@123</arg>
+<doc>Logs in with credentials and returns auth data</doc>
+<status status="PASS" start="2026-02-10T18:29:35.630263" elapsed="0.103082"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${auth_data}</arg>
+<arg>accessToken</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.733487" elapsed="0.000231"/>
+</kw>
+<return>
+<value>${auth_data}</value>
+<status status="PASS" start="2026-02-10T18:29:35.733855" elapsed="0.000059"/>
+</return>
+<arg>${TEST_EMAIL}</arg>
+<doc>Logins and validates JWT tokens</doc>
+<status status="PASS" start="2026-02-10T18:29:35.629259" elapsed="0.104806"/>
+</kw>
+<doc>Register &gt; Get OTP &gt; Resend OTP &gt; Get New OTP &gt; Activate &gt; Login</doc>
+<status status="PASS" start="2026-02-10T18:29:13.955205" elapsed="21.779152"/>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:35.735493" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:29:35.735410" elapsed="0.000159"/>
+</kw>
+<kw name="Postgres Delete User By Email" owner="util">
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:29:35.736439" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "tb_user" WHERE email = ''&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:29:35.739381" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.736275" elapsed="0.003858"/>
+</kw>
+<arg>DELETE FROM "tb_user" WHERE email = '${email}'</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:29:35.735982" elapsed="0.004284"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Deletes a user from the database using their email address</doc>
+<status status="PASS" start="2026-02-10T18:29:35.735725" elapsed="0.004615"/>
+</kw>
+<kw name="Postgres Disconnect" owner="util">
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.740803" elapsed="0.000303"/>
+</kw>
+<doc>Centralizes the database disconnection</doc>
+<status status="PASS" start="2026-02-10T18:29:35.740550" elapsed="0.000635"/>
+</kw>
+<doc>Closes all sessions</doc>
+<status status="PASS" start="2026-02-10T18:29:35.735185" elapsed="0.006049"/>
+</kw>
+<doc>Account registration suite using shared resources</doc>
+<status status="PASS" start="2026-02-10T18:29:09.341518" elapsed="26.399745"/>
+</suite>
+<suite id="s1-s2-s3" name="03 Recover" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\03_recover.robot">
+<kw name="Setup Test Suite" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:35.764096" level="INFO">Creating Session using : alias=api_session, url=http://localhost:20000/, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api_session</arg>
+<arg>${ROBOT_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-10T18:29:35.763651" elapsed="0.000993"/>
+</kw>
+<kw name="Postgres Connect" owner="util">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-10T18:29:35.766305" level="INFO">${p} = ParseResult(scheme='postgres', netloc='username:password@localhost:25432', path='/investor', params='', query='sslmode=disable', fragment='')</msg>
+<var>${p}</var>
+<arg>urllib.parse.urlparse($ROBOT_DATABASE_POSTGRES_URL)</arg>
+<arg>modules=urllib.parse</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.765694" elapsed="0.000653"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:29:35.772737" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-02-10T18:29:35.772854" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-02-10T18:29:35.773040" level="INFO">Connect to DB using : psycopg2.connect(database='investor', user='username', password=***, host='localhost', port=25432)</msg>
+<arg>db_module=psycopg2</arg>
+<arg>db_name=${{$p.path[1:]}}</arg>
+<arg>db_user=${{$p.username}}</arg>
+<arg>db_password=${{$p.password}}</arg>
+<arg>db_host=${{$p.hostname}}</arg>
+<arg>db_port=${{$p.port}}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.766659" elapsed="0.021543"/>
+</kw>
+<doc>Centralizes the database connection by parsing the URL</doc>
+<status status="PASS" start="2026-02-10T18:29:35.765410" elapsed="0.022947"/>
+</kw>
+<kw name="Mailbox Delete All Emails" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:35.789208" elapsed="2.632155"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:35.789031" elapsed="2.632427"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Delete All Emails" owner="ImapLibrary2">
+<doc>Delete all emails.</doc>
+<status status="PASS" start="2026-02-10T18:29:38.422292" elapsed="1.878234"/>
+</kw>
+<arg>Delete All Emails</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-10T18:29:38.421734" elapsed="1.878864"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:35.788897" elapsed="4.511725"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:40.301027" elapsed="0.233659"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:40.300784" elapsed="0.233981"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:40.300673" elapsed="0.234118"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:35.788851" elapsed="4.745967"/>
+</try>
+<doc>Cleans the inbox to avoid state interference</doc>
+<status status="PASS" start="2026-02-10T18:29:35.788658" elapsed="4.746208"/>
+</kw>
+<doc>Initializes API session and cleans the mailbox</doc>
+<status status="PASS" start="2026-02-10T18:29:35.763211" elapsed="4.771690"/>
+</kw>
+<test id="s1-s2-s3-t1" name="Complete Recovery Flow" line="16">
+<kw name="Create Active User For Recovery">
+<kw name="Generate Random String" owner="String">
+<msg time="2026-02-10T18:29:40.535861" level="INFO">${random_str} = amecjhokbs</msg>
+<var>${random_str}</var>
+<arg>10</arg>
+<arg>[LOWER]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-02-10T18:29:40.535685" elapsed="0.000201"/>
+</kw>
+<variable name="${email}">
+<msg time="2026-02-10T18:29:40.536019" level="INFO">${email} = recover_amecjhokbs@email.com</msg>
+<var>recover_${random_str}@email.com</var>
+<status status="PASS" start="2026-02-10T18:29:40.535937" elapsed="0.000100"/>
+</variable>
+<variable name="&amp;{reg_payload}">
+<msg time="2026-02-10T18:29:40.536184" level="INFO">&amp;{reg_payload} = { email=recover_amecjhokbs@email.com | password=OldPassword@123 | name=Recovery User }</msg>
+<var>email=${email}</var>
+<var>password=OldPassword@123</var>
+<var>name=Recovery User</var>
+<status status="PASS" start="2026-02-10T18:29:40.536065" elapsed="0.000138"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:42.597401" level="INFO">POST Request : url=http://localhost:20000/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '97', 'Content-Type': 'application/json'} 
+ body=b'{"email": "recover_amecjhokbs@email.com", "password": "OldPassword@123", "name": "Recovery User"}' 
+ </msg>
+<msg time="2026-02-10T18:29:42.597484" level="INFO">POST Response : url=http://localhost:20000/auth/register 
+ status=201, reason=Created 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-cba6-7215-8d63-0a8ed802add1', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:42 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/register</arg>
+<arg>json=&amp;{reg_payload}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:40.536289" elapsed="2.061258"/>
+</kw>
+<kw name="Mailbox Get OTP From Email" owner="util">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:42.598392" level="INFO">Starting email retrieval for: recover_amecjhokbs@email.com</msg>
+<arg>Starting email retrieval for: ${recipient_email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:42.598101" elapsed="0.000333"/>
+</kw>
+<variable name="${max_attempts_int}">
+<msg time="2026-02-10T18:29:42.599330" level="INFO">${max_attempts_int} = 15</msg>
+<var>${{int($max_attempts)}}</var>
+<status status="PASS" start="2026-02-10T18:29:42.598488" elapsed="0.000867"/>
+</variable>
+<variable name="${range_end}">
+<msg time="2026-02-10T18:29:42.600131" level="INFO">${range_end} = 16</msg>
+<var>${{${max_attempts_int} + 1}}</var>
+<status status="PASS" start="2026-02-10T18:29:42.599395" elapsed="0.000765"/>
+</variable>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:29:45.600914" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:29:42.600271" elapsed="3.000804"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:45.602825" level="INFO">Attempt 1/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:45.601964" elapsed="0.001324"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:45.605350" elapsed="2.613018"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:45.605099" elapsed="2.613396"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.281910" level="INFO">${emails} = 247</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:29:48.218608" elapsed="1.063343"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:29:49.282012" elapsed="0.000038"/>
+</return>
+<msg time="2026-02-10T18:29:49.282155" level="INFO">${email_index} = 247</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:29:45.604732" elapsed="3.677440"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:49.282446" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:49.282237" elapsed="0.000251"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:49.282220" elapsed="0.000285"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.753342" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.282956" elapsed="0.470427"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:49.754048" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:29:49.753446" elapsed="0.000626"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.754623" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.754421" elapsed="0.000234"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.754942" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.754771" elapsed="0.000188"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:49.755130" elapsed="0.000012"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:49.755170" elapsed="0.000011"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:49.755022" elapsed="0.000172"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:49.755004" elapsed="0.000203"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.755429" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.755273" elapsed="0.000174"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:49.754120" elapsed="0.001354"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.755904" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.755786" elapsed="0.000141"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.756172" level="INFO">${current_payload} = Activate your account - Investor
+
+Welcome to Investor!
+
+Thank you for registering. To activate your account and start investing, please use the link or the verification code below:
+
+Link: http:&amp;...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.756030" elapsed="0.000162"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:49.756332" elapsed="0.000011"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:29:49.756367" elapsed="0.000008"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:29:49.756246" elapsed="0.000141"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:49.756231" elapsed="0.000168"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.756555" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.756455" elapsed="0.000116"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:49.755505" elapsed="0.001088"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.756845" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.756767" elapsed="0.000094"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:29:49.757035" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.756917" elapsed="0.000138"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:29:49.757231" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:29:49.757173" elapsed="0.000078"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:29:49.757275" elapsed="0.000023"/>
+</break>
+<status status="PASS" start="2026-02-10T18:29:49.757098" elapsed="0.000217"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:49.757087" elapsed="0.000241"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:49.757421" elapsed="0.000033"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:49.756606" elapsed="0.000884"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:29:49.754119" elapsed="0.003392"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:29:49.757658" elapsed="0.000011"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:29:49.757561" elapsed="0.000192"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:49.757548" elapsed="0.000248"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:29:49.757845" elapsed="0.000029"/>
+</return>
+<msg time="2026-02-10T18:29:49.757977" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Activate your account - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:49.282742" elapsed="0.475256"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:29:49.758492" level="INFO">${matches} = ['694817']</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.758311" elapsed="0.000199"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:29:49.758785" level="INFO">Length is 1.</msg>
+<msg time="2026-02-10T18:29:49.758836" level="INFO">${match_count} = 1</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.758580" elapsed="0.000271"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.758920" elapsed="0.000235"/>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="PASS" start="2026-02-10T18:29:49.759192" elapsed="0.000023"/>
+</return>
+<msg time="2026-02-10T18:29:49.759898" level="INFO">${otp_code} = 694817</msg>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="PASS" start="2026-02-10T18:29:49.758125" elapsed="0.001794"/>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:29:49.760023" elapsed="1.049420"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:50.809527" elapsed="0.000043"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:45.604549" elapsed="5.205051"/>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:29:50.810124" elapsed="0.233525"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:29:50.809766" elapsed="0.233960"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:29:50.809644" elapsed="0.234107"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:45.604507" elapsed="5.439273"/>
+</try>
+<msg time="2026-02-10T18:29:51.043914" level="INFO">${otp_code} = 694817</msg>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="PASS" start="2026-02-10T18:29:45.604102" elapsed="5.439834"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="PASS" start="2026-02-10T18:29:51.043978" elapsed="0.000036"/>
+</return>
+<status status="PASS" start="2026-02-10T18:29:45.603579" elapsed="5.440457"/>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:51.044164" elapsed="0.000016"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:29:51.044335" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:29:51.044067" elapsed="0.000312"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:45.603501" elapsed="5.440899"/>
+</try>
+<var name="${attempt}">1</var>
+<status status="PASS" start="2026-02-10T18:29:45.601760" elapsed="5.442657"/>
+</iter>
+<var>${attempt}</var>
+<value>1</value>
+<value>${range_end}</value>
+<status status="PASS" start="2026-02-10T18:29:45.601188" elapsed="5.443253"/>
+</for>
+<msg time="2026-02-10T18:29:51.044539" level="INFO">${activation_otp} = 694817</msg>
+<var>${activation_otp}</var>
+<arg>${email}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:29:42.597816" elapsed="8.446740"/>
+</kw>
+<variable name="&amp;{act_payload}">
+<msg time="2026-02-10T18:29:51.044719" level="INFO">&amp;{act_payload} = { email=recover_amecjhokbs@email.com | otp=694817 }</msg>
+<var>email=${email}</var>
+<var>otp=${activation_otp}</var>
+<status status="PASS" start="2026-02-10T18:29:51.044588" elapsed="0.000150"/>
+</variable>
+<kw name="PUT On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:51.104758" level="INFO">PUT Request : url=http://localhost:20000/auth/activate 
+ path_url=/auth/activate 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '58', 'Content-Type': 'application/json'} 
+ body=b'{"email": "recover_amecjhokbs@email.com", "otp": "694817"}' 
+ </msg>
+<msg time="2026-02-10T18:29:51.104857" level="INFO">PUT Response : url=http://localhost:20000/auth/activate 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-ecc5-7026-828c-ce6d2b273ad2', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:51 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>auth/activate</arg>
+<arg>json=&amp;{act_payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a PUT request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:51.044818" elapsed="0.060132"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:51.105503" level="INFO">User created and activated: recover_amecjhokbs@email.com</msg>
+<arg>User created and activated: ${email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:51.105119" elapsed="0.000425"/>
+</kw>
+<return>
+<value>${email}</value>
+<status status="PASS" start="2026-02-10T18:29:51.105599" elapsed="0.000040"/>
+</return>
+<msg time="2026-02-10T18:29:51.105748" level="INFO">${TEST_EMAIL} = recover_amecjhokbs@email.com</msg>
+<var>${TEST_EMAIL}</var>
+<doc>Registers and activates a new user, returning the email</doc>
+<status status="PASS" start="2026-02-10T18:29:40.535468" elapsed="10.570296"/>
+</kw>
+<kw name="Request Recovery And Get Code">
+<variable name="&amp;{payload}">
+<msg time="2026-02-10T18:29:51.106850" level="INFO">&amp;{payload} = { email=recover_amecjhokbs@email.com }</msg>
+<var>email=${email}</var>
+<status status="PASS" start="2026-02-10T18:29:51.106659" elapsed="0.000230"/>
+</variable>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-10T18:29:54.409399" level="INFO">POST Request : url=http://localhost:20000/auth/recover 
+ path_url=/auth/recover 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '41', 'Content-Type': 'application/json'} 
+ body=b'{"email": "recover_amecjhokbs@email.com"}' 
+ </msg>
+<msg time="2026-02-10T18:29:54.409472" level="INFO">POST Response : url=http://localhost:20000/auth/recover 
+ status=200, reason=OK 
+ headers={'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'vary': 'Origin', 'x-request-id': '019c4975-ed09-715f-815f-1d2e25f17d49', 'content-length': '0', 'Date': 'Tue, 10 Feb 2026 21:29:54 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=72'} 
+ body=None 
+ </msg>
+<arg>api_session</arg>
+<arg>${RECOVER_PATH}</arg>
+<arg>json=&amp;{payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-10T18:29:51.107101" elapsed="3.302442"/>
+</kw>
+<kw name="Mailbox Get OTP From Email" owner="util">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:54.410353" level="INFO">Starting email retrieval for: recover_amecjhokbs@email.com</msg>
+<arg>Starting email retrieval for: ${recipient_email}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:54.410066" elapsed="0.000325"/>
+</kw>
+<variable name="${max_attempts_int}">
+<msg time="2026-02-10T18:29:54.411256" level="INFO">${max_attempts_int} = 15</msg>
+<var>${{int($max_attempts)}}</var>
+<status status="PASS" start="2026-02-10T18:29:54.410431" elapsed="0.000861"/>
+</variable>
+<variable name="${range_end}">
+<msg time="2026-02-10T18:29:54.411852" level="INFO">${range_end} = 16</msg>
+<var>${{${max_attempts_int} + 1}}</var>
+<status status="PASS" start="2026-02-10T18:29:54.411331" elapsed="0.000541"/>
+</variable>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:29:57.412767" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:29:54.411949" elapsed="3.000978"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:29:57.414159" level="INFO">Attempt 1/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:29:57.413635" elapsed="0.000596"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:29:57.415360" elapsed="2.644463"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:29:57.415216" elapsed="2.644700"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.101559" level="INFO">${emails} = 249</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:30:00.060027" elapsed="1.041599"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:30:01.101763" elapsed="0.000069"/>
+</return>
+<msg time="2026-02-10T18:30:01.102033" level="INFO">${email_index} = 249</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:29:57.414984" elapsed="3.687085"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:01.102541" elapsed="0.000032"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:01.102187" elapsed="0.000436"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.102158" elapsed="0.000501"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.568984" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.103559" elapsed="0.465492"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:01.570460" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:30:01.569155" elapsed="0.001383"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.571507" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.571246" elapsed="0.000300"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.571951" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.571727" elapsed="0.000244"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:01.572279" elapsed="0.000016"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:01.572342" elapsed="0.000017"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:01.572058" elapsed="0.000336"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.572022" elapsed="0.000394"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.572789" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.572537" elapsed="0.000275"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:01.570648" elapsed="0.002195"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.573285" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.573164" elapsed="0.000141"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.573549" level="INFO">${current_payload} = Identity Verification - Investor
+
+To proceed with your registration, we need to validate your identity.
+Please upload the following:
+- Government ID (Front and Back) - ID Card or Driver's License...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.573382" elapsed="0.000221"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:01.573823" elapsed="0.000014"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:01.573870" elapsed="0.000009"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:01.573702" elapsed="0.000193"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.573682" elapsed="0.000227"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.574109" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.573981" elapsed="0.000170"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:01.572866" elapsed="0.001313"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.574519" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.574412" elapsed="0.000128"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:01.574871" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.574608" elapsed="0.000288"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:01.575267" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:30:01.575102" elapsed="0.000206"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:30:01.575373" elapsed="0.000062"/>
+</break>
+<status status="PASS" start="2026-02-10T18:30:01.574969" elapsed="0.000497"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.574947" elapsed="0.000548"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:01.575580" elapsed="0.000017"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:01.574198" elapsed="0.001427"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:30:01.570646" elapsed="0.004998"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:01.575850" elapsed="0.000016"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:30:01.575726" elapsed="0.000167"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.575705" elapsed="0.000210"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:30:01.575940" elapsed="0.000032"/>
+</return>
+<msg time="2026-02-10T18:30:01.576110" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:01.103136" elapsed="0.473006"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:30:01.576907" level="INFO">${matches} = []</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.576626" elapsed="0.000307"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:30:01.577377" level="INFO">Length is 0.</msg>
+<msg time="2026-02-10T18:30:01.577459" level="INFO">${match_count} = 0</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.577025" elapsed="0.000459"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<msg time="2026-02-10T18:30:01.578043" level="FAIL">OTP pattern not found in email body</msg>
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="FAIL" start="2026-02-10T18:30:01.577572" elapsed="0.000625">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:01.578263" elapsed="0.000033"/>
+</return>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="FAIL" start="2026-02-10T18:30:01.576371" elapsed="0.002023">OTP pattern not found in email body</status>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:01.578491" elapsed="0.000017"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:01.578538" elapsed="0.000014"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:29:57.414878" elapsed="4.163707">OTP pattern not found in email body</status>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.579112" elapsed="0.238026"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.578783" elapsed="0.238479"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:01.578626" elapsed="0.238698"/>
+</branch>
+<status status="FAIL" start="2026-02-10T18:29:57.414853" elapsed="4.402525">OTP pattern not found in email body</status>
+</try>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="FAIL" start="2026-02-10T18:29:57.414642" elapsed="4.402921">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:01.817665" elapsed="0.000032"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:29:57.414352" elapsed="4.403423">OTP pattern not found in email body</status>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:01.818667" level="WARN">Attempt 1 failed: OTP pattern not found in email body</msg>
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.818088" elapsed="0.001090"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<if>
+<branch type="IF" condition="$attempt == $max_attempts">
+<kw name="Fail" owner="BuiltIn">
+<arg>Failed to retrieve OTP after ${max_attempts} attempts. Last error: ${error}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:01.820106" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:01.819896" elapsed="0.000261"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:01.819870" elapsed="0.000307"/>
+</if>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:01.820523" level="INFO">Waiting 5s before next attempt...</msg>
+<arg>Waiting ${wait_time} before next attempt...</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.820241" elapsed="0.000324"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:30:06.821308" level="INFO">Slept 5 seconds.</msg>
+<arg>${wait_time}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:30:01.820644" elapsed="5.000824"/>
+</kw>
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:01.819439" elapsed="5.002147"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:01.817895" elapsed="5.003752"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:29:57.414310" elapsed="9.407392"/>
+</try>
+<var name="${attempt}">1</var>
+<status status="PASS" start="2026-02-10T18:29:57.413479" elapsed="9.408262"/>
+</iter>
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:06.822727" level="INFO">Attempt 2/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:06.822196" elapsed="0.000597"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:30:06.824166" elapsed="2.580278"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:30:06.823896" elapsed="2.580644"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.497548" level="INFO">${emails} = 249</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:30:09.404657" elapsed="1.092949"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:30:10.497701" elapsed="0.000054"/>
+</return>
+<msg time="2026-02-10T18:30:10.497921" level="INFO">${email_index} = 249</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:30:06.823638" elapsed="3.674313"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:10.498347" elapsed="0.000027"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:10.498048" elapsed="0.000365"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:10.498025" elapsed="0.000417"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.984262" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.499192" elapsed="0.485111"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:10.985117" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:30:10.984367" elapsed="0.000809"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.986355" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.986042" elapsed="0.000333"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.986880" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.986605" elapsed="0.000306"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:10.987199" elapsed="0.000018"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:10.987262" elapsed="0.000015"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:10.987010" elapsed="0.000287"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:10.986978" elapsed="0.000339"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.987579" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.987419" elapsed="0.000184"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:10.985295" elapsed="0.002345"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.988032" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.987921" elapsed="0.000135"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.988353" level="INFO">${current_payload} = Identity Verification - Investor
+
+To proceed with your registration, we need to validate your identity.
+Please upload the following:
+- Government ID (Front and Back) - ID Card or Driver's License...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.988172" elapsed="0.000209"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:10.988591" elapsed="0.000017"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:10.988648" elapsed="0.000012"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:10.988452" elapsed="0.000228"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:10.988436" elapsed="0.000264"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.988945" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.988787" elapsed="0.000212"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:10.987663" elapsed="0.001374"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.989421" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.989309" elapsed="0.000136"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:10.989752" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.989536" elapsed="0.000249"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:10.990063" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:30:10.989977" elapsed="0.000142"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:30:10.990162" elapsed="0.000033"/>
+</break>
+<status status="PASS" start="2026-02-10T18:30:10.989856" elapsed="0.000364"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:10.989838" elapsed="0.000405"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:10.990338" elapsed="0.000020"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:10.989058" elapsed="0.001339"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:30:10.985294" elapsed="0.005126"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:10.990583" elapsed="0.000016"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:30:10.990472" elapsed="0.000155"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:10.990459" elapsed="0.000188"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:30:10.990678" elapsed="0.000030"/>
+</return>
+<msg time="2026-02-10T18:30:10.990841" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:10.498821" elapsed="0.492049"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:30:10.991673" level="INFO">${matches} = []</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.991365" elapsed="0.000338"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:30:10.992207" level="INFO">Length is 0.</msg>
+<msg time="2026-02-10T18:30:10.992293" level="INFO">${match_count} = 0</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.991824" elapsed="0.000491"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<msg time="2026-02-10T18:30:10.992941" level="FAIL">OTP pattern not found in email body</msg>
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="FAIL" start="2026-02-10T18:30:10.992433" elapsed="0.000623">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:10.993138" elapsed="0.000022"/>
+</return>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="FAIL" start="2026-02-10T18:30:10.991053" elapsed="0.002255">OTP pattern not found in email body</status>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:10.993443" elapsed="0.000021"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:10.993506" elapsed="0.000017"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:06.823484" elapsed="4.170089">OTP pattern not found in email body</status>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.994032" elapsed="0.231979"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:30:10.993733" elapsed="0.232387"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:10.993632" elapsed="0.232537"/>
+</branch>
+<status status="FAIL" start="2026-02-10T18:30:06.823456" elapsed="4.402761">OTP pattern not found in email body</status>
+</try>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="FAIL" start="2026-02-10T18:30:06.823251" elapsed="4.403120">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:11.226453" elapsed="0.000026"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:06.822907" elapsed="4.403628">OTP pattern not found in email body</status>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:11.227292" level="WARN">Attempt 2 failed: OTP pattern not found in email body</msg>
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:11.226804" elapsed="0.000973"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<if>
+<branch type="IF" condition="$attempt == $max_attempts">
+<kw name="Fail" owner="BuiltIn">
+<arg>Failed to retrieve OTP after ${max_attempts} attempts. Last error: ${error}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:11.228941" elapsed="0.000039"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:11.228617" elapsed="0.000401"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:11.228588" elapsed="0.000451"/>
+</if>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:11.229409" level="INFO">Waiting 5s before next attempt...</msg>
+<arg>Waiting ${wait_time} before next attempt...</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:11.229122" elapsed="0.000324"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:30:16.230241" level="INFO">Slept 5 seconds.</msg>
+<arg>${wait_time}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:30:11.229797" elapsed="5.000565"/>
+</kw>
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:11.228101" elapsed="5.002341"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:11.226645" elapsed="5.003834"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:06.822868" elapsed="9.407649"/>
+</try>
+<var name="${attempt}">2</var>
+<status status="PASS" start="2026-02-10T18:30:06.822041" elapsed="9.408496"/>
+</iter>
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:16.231331" level="INFO">Attempt 3/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:16.230967" elapsed="0.000408"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="PASS" start="2026-02-10T18:30:16.232504" elapsed="2.605409"/>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="PASS" start="2026-02-10T18:30:16.232222" elapsed="2.605787"/>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:19.850117" level="INFO">${emails} = 249</msg>
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="PASS" start="2026-02-10T18:30:18.838120" elapsed="1.012034"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="PASS" start="2026-02-10T18:30:19.850215" elapsed="0.000037"/>
+</return>
+<msg time="2026-02-10T18:30:19.850352" level="INFO">${email_index} = 249</msg>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="PASS" start="2026-02-10T18:30:16.232035" elapsed="3.618331"/>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:19.850638" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:19.850424" elapsed="0.000253"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:19.850411" elapsed="0.000283"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.316023" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:19.851162" elapsed="0.464900"/>
+</kw>
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:20.316714" level="INFO">${extracted_body} = </msg>
+<var>${EMPTY}</var>
+<status status="PASS" start="2026-02-10T18:30:20.316118" elapsed="0.000624"/>
+</variable>
+<while condition="$status != False">
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.317185" level="INFO">${type} = multipart/alternative</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.317064" elapsed="0.000139"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.317409" level="INFO">${current_payload} = None</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.317273" elapsed="0.000152"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:20.317564" elapsed="0.000012"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:20.317620" elapsed="0.000011"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:20.317478" elapsed="0.000167"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:20.317464" elapsed="0.000194"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.317840" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.317724" elapsed="0.000132"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:20.316788" elapsed="0.001096"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.318143" level="INFO">${type} = text/plain</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.318066" elapsed="0.000093"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.318338" level="INFO">${current_payload} = Identity Verification - Investor
+
+To proceed with your registration, we need to validate your identity.
+Please upload the following:
+- Government ID (Front and Back) - ID Card or Driver's License...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.318216" elapsed="0.000140"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<var>${current_payload}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:20.318481" elapsed="0.000011"/>
+</variable>
+<break>
+<status status="NOT RUN" start="2026-02-10T18:30:20.318515" elapsed="0.000009"/>
+</break>
+<status status="NOT RUN" start="2026-02-10T18:30:20.318402" elapsed="0.000135"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:20.318389" elapsed="0.000159"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.318699" level="INFO">${status} = 2</msg>
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.318603" elapsed="0.000114"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:20.317899" elapsed="0.000839"/>
+</iter>
+<iter>
+<kw name="Get Multipart Content Type" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.318976" level="INFO">${type} = text/html</msg>
+<var>${type}</var>
+<doc>Returns the content type of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.318902" elapsed="0.000089"/>
+</kw>
+<kw name="Get Multipart Payload" owner="ImapLibrary2">
+<msg time="2026-02-10T18:30:20.319160" level="INFO">${current_payload} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<arg>decode=True</arg>
+<doc>Returns the payload of current part of selected multipart email message.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.319045" elapsed="0.000153"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;text/html&quot; in $type">
+<variable name="${extracted_body}">
+<msg time="2026-02-10T18:30:20.319382" level="INFO">${extracted_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${current_payload}</var>
+<status status="PASS" start="2026-02-10T18:30:20.319321" elapsed="0.000081"/>
+</variable>
+<break>
+<status status="PASS" start="2026-02-10T18:30:20.319427" elapsed="0.000025"/>
+</break>
+<status status="PASS" start="2026-02-10T18:30:20.319244" elapsed="0.000226"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:20.319233" elapsed="0.000251"/>
+</if>
+<kw name="Walk Multipart Email" owner="ImapLibrary2">
+<var>${status}</var>
+<arg>${email_index}</arg>
+<doc>Returns total parts of a multipart email message on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:20.319548" elapsed="0.000014"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:20.318752" elapsed="0.000834"/>
+</iter>
+<status status="PASS" start="2026-02-10T18:30:20.316786" elapsed="0.002831"/>
+</while>
+<if>
+<branch type="IF" condition="$extracted_body == &quot;&quot;">
+<variable name="${extracted_body}">
+<var>Get Email Body</var>
+<var>${email_index}</var>
+<status status="NOT RUN" start="2026-02-10T18:30:20.319730" elapsed="0.000011"/>
+</variable>
+<status status="NOT RUN" start="2026-02-10T18:30:20.319654" elapsed="0.000106"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:20.319644" elapsed="0.000131"/>
+</if>
+<return>
+<value>${extracted_body}</value>
+<status status="PASS" start="2026-02-10T18:30:20.319797" elapsed="0.000023"/>
+</return>
+<msg time="2026-02-10T18:30:20.319906" level="INFO">${email_body} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Identity Verification - Investor&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body style="font-family: Arial, sans-serif; line-height: 1.6; colo...</msg>
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:19.850954" elapsed="0.468971"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-02-10T18:30:20.320399" level="INFO">${matches} = []</msg>
+<var>${matches}</var>
+<arg>${content}</arg>
+<arg>${REGEX_EMAIL_OTP}</arg>
+<arg>1</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.320236" elapsed="0.000181"/>
+</kw>
+<kw name="Get Length" owner="BuiltIn">
+<msg time="2026-02-10T18:30:20.320738" level="INFO">Length is 0.</msg>
+<msg time="2026-02-10T18:30:20.320791" level="INFO">${match_count} = 0</msg>
+<var>${match_count}</var>
+<arg>${matches}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.320485" elapsed="0.000322"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<msg time="2026-02-10T18:30:20.321155" level="FAIL">OTP pattern not found in email body</msg>
+<arg>${match_count} &gt; 0</arg>
+<arg>msg=OTP pattern not found in email body</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="FAIL" start="2026-02-10T18:30:20.320878" elapsed="0.000334">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${matches[0]}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:20.321256" elapsed="0.000018"/>
+</return>
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="FAIL" start="2026-02-10T18:30:20.320048" elapsed="0.001294">OTP pattern not found in email body</status>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:20.321416" elapsed="0.000013"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:20.321453" elapsed="0.000009"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:16.231932" elapsed="4.089556">OTP pattern not found in email body</status>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Close Mailbox" owner="ImapLibrary2">
+<doc>Close IMAP email client session.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.321830" elapsed="0.240686"/>
+</kw>
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.321591" elapsed="0.241091"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:20.321527" elapsed="0.241201"/>
+</branch>
+<status status="FAIL" start="2026-02-10T18:30:16.231898" elapsed="4.330876">OTP pattern not found in email body</status>
+</try>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="FAIL" start="2026-02-10T18:30:16.231711" elapsed="4.331303">OTP pattern not found in email body</status>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:20.563168" elapsed="0.000031"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:16.231456" elapsed="4.331839">OTP pattern not found in email body</status>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:20.563829" level="WARN">Attempt 3 failed: OTP pattern not found in email body</msg>
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.563512" elapsed="0.000640"/>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<if>
+<branch type="IF" condition="$attempt == $max_attempts">
+<kw name="Fail" owner="BuiltIn">
+<arg>Failed to retrieve OTP after ${max_attempts} attempts. Last error: ${error}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:20.564915" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:20.564724" elapsed="0.000236"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:20.564646" elapsed="0.000331"/>
+</if>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:20.565294" level="INFO">Waiting 5s before next attempt...</msg>
+<arg>Waiting ${wait_time} before next attempt...</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.565037" elapsed="0.000289"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-10T18:30:25.565777" level="INFO">Slept 5 seconds.</msg>
+<arg>${wait_time}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-10T18:30:20.565396" elapsed="5.000545"/>
+</kw>
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="PASS" start="2026-02-10T18:30:20.564357" elapsed="5.001710"/>
+</kw>
+<status status="PASS" start="2026-02-10T18:30:20.563396" elapsed="5.002739"/>
+</branch>
+<status status="PASS" start="2026-02-10T18:30:16.231427" elapsed="9.334773"/>
+</try>
+<var name="${attempt}">3</var>
+<status status="PASS" start="2026-02-10T18:30:16.230751" elapsed="9.335494"/>
+</iter>
+<iter>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-10T18:30:25.567291" level="INFO">Attempt 4/15 to retrieve email</msg>
+<arg>Attempt ${attempt}/${max_attempts} to retrieve email</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-10T18:30:25.566728" elapsed="0.000673"/>
+</kw>
+<try>
+<branch type="TRY">
+<kw name="Mailbox Try Get OTP" owner="util">
+<try>
+<branch type="TRY">
+<kw name="Mailbox Open And Wait For Email" owner="util">
+<kw name="Mailbox Connect" owner="util">
+<kw name="Open Mailbox" owner="ImapLibrary2">
+<arg>host=${ROBOT_MAILER_IMAP_HOST}</arg>
+<arg>port=${ROBOT_MAILER_IMAP_PORT}</arg>
+<arg>user=${ROBOT_MAILER_IMAP_USERNAME}</arg>
+<arg>password=${ROBOT_MAILER_IMAP_PASSWORD}</arg>
+<doc>Open IMAP email client session to given ``host`` with given ``user`` and ``password``.</doc>
+<status status="FAIL" start="2026-02-10T18:30:25.568815" elapsed="1.535042">Execution terminated by signal</status>
+</kw>
+<doc>Centralizes the mailbox opening</doc>
+<status status="FAIL" start="2026-02-10T18:30:25.568505" elapsed="1.535585">Execution terminated by signal</status>
+</kw>
+<kw name="Wait For Email" owner="ImapLibrary2">
+<var>${emails}</var>
+<arg>sender=${ROBOT_MAILER_SMTP_FROM}</arg>
+<arg>recipient=${recipient_email}</arg>
+<arg>timeout=10</arg>
+<doc>Wait for email message to arrived based on any given filter criteria.
+Returns email index of the latest email message received.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.104314" elapsed="0.000042"/>
+</kw>
+<return>
+<value>${emails}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:27.104439" elapsed="0.000029"/>
+</return>
+<var>${email_index}</var>
+<arg>${recipient_email}</arg>
+<doc>Opens the mailbox and waits for a specific recipient email</doc>
+<status status="FAIL" start="2026-02-10T18:30:25.568302" elapsed="1.536272">Execution terminated by signal</status>
+</kw>
+<if>
+<branch type="IF" condition="$email_index == $None or $email_index == &quot;&quot;">
+<kw name="Fail" owner="BuiltIn">
+<arg>No email found yet</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.104845" elapsed="0.000030"/>
+</kw>
+<status status="NOT RUN" start="2026-02-10T18:30:27.104697" elapsed="0.000229"/>
+</branch>
+<status status="NOT RUN" start="2026-02-10T18:30:27.104670" elapsed="0.000291"/>
+</if>
+<kw name="Mailbox Get Content From Multipart Email" owner="util">
+<var>${email_body}</var>
+<arg>${email_index}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.105427" elapsed="0.000039"/>
+</kw>
+<kw name="Mailbox Extract OTP From Content" owner="util">
+<var>${otp_code}</var>
+<arg>${email_body}</arg>
+<doc>Parses the email body to find the OTP code using Regex</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.105654" elapsed="0.000029"/>
+</kw>
+<kw name="Delete Email" owner="ImapLibrary2">
+<arg>${email_index}</arg>
+<doc>Delete email on given ``email_index``.</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.105805" elapsed="0.000023"/>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:27.105879" elapsed="0.000021"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:25.568164" elapsed="1.537798">Execution terminated by signal</status>
+</branch>
+<branch type="FINALLY">
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<arg>Close Mailbox</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.106152" elapsed="0.000357">Execution terminated by signal</status>
+</kw>
+<status status="FAIL" start="2026-02-10T18:30:27.106032" elapsed="0.000559">Execution terminated by signal</status>
+</branch>
+<status status="FAIL" start="2026-02-10T18:30:25.568129" elapsed="1.538504">Execution terminated by signal</status>
+</try>
+<var>${otp_code}</var>
+<arg>${recipient_email}</arg>
+<doc>Orchestrates mailbox access and OTP extraction</doc>
+<status status="FAIL" start="2026-02-10T18:30:25.567794" elapsed="1.538939">Execution terminated by signal</status>
+</kw>
+<return>
+<value>${otp_code}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:27.106803" elapsed="0.000022"/>
+</return>
+<status status="FAIL" start="2026-02-10T18:30:25.567568" elapsed="1.539318">Execution terminated by signal</status>
+</branch>
+<branch type="EXCEPT" assign="${error}">
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${attempt} failed: ${error}</arg>
+<arg>level=WARN</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.107204" elapsed="0.000549">Execution terminated by signal</status>
+</kw>
+<kw name="Mailbox Handle Failed OTP Attempt" owner="util">
+<arg>${attempt}</arg>
+<arg>${max_attempts_int}</arg>
+<arg>${wait_between_attempts}</arg>
+<arg>${error}</arg>
+<doc>Handles failed OTP attempts with retry logic</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.108121" elapsed="0.000037"/>
+</kw>
+<status status="FAIL" start="2026-02-10T18:30:27.107001" elapsed="0.001232">Execution terminated by signal</status>
+</branch>
+<status status="FAIL" start="2026-02-10T18:30:25.567528" elapsed="1.540761">Execution terminated by signal</status>
+</try>
+<var name="${attempt}">4</var>
+<status status="FAIL" start="2026-02-10T18:30:25.566546" elapsed="1.541800">Execution terminated by signal</status>
+</iter>
+<var>${attempt}</var>
+<value>1</value>
+<value>${range_end}</value>
+<status status="FAIL" start="2026-02-10T18:29:57.413036" elapsed="29.695410">Execution terminated by signal</status>
+</for>
+<var>${otp}</var>
+<arg>${email}</arg>
+<doc>Retrieves the OTP code from the email with retry logic</doc>
+<status status="FAIL" start="2026-02-10T18:29:54.409804" elapsed="32.698770">Execution terminated by signal</status>
+</kw>
+<return>
+<value>${otp}</value>
+<status status="NOT RUN" start="2026-02-10T18:30:27.108682" elapsed="0.000017"/>
+</return>
+<var>${recovery_otp}</var>
+<arg>${TEST_EMAIL}</arg>
+<doc>Requests password recovery and retrieves OTP from email</doc>
+<status status="FAIL" start="2026-02-10T18:29:51.106316" elapsed="36.002441">Execution terminated by signal</status>
+</kw>
+<kw name="Perform Password Reset">
+<arg>${TEST_EMAIL}</arg>
+<arg>${recovery_otp}</arg>
+<arg>${NEW_PASSWORD}</arg>
+<doc>Performs the password reset using the PATCH method</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.109063" elapsed="0.000023"/>
+</kw>
+<kw name="Login With New Password">
+<arg>${TEST_EMAIL}</arg>
+<arg>${NEW_PASSWORD}</arg>
+<doc>Verifies login with new password and validates access token</doc>
+<status status="NOT RUN" start="2026-02-10T18:30:27.109443" elapsed="0.000040"/>
+</kw>
+<doc>Request recover &gt; Reset password &gt; Login</doc>
+<status status="FAIL" start="2026-02-10T18:29:40.534955" elapsed="46.574878">Execution terminated by signal</status>
+</test>
+<kw name="Teardown Test Suite" type="TEARDOWN">
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-02-10T18:30:27.111163" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-02-10T18:30:27.110992" elapsed="0.000285"/>
+</kw>
+<kw name="Postgres Delete User By Email" owner="util">
+<kw name="Postgres Execute" owner="util">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-02-10T18:30:27.112357" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "tb_user" WHERE email = ''&lt;/code&gt;</msg>
+<msg time="2026-02-10T18:30:27.116758" level="INFO">Commit the transaction</msg>
+<arg>${query}</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-02-10T18:30:27.112154" elapsed="0.005640"/>
+</kw>
+<arg>DELETE FROM "tb_user" WHERE email = '${email}'</arg>
+<doc>Executes a query and returns the result</doc>
+<status status="PASS" start="2026-02-10T18:30:27.111796" elapsed="0.006101"/>
+</kw>
+<arg>${TEST_EMAIL}</arg>
+<doc>Deletes a user from the database using their email address</doc>
+<status status="PASS" start="2026-02-10T18:30:27.111474" elapsed="0.006467"/>
+</kw>
+<kw name="Postgres Disconnect" owner="util">
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-02-10T18:30:27.118320" elapsed="0.000248"/>
+</kw>
+<doc>Centralizes the database disconnection</doc>
+<status status="PASS" start="2026-02-10T18:30:27.118133" elapsed="0.000502"/>
+</kw>
+<doc>Cleans up resources after tests</doc>
+<status status="PASS" start="2026-02-10T18:30:27.110711" elapsed="0.008028"/>
+</kw>
+<doc>Password recovery and reset test suite</doc>
+<status status="FAIL" start="2026-02-10T18:29:35.742476" elapsed="51.376353"/>
+</suite>
+<suite id="s1-s2-s4" name="04 2Fa" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\04_2fa.robot">
+<test id="s1-s2-s4-t1" name="Complete 2FA Authentication Flow" line="16">
+<doc>Register &gt; Enable 2FA &gt; Login &gt; Validate &gt; Get OTP &gt; Authorize 2FA</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.121141" elapsed="0.000739">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Authentication token refresh test suite</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.120272" elapsed="0.002459"/>
+</suite>
+<suite id="s1-s2-s5" name="05 Refresh" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\05_refresh.robot">
+<test id="s1-s2-s5-t1" name="Complete Token Refresh Flow" line="16">
+<doc>Register &gt; Activate &gt; Login &gt; Refresh &gt; Validate</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.124630" elapsed="0.000734">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Authentication token refresh test suite</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.123660" elapsed="0.002955"/>
+</suite>
+<suite id="s1-s2-s6" name="06 Sso" source="C:\dev\leandroluk\investor\apps\e2e\tests\02_auth\06_sso.robot">
+<test id="s1-s2-s6-t1" name="Complete Login Using SSO" line="17">
+<doc>Redirect to provider &gt; Redirec to callback_url &gt; Login with token</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.128703" elapsed="0.000534">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Authentication token refresh test suite</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.127913" elapsed="0.002252"/>
+</suite>
+<status status="FAIL" start="2026-02-10T18:29:03.650238" elapsed="83.480954"/>
+</suite>
+<suite id="s1-s3" name="03 Device" source="C:\dev\leandroluk\investor\apps\e2e\tests\03_device">
+<suite id="s1-s3-s1" name="01 Device" source="C:\dev\leandroluk\investor\apps\e2e\tests\03_device\01_device.robot">
+<test id="s1-s3-s1-t1" name="Complete Device Flow" line="16">
+<doc>Register &gt; Login &gt; Devices[0] &gt; Register Device &gt; Devices[1] &gt; Revoke &gt; Devices[0]</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.134065" elapsed="0.000543">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Account registration suite using shared resources</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.133182" elapsed="0.002284"/>
+</suite>
+<status status="FAIL" start="2026-02-10T18:30:27.132248" elapsed="0.004398"/>
+</suite>
+<suite id="s1-s4" name="04 User" source="C:\dev\leandroluk\investor\apps\e2e\tests\04_user">
+<suite id="s1-s4-s1" name="01 Profile" source="C:\dev\leandroluk\investor\apps\e2e\tests\04_user\01_profile.robot">
+<test id="s1-s4-s1-t1" name="Complete Profile Flow" line="16">
+<doc>Register &gt; Login &gt; List Document (Empty) &gt; Update Document &gt;</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.138791" elapsed="0.000580">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Get and update user profile</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.138107" elapsed="0.002261"/>
+</suite>
+<suite id="s1-s4-s2" name="02 Document" source="C:\dev\leandroluk\investor\apps\e2e\tests\04_user\02_document.robot">
+<test id="s1-s4-s2-t1" name="Complete Profile Flow" line="16">
+<doc>Register &gt; Login &gt; List Document (Empty) &gt; Update Document &gt; List Document (NotEmpty)</doc>
+<tag>robot:exit</tag>
+<status status="FAIL" start="2026-02-10T18:30:27.142214" elapsed="0.000592">Test execution stopped due to a fatal error.</status>
+</test>
+<doc>Get and update user document</doc>
+<status status="FAIL" start="2026-02-10T18:30:27.141370" elapsed="0.002223"/>
+</suite>
+<status status="FAIL" start="2026-02-10T18:30:27.137497" elapsed="0.007189"/>
+</suite>
+<status status="FAIL" start="2026-02-10T18:28:56.874842" elapsed="90.270837"/>
+</suite>
+<statistics>
+<total>
+<stat pass="4" fail="7" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat info="combined" combined="NOT robot:exit" pass="4" fail="1" skip="0">NOT robot:exit</stat>
+</tag>
+<suite>
+<stat name="Tests" id="s1" pass="4" fail="7" skip="0">Tests</stat>
+<stat name="01 System" id="s1-s1" pass="1" fail="0" skip="0">Tests.01 System</stat>
+<stat name="01 Health" id="s1-s1-s1" pass="1" fail="0" skip="0">Tests.01 System.01 Health</stat>
+<stat name="02 Auth" id="s1-s2" pass="3" fail="4" skip="0">Tests.02 Auth</stat>
+<stat name="01 Check-Email" id="s1-s2-s1" pass="2" fail="0" skip="0">Tests.02 Auth.01 Check-Email</stat>
+<stat name="02 Register" id="s1-s2-s2" pass="1" fail="0" skip="0">Tests.02 Auth.02 Register</stat>
+<stat name="03 Recover" id="s1-s2-s3" pass="0" fail="1" skip="0">Tests.02 Auth.03 Recover</stat>
+<stat name="04 2Fa" id="s1-s2-s4" pass="0" fail="1" skip="0">Tests.02 Auth.04 2Fa</stat>
+<stat name="05 Refresh" id="s1-s2-s5" pass="0" fail="1" skip="0">Tests.02 Auth.05 Refresh</stat>
+<stat name="06 Sso" id="s1-s2-s6" pass="0" fail="1" skip="0">Tests.02 Auth.06 Sso</stat>
+<stat name="03 Device" id="s1-s3" pass="0" fail="1" skip="0">Tests.03 Device</stat>
+<stat name="01 Device" id="s1-s3-s1" pass="0" fail="1" skip="0">Tests.03 Device.01 Device</stat>
+<stat name="04 User" id="s1-s4" pass="0" fail="2" skip="0">Tests.04 User</stat>
+<stat name="01 Profile" id="s1-s4-s1" pass="0" fail="1" skip="0">Tests.04 User.01 Profile</stat>
+<stat name="02 Document" id="s1-s4-s2" pass="0" fail="1" skip="0">Tests.04 User.02 Document</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-02-10T18:30:01.818667" level="WARN">Attempt 1 failed: OTP pattern not found in email body</msg>
+<msg time="2026-02-10T18:30:11.227292" level="WARN">Attempt 2 failed: OTP pattern not found in email body</msg>
+<msg time="2026-02-10T18:30:20.563829" level="WARN">Attempt 3 failed: OTP pattern not found in email body</msg>
+</errors>
+</robot>

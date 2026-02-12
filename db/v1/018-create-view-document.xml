@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-view-document" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE VIEW "vw_document" AS
+      SELECT
+        d.id            AS "id",
+        d.created_at    AS "created_at",
+        d.updated_at    AS "updated_at",
+        d.user_id       AS "user_id",
+        d.type          AS "type",
+        d.storage_key   AS "storage_key",
+        d.status        AS "status",
+        d.reject_reason AS "reject_reason",
+        p.name          AS "profile_name",
+        u.email         AS "user_email",
+        k.status        AS "kyc_status"
+      FROM "tb_document" d
+      JOIN      "tb_user"    u ON u.id      = d.user_id
+      JOIN      "tb_profile" p ON p.user_id = u.id
+      LEFT JOIN "tb_kyc"     k ON k.user_id = u.id;
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP VIEW "vw_document";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>

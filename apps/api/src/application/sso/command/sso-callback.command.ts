@@ -1,10 +1,10 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
 import {CipherPort, OidcPort} from '#/domain/_shared/ports';
-import {UserEntity} from '#/domain/account/entities';
-import {KycStatusEnum, SsoProviderEnum, UserStatusEnum} from '#/domain/account/enums';
+import {AccountUOW} from '#/domain/account';
+import {KycEntity, ProfileEntity, UserEntity} from '#/domain/account/entities';
+import {KycStatusEnum, SsoProviderEnum, UserRoleEnum, UserStatusEnum} from '#/domain/account/enums';
 import {SsoInvalidOAuthCodeError, SsoInvalidStateError} from '#/domain/account/errors';
-import {UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
@@ -33,7 +33,7 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, s
 
   constructor(
     private readonly oidcPort: OidcPort,
-    private readonly userRepository: UserRepository,
+    private readonly accountUOW: AccountUOW,
     private readonly cipherPort: CipherPort
   ) {}
 
@@ -56,29 +56,43 @@ export class SsoCallbackHandler implements ICommandHandler<SsoCallbackCommand, s
   }
 
   private async upsertUser(claims: OidcPort.Claims): Promise<UserEntity> {
-    const oldUser = await this.userRepository.findByEmail(claims.email);
+    return await this.accountUOW.transaction(async session => {
+      const oldUser = await session.user.findByEmail(claims.email);
 
-    if (oldUser) {
-      return oldUser;
-    }
+      if (oldUser) {
+        return oldUser;
+      }
 
-    const newUser = UserEntity.new({
-      email: claims.email,
-      name: `${claims.givenName} ${claims.familyName}`.trim(),
-      passwordHash: '', // no need password when login using SSO
-      status: UserStatusEnum.ACTIVE,
-      walletAddress: null,
-      walletVerifiedAt: null,
-      walletSeedEncrypted: null,
-      kycStatus: KycStatusEnum.NONE,
-      kycVerifiedAt: null,
-      twoFactorEnabled: false,
-      language: 'en',
-      timezone: 'UTC',
+      const newUser = UserEntity.new({
+        email: claims.email,
+        passwordHash: '', // no need password when login using SSO
+        status: UserStatusEnum.ACTIVE,
+        role: UserRoleEnum.USER,
+      });
+
+      const newProfile = ProfileEntity.new({
+        userId: newUser.id,
+        name: `${claims.givenName} ${claims.familyName}`.trim(),
+        phone: null,
+        birthdate: null,
+        twoFactorEnabled: false,
+        language: 'en',
+        timezone: 'UTC',
+      });
+
+      const newKyc = KycEntity.new({
+        userId: newUser.id,
+        status: KycStatusEnum.NONE,
+        verifiedAt: null,
+        level: '1',
+      });
+
+      await session.user.create(newUser);
+      await session.profile.create(newProfile);
+      await session.kyc.create(newKyc);
+
+      return newUser;
     });
-
-    await this.userRepository.create(newUser);
-    return newUser;
   }
 
   private async generateToken(provider: SsoProviderEnum, userId: UserEntity['id']): Promise<string> {

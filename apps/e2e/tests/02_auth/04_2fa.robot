@@ -52,9 +52,11 @@ Register New Account
 Enable User And Set To Use 2FA On Database
     [Documentation]    Enables 2FA on the database for the given email
     [Arguments]    ${email}
-
-    Postgres Execute
-    ...    UPDATE "tb_user" SET "two_factor_enabled" = true, "status" = 'active' WHERE email = '${email}'
+    Postgres Execute    UPDATE "tb_user" SET "status" = 'active' WHERE email = '${email}';
+    ${query_profile} =    Catenate
+    ...    UPDATE "tb_profile" SET "two_factor_enabled" = true
+    ...    WHERE "user_id" = (SELECT id FROM "tb_user" WHERE email = '${email}');
+    Postgres Execute    ${query_profile}
 
 Login With Activated Account
     [Documentation]    Logins and validates JWT tokens

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-wallet" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "tb_wallet" (
+        "id"             UUID           NOT NULL,
+        "created_at"     TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "updated_at"     TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+        "user_id"        UUID           NOT NULL,
+        "name"           VARCHAR(50)    NOT NULL DEFAULT 'Minha Carteira',
+        "network"        VARCHAR(50)    NOT NULL,
+        "address"        CHAR(42)       NOT NULL,
+        "seed_encrypted" TEXT               NULL,
+        "is_custodial"   BOOLEAN        NOT NULL,
+        "is_active"      BOOLEAN        NOT NULL DEFAULT TRUE,
+        "verified_at"    TIMESTAMPTZ(3)     NULL,
+        ---
+        PRIMARY KEY ("id"),
+        FOREIGN KEY ("user_id") REFERENCES "tb_user"("id") ON DELETE CASCADE,
+        UNIQUE      ("address")
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "tb_wallet";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>
