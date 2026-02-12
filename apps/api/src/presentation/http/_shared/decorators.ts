@@ -57,17 +57,13 @@ export const MapDomainError = Object.assign(
     );
 
     const swaggerDecorators = Object.entries(errorByStatus).map(([status, errors]) =>
-      ApiResponse({
-        status: Number(status),
-        description: `Domain Error: ${errors.join(' ')}`,
-        type: ErrorDTO,
-      })
+      ApiResponse({status: Number(status), description: errors.join(' '), type: ErrorDTO})
     );
 
     swaggerDecorators.push(
       ApiResponse({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
-        description: 'Validation Error',
+        description: '`RequestValidationError`',
         type: ErrorDTO,
       })
     );
