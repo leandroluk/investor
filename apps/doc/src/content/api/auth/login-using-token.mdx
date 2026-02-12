@@ -2,7 +2,7 @@
 title: Login using token
 description: Authenticate user with a temporary token (e.g. from SSO)
 ---
-import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import {MermaidZoom} from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -62,8 +62,9 @@ flowchart TD
 - Body:
 ```json
 {
-  "statusCode": 401,
+  "correlationId": "uuid-v7",
+  "code": "user.invalid_credentials",
   "message": "Invalid or expired token",
-  "error": "Unauthorized"
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```

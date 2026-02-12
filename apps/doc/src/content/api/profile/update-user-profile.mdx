@@ -64,8 +64,10 @@ flowchart TD
 
 ```json
 {
-  "code": "VALIDATION_ERROR",
+  "correlationId": "uuid-v7",
+  "code": "request.validation_error",
   "message": "Invalid language code",
+  "occurredAt": "2023-01-01T00:00:00.000Z",
   "details": ["language must be a valid ISO 639-1 code"]
 }
 ```
@@ -75,7 +77,9 @@ flowchart TD
 
 ```json
 {
-  "code": "UNAUTHORIZED",
-  "message": "Missing or invalid token"
+  "correlationId": "uuid-v7",
+  "code": "auth.unauthorized",
+  "message": "Missing or invalid token",
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```

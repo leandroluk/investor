@@ -55,8 +55,10 @@ flowchart TD
 
 ```json
 {
-  "code": "UNAUTHORIZED",
-  "message": "Missing or invalid token"
+  "correlationId": "uuid-v7",
+  "code": "auth.unauthorized",
+  "message": "Missing or invalid token",
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```
 
@@ -65,7 +67,9 @@ flowchart TD
 
 ```json
 {
-  "code": "KYC_NOT_FOUND",
-  "message": "KYC record not found"
+  "correlationId": "uuid-v7",
+  "code": "kyc.not_found",
+  "message": "KYC record not found",
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```

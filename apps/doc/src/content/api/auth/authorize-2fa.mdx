@@ -51,8 +51,9 @@ flowchart TD
 - Body:
 ```json
 {
-  "statusCode": 403,
+  "correlationId": "uuid-v7",
+  "code": "user.invalid_otp",
   "message": "Invalid or expired code",
-  "error": "Forbidden"
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```

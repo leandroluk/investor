@@ -57,8 +57,10 @@ flowchart TD
 
 ```json
 {
-  "code": "EMAIL_CONFLICT",
-  "message": "The email is already in use."
+  "correlationId": "uuid-v7",
+  "code": "user.email_in_use",
+  "message": "The email is already in use.",
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```
 
@@ -68,7 +70,9 @@ flowchart TD
 
 ```json
 {
-  "code": "VALIDATION_ERROR",
-  "message": "Invalid password format."
+  "correlationId": "uuid-v7",
+  "code": "request.validation_error",
+  "message": "Invalid password format.",
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```

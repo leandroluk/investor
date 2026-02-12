@@ -43,9 +43,16 @@ flowchart TD
 - **Body**:
 ```json
 {
-  "statusCode": 422,
+  "correlationId": "uuid-v7",
+  "code": "request.validation_error",
   "message": "Validation failed",
-  "error": "Unprocessable Entity"
+  "occurredAt": "2023-01-01T00:00:00.000Z",
+  "details": [
+    {
+      "message": "Invalid email",
+      "path": ["email"]
+    }
+  ]
 }
 ```
 
@@ -54,8 +61,9 @@ flowchart TD
 - **Body**:
 ```json
 {
-  "statusCode": 409,
+  "correlationId": "uuid-v7",
+  "code": "user.email_in_use",
   "message": "The provided email \"user@example.com\" is already in use.",
-  "error": "Conflict"
+  "occurredAt": "2023-01-01T00:00:00.000Z"
 }
 ```
