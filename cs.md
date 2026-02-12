@@ -104,7 +104,7 @@
 ##### 01.23.🔍✔️🔒`[user]` redirect to signed url user document
 - Quando o usuário enviar o id do documento ele deverá ser redirecionado para a url assinada do documento
 - Caso o documento não exista então deve retornar 404
-##### 01.24.⚡⛔🔒`[user]` link user wallet address (web3 signature - EIP-4361)
+##### 01.24.⚡✅🔒`[user]` link user wallet address (web3 signature - EIP-4361)
 - Permite que o usuário vincule uma carteira criptográfica (ex: Ethereum) ao seu perfil provando a posse da chave privada sem expô-la.
 - O processo inicia com a solicitação de um nonce (string aleatória única) gerado pelo sistema e armazenado temporariamente em cache (TTL curto). O usuário deve informar um apelido (name) para a carteira.
 - O usuário deve assinar uma mensagem padronizada seguindo o padrão **EIP-4361 (Sign-In with Ethereum)** contendo este nonce, timestamp e domínio da aplicação para evitar phishing.
@@ -115,7 +115,7 @@
 ##### 01.25.⚡⛔🔒`[user]` generate user wallet
 - Gera uma carteira Hierarchical Deterministic (HD) seguindo o padrão BIP39 com uma seed de 12 palavras para garantir portabilidade e segurança. O usuário pode fornecer um apelido (name).
 - Deriva a chave privada e o endereço público para a rede Ethereum utilizando o derivation path padrão m/44'/60'/0'/0/0.
-- Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM antes da persistência. A chave de criptografia deve ser derivada da senha do usuário (ex: via PBKDF2 ou Argon2), garantindo que a plataforma não possua custódia total sem a interação do usuário.
+- Segurança de Ativos: O mnemonic é criptografado via AES-256-GCM (CipherPort) com uma chave do sistema antes da persistência. Isso permite a automação de investimentos sem custódia total da senha do usuário, mas mantém a segurança dos fundos.
 - O sistema armazena o endereço público, a seed criptografada e o Initialization Vector (IV) no banco de dados.
 - Regra de Limite: O sistema pode impor um limite máximo de carteiras custodiais por usuário nas configurações globais.
 ##### 01.26.🔍⛔🔒`[user]` reveal user wallet seed phrase

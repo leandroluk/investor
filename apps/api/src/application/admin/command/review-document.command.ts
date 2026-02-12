@@ -12,7 +12,10 @@ import z from 'zod';
 export class ReviewDocumentCommand extends createClass(
   Command,
   z.object({
-    adminId: z.uuid().meta({description: 'Admin ID', example: '123e4567-e89b-12d3-a456-426614174000'}),
+    adminId: z.uuid().meta({
+      description: 'Admin ID',
+      example: '123e4567-e89b-12d3-a456-426614174000',
+    }),
     documentId: DocumentEntity.schema.shape.id,
     status: DocumentEntity.schema.shape.status,
     rejectReason: DocumentEntity.schema.shape.rejectReason,

@@ -1,3 +1,4 @@
+export * from './generate-user-wallet.dto';
 export * from './get-kyc.dto';
 export * from './get-user-profile.dto';
 export * from './link-user-wallet.dto';

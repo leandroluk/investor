@@ -1,4 +1,5 @@
 import {
+  GenerateUserWalletCommand,
   LinkUserWalletCommand,
   RequestWalletNonceCommand,
   UpdateUserProfileCommand,
@@ -26,6 +27,8 @@ import {FastifyReply} from 'fastify';
 import {GetMeta, MapDomainError} from '../_shared/decorators';
 import {AuthGuard, ChallengeGuard} from '../_shared/guards';
 import {
+  GenerateUserWalletBodyDTO,
+  GenerateUserWalletResultDTO,
   GetKycResultDTO,
   GetUserProfileResultDTO,
   LinkUserWalletBodyDTO,
@@ -76,6 +79,19 @@ export class UserController {
     @Body() body: LinkUserWalletBodyDTO
   ): Promise<LinkUserWalletResultDTO> {
     const result = await this.commandBus.execute(LinkUserWalletCommand.new({...meta, ...body}));
+    return result;
+  }
+  // #endregion
+
+  // #region postGenerateUserWallet
+  @Post('wallet/generate')
+  @ApiOperation({summary: 'Generate user wallet'})
+  @ApiCreatedResponse({description: 'Wallet generated successfully', type: GenerateUserWalletResultDTO})
+  async postGenerateUserWallet(
+    @GetMeta() meta: GetMeta,
+    @Body() body: GenerateUserWalletBodyDTO
+  ): Promise<GenerateUserWalletResultDTO> {
+    const result = await this.commandBus.execute(GenerateUserWalletCommand.new({...meta, ...body}));
     return result;
   }
   // #endregion

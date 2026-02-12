@@ -11,8 +11,13 @@ import z from 'zod';
 export class Authorize2FACommand extends createClass(
   Command,
   z.object({
-    challengeId: z.uuid().meta({description: 'Challenge ID'}),
-    otp: z.string().min(1).meta({description: '2FA Code', example: '123456'}),
+    challengeId: z.uuid().meta({
+      description: 'Challenge ID',
+    }),
+    otp: z.string().min(1).meta({
+      description: '2FA Code',
+      example: '123456',
+    }),
   })
 ) {}
 
