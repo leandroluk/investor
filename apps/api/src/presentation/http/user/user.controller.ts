@@ -1,4 +1,9 @@
-import {RequestWalletNonceCommand, UpdateUserProfileCommand, UploadDocumentCommand} from '#/application/user/command';
+import {
+  LinkUserWalletCommand,
+  RequestWalletNonceCommand,
+  UpdateUserProfileCommand,
+  UploadDocumentCommand,
+} from '#/application/user/command';
 import {GetKycQuery, GetUserDocumentQuery, GetUserProfileQuery, ListUserDocumentQuery} from '#/application/user/query';
 import {
   AuthUnauthorizedError,
@@ -23,6 +28,8 @@ import {AuthGuard, ChallengeGuard} from '../_shared/guards';
 import {
   GetKycResultDTO,
   GetUserProfileResultDTO,
+  LinkUserWalletBodyDTO,
+  LinkUserWalletResultDTO,
   RequestWalletNonceResultDTO,
   UpdateUserProfileBodyDTO,
   UploadDocumentBodyDTO,
@@ -52,8 +59,23 @@ export class UserController {
   @Post('wallet/nonce')
   @ApiOperation({summary: 'Request wallet nonce'})
   @ApiCreatedResponse({type: RequestWalletNonceResultDTO})
-  async postRequestWalletNonce(@GetMeta() meta: GetMeta): Promise<RequestWalletNonceResultDTO> {
+  async postRequestWalletNonce(
+    @GetMeta() meta: GetMeta //
+  ): Promise<RequestWalletNonceResultDTO> {
     const result = await this.commandBus.execute(RequestWalletNonceCommand.new({...meta}));
+    return result;
+  }
+  // #endregion
+
+  // #region postLinkUserWallet
+  @Post('wallet/link')
+  @ApiOperation({summary: 'Link user wallet'})
+  @ApiCreatedResponse({description: 'Wallet linked successfully', type: LinkUserWalletResultDTO})
+  async postLinkUserWallet(
+    @GetMeta() meta: GetMeta,
+    @Body() body: LinkUserWalletBodyDTO
+  ): Promise<LinkUserWalletResultDTO> {
+    const result = await this.commandBus.execute(LinkUserWalletCommand.new({...meta, ...body}));
     return result;
   }
   // #endregion

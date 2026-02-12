@@ -1,7 +1,7 @@
 import {Retry, Throws, Trace} from '#/application/_shared/decorators';
 import {BlockchainPort} from '#/domain/_shared/ports';
 import {InjectableExisting} from '#/infrastructure/_shared/decorator';
-import {FetchRequest, Interface, JsonRpcProvider, isAddress} from 'ethers';
+import {FetchRequest, Interface, JsonRpcProvider, isAddress, verifyMessage} from 'ethers';
 import {BlockchainEthersConfig} from './ethers.config';
 import {BlockchainEthersError} from './ethers.error';
 
@@ -98,5 +98,9 @@ export class BlockchainEthersAdapter implements BlockchainPort {
       throw new BlockchainEthersError(`Event ${eventName} not found in interface`);
     }
     void this.provider.on({address, topics: [eventFragment.topicHash]}, callback);
+  }
+
+  recoverAddress(message: string, signature: string): string {
+    return verifyMessage(message, signature);
   }
 }

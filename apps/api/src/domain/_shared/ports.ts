@@ -12,6 +12,7 @@ export abstract class BlockchainPort {
   abstract getTransaction(hash: string): Promise<BlockchainPort.Transaction | null>;
   abstract getBlockNumber(): Promise<number>;
   abstract watchEvent(address: string, eventName: string, callback: (event: any) => void): void;
+  abstract recoverAddress(message: string, signature: string): string;
 }
 export namespace BlockchainPort {
   export interface Transaction {

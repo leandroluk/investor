@@ -17,6 +17,7 @@ export class BrokerKafkaAdapter implements BrokerPort {
     /Connection closed/,
     /Restarting the consumer/,
     /Consumer rebalanced/,
+    /The coordinator is loading/,
   ];
   private readonly kafka: Kafka;
   private readonly producer: Producer;

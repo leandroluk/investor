@@ -98,7 +98,7 @@ export const MapDomainError = Object.assign(
 
           const payload = {
             correlationId: request.id,
-            code: exception instanceof ZodError ? 'VALIDATION_ERROR' : (exception as any).code || errorName,
+            code: exception instanceof ZodError ? 'request.validation_error' : (exception as any).code || errorName,
             message: exception.message,
             occurredAt: new Date().toISOString(),
             ...(exception instanceof ZodError && {details: z.treeifyError(exception)}),
