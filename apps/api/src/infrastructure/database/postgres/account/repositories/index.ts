@@ -1,3 +1,4 @@
+export * from './activity.repository';
 export * from './challenge.repository';
 export * from './device.repository';
 export * from './document.repository';

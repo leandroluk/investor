@@ -44,6 +44,17 @@ erDiagram
         boolean      is_active   ""
     }
 
+    tb_activity {
+        uuidv7       id           PK
+        timestamp[3] created_at   ""
+        uuidv7       user_id      FK
+        varchar[50]  action       "REVEAL_SEED|CHANGE_PASSWORD"
+        varchar[45]  ip           ""
+        uuidv7       device_id    FK
+        uuidv7       resource_ref "Target ID (ex: wallet_id)"
+        json         metadata     "Context Data"
+    }
+
     %% MODULE: PROFILE (USER PREFERENCE & DATA)
     tb_profile {
         uuidv7       id                 PK
@@ -179,6 +190,8 @@ erDiagram
         text         description  ""
     }
 
+
+
     %% MODULE: SUPPORT & SYSTEM
     tb_ticket {
         uuidv7       id         PK
@@ -235,6 +248,7 @@ erDiagram
     tb_user       ||--o{ tb_investment : "holds"
     tb_withdrawal }o--|| tb_user       : "requests"
     tb_user       ||--o{ tb_ledger     : "audits"
+    tb_user       ||--o{ tb_activity   : "logs"
     
     %% Wallet Linkages
     tb_wallet     |o--o{ tb_investment : "funds"

@@ -1,4 +1,5 @@
 import {
+  type ActivityEntity,
   type ChallengeEntity,
   type DeviceEntity,
   type DocumentEntity,
@@ -70,4 +71,8 @@ export abstract class WalletRepository {
   abstract findById(id: string): Promise<WalletEntity | null>;
   abstract findByAddress(address: string): Promise<WalletEntity | null>;
   abstract listByUserId(userId: string): Promise<WalletEntity[]>;
+}
+
+export abstract class ActivityRepository {
+  abstract create(activity: ActivityEntity): Promise<void>;
 }

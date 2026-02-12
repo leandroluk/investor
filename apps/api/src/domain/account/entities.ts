@@ -338,3 +338,38 @@ export class WalletEntity extends createClass(
       }),
     })
 ) {}
+
+export class ActivityEntity extends createClass(
+  indexableSchema //
+    .extend(creatableSchema.shape)
+    .extend({
+      userId: z.uuid().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'The user who performed the action',
+        format: 'uuid',
+      }),
+      action: z.string().meta({
+        example: 'REVEAL_SEED',
+        description: 'Action type performed by the user',
+        maxLength: 50,
+      }),
+      ip: z.string().meta({
+        example: '192.168.1.1',
+        description: 'IP address of the request',
+        maxLength: 45,
+      }),
+      deviceId: z.uuid().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'Device from which the action was performed',
+        format: 'uuid',
+      }),
+      resourceRef: z.uuid().nullable().meta({
+        example: '018f3b5e-1234-7000-8000-000000000000',
+        description: 'Reference to the target resource (e.g., wallet_id)',
+        format: 'uuid',
+      }),
+      metadata: z.record(z.string(), z.unknown()).nullable().meta({
+        description: 'Additional context data for the activity',
+      }),
+    })
+) {}

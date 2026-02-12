@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+  <changeSet id="create-table-activity" author="leandroluk@gmail.com">
+    <sql splitStatements="false" endDelimiter=";"><![CDATA[
+      CREATE TABLE "tb_activity" (
+        "id"           UUID           NOT NULL,
+        "created_at"   TIMESTAMPTZ(3) NOT NULL,
+        "user_id"      UUID           NOT NULL,
+        "action"       VARCHAR(50)    NOT NULL,
+        "ip"           VARCHAR(45)    NOT NULL,
+        "device_id"    UUID           NOT NULL,
+        "resource_ref" UUID               NULL,
+        "metadata"     JSONB              NULL,
+        ---
+        PRIMARY KEY ("id"),
+        FOREIGN KEY ("user_id")   REFERENCES "tb_user"("id")   ON DELETE CASCADE,
+        FOREIGN KEY ("device_id") REFERENCES "tb_device"("id") ON DELETE CASCADE
+      );
+    ]]></sql>
+
+    <rollback><sql splitStatements="false" endDelimiter=";"><![CDATA[
+      DROP TABLE "tb_activity";
+    ]]></sql></rollback>
+  </changeSet>
+</databaseChangeLog>
