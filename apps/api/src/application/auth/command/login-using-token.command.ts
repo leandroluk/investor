@@ -147,11 +147,13 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
   private async publishUserLoggedInEvent(
     correlationId: string,
     occurredAt: Date,
-    userId: UserEntity['id']
+    userId: UserEntity['id'],
+    deviceId: string
   ): Promise<void> {
     await this.brokerPort.publish(
       new UserLoggedInEvent(correlationId, occurredAt, {
         userId,
+        deviceId,
         strategy: LoginStrategyEnum.TOKEN,
       })
     );
@@ -169,7 +171,7 @@ export class LoginUsingTokenHandler implements ICommandHandler<LoginUsingTokenCo
       await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
     }
 
-    await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
+    await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id, device.id);
 
     return LoginUsingTokenCommandResult.new(result);
   }

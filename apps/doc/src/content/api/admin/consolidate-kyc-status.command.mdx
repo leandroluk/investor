@@ -1,0 +1,58 @@
+---
+title: "Consolidate KYC Status ⚙️"
+---
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+
+> **Acesso**: `⚙️ Internal` — Disparado pela saga `AdminSaga` ao receber `DocumentReviewedEvent` com `documentStatus === APPROVED`.
+
+## Purpose
+
+Evaluates whether all mandatory KYC documents have been approved and, if so, promotes the user's KYC status to `APPROVED`. This bridges the admin document review flow with the user onboarding saga.
+
+## Input
+
+| Field  | Type | Description     |
+| :----- | :--- | :-------------- |
+| userId | uuid | User identifier |
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["DocumentReviewedEvent\n(APPROVED)"] --> B["AdminSaga dispatches ConsolidateKycStatusCommand"]
+    B --> C["Fetch all user documents"]
+    C --> D["Consolidate approval status"]
+    D --> E{"Selfie APPROVED AND\n(RG front+back APPROVED\nOR CNH front+back APPROVED)?"}
+    E -- "No" --> F["Return (requirements not met)"]
+    E -- "Yes" --> G{"KYC already APPROVED?"}
+    G -- "Yes" --> H["Return (already approved)"]
+    G -- "No" --> I["Update KYC status to APPROVED"]
+    I --> J["Set verifiedAt timestamp"]
+    J --> K["Publish UserKycStatusChangedEvent"]
+```
+</MermaidZoom>
+
+## Side Effects
+
+- Updates `KycEntity.status` to `APPROVED` and sets `verifiedAt`
+- Publishes `UserKycStatusChangedEvent` (consumed by `UserSaga` Phase 2)
+
+## Emitted Events
+
+### UserKycStatusChangedEvent
+
+**Tipo**: Não-Auditável
+
+**Payload:**
+```json
+{
+  "correlationId": "...",
+  "occurredAt": "...",
+  "payload": {
+    "userId": "uuid",
+    "status": "APPROVED",
+    "verifiedAt": "2026-01-01T00:00:00.000Z"
+  }
+}
+```

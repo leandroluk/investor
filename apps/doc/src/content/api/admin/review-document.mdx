@@ -1,14 +1,15 @@
 ---
 title: Approve/Reject Document
 ---
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
 - **Admin Access**: Only users with ADMIN role can perform this action.
 - **Workflow**:
-    - **Approve**: Updates document status to `APPROVED`. Checks if all required docs are approved to upgrade user status.
-    - **Reject**: Updates status to `REJECTED`. Requires a `rejectReason`.
+    - **Approve**: Updates document status to `APPROVED`. Publishes `DocumentReviewedEvent`.
+    - **Reject**: Updates status to `REJECTED`. Requires a `rejectReason`. Publishes `DocumentReviewedEvent`.
+- **KYC Consolidation (via Saga)**: When a document is approved, `AdminSaga` dispatches `ConsolidateKycStatusCommand` to check if all required documents are complete and promote KYC status.
 - **Notification**: Triggers an email/notification to the user with the result.
 
 ## Request
@@ -33,9 +34,10 @@ flowchart TD
     C -- "Yes" --> E{"Status?"}
     E -- "Approved" --> F["Mark as APPROVED"]
     E -- "Rejected" --> G["Mark as REJECTED + Reason"]
-    F & G --> H["Notify User"]
-    H --> I["Update User KYC Status?"]
-    I --> J["Return 200 OK"]
+    F & G --> H["Publish DocumentReviewedEvent"]
+    H --> I["Return 200 OK"]
+    H -.-> J["AdminSaga: ConsolidateKycStatusCommand"]
+    J -.-> K["Publish UserKycStatusChangedEvent"]
 ```
 </MermaidZoom>
 
@@ -71,5 +73,70 @@ flowchart TD
       "path": ["rejectReason"]
     }
   ]
+}
+```
+
+## Emitted Events
+
+### DocumentReviewedByAdminEvent
+
+**Tipo**: 📜 **Auditável** (`REVIEW_DOCUMENT_ADMIN`)
+
+> [!IMPORTANT]
+> Este evento é **automaticamente registrado** no audit log (`tb_activity`) vinculado ao **usuário dono do documento**, registrando qual admin realizou a revisão para compliance e rastreabilidade.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "documentOwnerId": "018f3b5e-5678-7000-8000-000000000001",
+    "documentId": "018f3b5e-doc1-7000-8000-000000000004",
+    "previousStatus": "PENDING",
+    "newStatus": "APPROVED",
+    "reviewerId": "018f3b5e-adm1-7000-8000-000000000099",
+    "reviewerDeviceId": "018f3b5e-9999-7000-8000-000000000003",
+    "rejectReason": null
+  }
+}
+```
+
+### DocumentReviewedEvent
+
+**Tipo**: Não-Auditável
+
+Disparado para notificar o usuário sobre o resultado da análise do documento.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "documentId": "018f3b5e-doc1-7000-8000-000000000004",
+    "documentStatus": "APPROVED",
+    "documentRejectReason": null,
+    "documentUserId": "018f3b5e-5678-7000-8000-000000000001"
+  }
+}
+```
+
+### UserKycStatusChangedEvent _(via Saga)_
+
+**Tipo**: Não-Auditável
+
+Disparado pelo `ConsolidateKycStatusCommand` (via `AdminSaga`) **apenas se** todos os documentos obrigatórios forem aprovados, promovendo o status KYC do usuário para `APPROVED`.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "userId": "018f3b5e-5678-7000-8000-000000000001",
+    "status": "APPROVED",
+    "verifiedAt": "2026-02-12T21:00:00.000Z"
+  }
 }
 ```

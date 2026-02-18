@@ -24,14 +24,16 @@ export type GetMeta = {
   occurredAt: Date;
   fingerprint: string;
   userId: string;
+  ip: string;
 };
 export const GetMeta = createParamDecorator((_data: unknown, ctx: ExecutionContext): GetMeta => {
-  const {id, startTime, fingerprint, user = {claims: {}} as any} = ctx.switchToHttp().getRequest<FastifyRequest>();
+  const {id, startTime, fingerprint, user = {claims: {}} as any, ip} = ctx.switchToHttp().getRequest<FastifyRequest>();
   return {
     correlationId: id,
     occurredAt: startTime,
     fingerprint: fingerprint,
     userId: user.claims.id,
+    ip,
   };
 });
 // #endregion

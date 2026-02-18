@@ -20,6 +20,7 @@ export class DatabasePostgresUserRepository extends DAO<Entity> implements Inter
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
+      isOnboardCompleted: 'is_onboard_completed',
     });
   }
 

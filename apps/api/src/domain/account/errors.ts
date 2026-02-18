@@ -109,9 +109,9 @@ export class WalletNotFoundError extends DomainError {
   }
 }
 
-export class WalletAlreadyExistsError extends DomainError {
-  constructor(message = 'Wallet already exists') {
-    super(message, 'wallet.already_exists');
+export class WalletSeedNotAvailableError extends DomainError {
+  constructor(message = 'Wallet seed is not available') {
+    super(message, 'wallet.seed_not_available');
   }
 }
 // #endregion

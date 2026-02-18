@@ -14,11 +14,7 @@ export class DatabasePostgresActivityRepository extends DAO<Entity> implements I
     super('tb_activity', {
       id: 'id',
       createdAt: 'created_at',
-      userId: 'user_id',
       action: 'action',
-      ip: 'ip',
-      deviceId: 'device_id',
-      resourceRef: 'resource_ref',
       metadata: 'metadata',
     });
   }

@@ -4,7 +4,7 @@ import {BrokerPort, HasherPort} from '#/domain/_shared/ports';
 import {PASSWORD_REGEX_CONSTANT} from '#/domain/account/constants';
 import {UserEntity} from '#/domain/account/entities';
 import {UserInvalidOtpError, UserNotFoundError} from '#/domain/account/errors';
-import {UserPasswordChangedEvent} from '#/domain/account/events';
+import {UserPasswordResetEvent} from '#/domain/account/events';
 import {UserRepository} from '#/domain/account/repositories';
 import {OtpStore} from '#/domain/account/stores';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -60,7 +60,11 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
   }
 
   private async publishEvent(correlationId: string, user: UserEntity): Promise<void> {
-    await this.brokerPort.publish(new UserPasswordChangedEvent(correlationId, new Date(), {userId: user.id}));
+    await this.brokerPort.publish(
+      new UserPasswordResetEvent(correlationId, new Date(), {
+        userId: user.id,
+      })
+    );
   }
 
   async execute(command: ResetPasswordCommand): Promise<void> {

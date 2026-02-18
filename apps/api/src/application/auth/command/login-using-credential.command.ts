@@ -148,11 +148,13 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
   private async publishUserLoggedInEvent(
     correlationId: string,
     occurredAt: Date,
-    userId: UserEntity['id']
+    userId: UserEntity['id'],
+    deviceId: string
   ): Promise<void> {
     await this.brokerPort.publish(
       new UserLoggedInEvent(correlationId, occurredAt, {
         userId,
+        deviceId,
         strategy: LoginStrategyEnum.PASSWORD,
       })
     );
@@ -170,7 +172,7 @@ export class LoginUsingCredentialHandler implements ICommandHandler<
         await this.publishUserRequestChallengeEvent(command.correlationId, command.occurredAt, user);
       }
 
-      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id);
+      await this.publishUserLoggedInEvent(command.correlationId, command.occurredAt, user.id, device.id);
 
       return LoginUsingCredentialCommandResult.new(result);
     } catch (error) {

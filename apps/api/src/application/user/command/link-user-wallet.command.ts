@@ -1,9 +1,11 @@
 import {Command} from '#/application/_shared/bus';
 import {createClass} from '#/domain/_shared/factories';
-import {BlockchainPort} from '#/domain/_shared/ports';
+import {BlockchainPort, BrokerPort} from '#/domain/_shared/ports';
 import {WalletEntity} from '#/domain/account/entities';
 import {WalletNetworkEnum} from '#/domain/account/enums';
-import {WalletRepository} from '#/domain/account/repositories';
+import {DeviceNotFoundError} from '#/domain/account/errors';
+import {WalletLinkedEvent} from '#/domain/account/events';
+import {DeviceRepository, WalletRepository} from '#/domain/account/repositories';
 import {NonceStore} from '#/domain/account/stores';
 import {ConflictException, PreconditionFailedException, UnprocessableEntityException} from '@nestjs/common';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
@@ -13,6 +15,7 @@ export class LinkUserWalletCommand extends createClass(
   Command,
   z.object({
     userId: z.uuid(),
+    fingerprint: z.string().min(1),
     address: z.string().length(42),
     signature: z.string().startsWith('0x'),
     message: z.string(),
@@ -30,11 +33,23 @@ export class LinkUserWalletCommandResult extends createClass(
 export class LinkUserWalletHandler implements ICommandHandler<LinkUserWalletCommand, LinkUserWalletCommandResult> {
   constructor(
     private readonly walletRepository: WalletRepository,
+    private readonly deviceRepository: DeviceRepository,
     private readonly blockchainPort: BlockchainPort,
+    private readonly brokerPort: BrokerPort,
     private readonly nonceStore: NonceStore
   ) {}
 
+  private async getDeviceId(userId: string, fingerprint: string): Promise<string> {
+    const device = await this.deviceRepository.findByFingerprint(userId, fingerprint);
+    if (!device) {
+      throw new DeviceNotFoundError();
+    }
+    return device.id;
+  }
+
   async execute(command: LinkUserWalletCommand): Promise<LinkUserWalletCommandResult> {
+    const deviceId = await this.getDeviceId(command.userId, command.fingerprint);
+
     // 1. Verify Nonce
     const nonce = await this.nonceStore.get(command.userId);
     if (!nonce) {
@@ -77,6 +92,16 @@ export class LinkUserWalletHandler implements ICommandHandler<LinkUserWalletComm
 
     await this.walletRepository.create(wallet);
     await this.nonceStore.delete(command.userId);
+
+    await this.brokerPort.publish(
+      new WalletLinkedEvent(command.correlationId, command.occurredAt, {
+        userId: command.userId,
+        deviceId,
+        walletId: wallet.id,
+        address: wallet.address,
+        network: wallet.network,
+      })
+    );
 
     return LinkUserWalletCommandResult.new({id: wallet.id});
   }

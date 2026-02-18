@@ -1,7 +1,7 @@
 ---
 title: Revoke Device
 ---
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -44,3 +44,25 @@ flowchart TD
 
 - **Status**: `401 Unauthorized` (Invalid token)
 - **Status**: `404 Not Found` (Device not found or does not belong to user)
+
+## Emitted Events
+
+### DeviceRevokedEvent
+
+**Tipo**: 📜 **Auditável** (`REVOKE_DEVICE`)
+
+> [!IMPORTANT]
+> Este evento é **automaticamente registrado** no audit log (`tb_activity`) para rastreabilidade de revogação de dispositivos e investigação de segurança.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "userId": "018f3b5e-5678-7000-8000-000000000001",
+    "deviceId": "018f3b5e-9999-7000-8000-000000000003",
+    "reason": "Suspicious activity detected"
+  }
+}
+```

@@ -2,8 +2,8 @@
 title: Link User Wallet
 ---
 
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
-import {Web3SignatureDemo} from '#/components/molecules/Web3SignatureDemo'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+import { Web3SignatureDemo } from '#/components/molecules/Web3SignatureDemo'
 
 
 ## Rules
@@ -56,7 +56,8 @@ flowchart TD
     I -- Yes --> J["Return 409 Conflict"]
     I -- No --> K["Link Wallet to User"]
     K --> L["Invalidate Nonce"]
-    L --> M["Return 201 Created"]
+    L --> M["Publish WalletLinkedEvent"]
+    M --> N["Return 201 Created"]
 ```
 </MermaidZoom>
 
@@ -84,5 +85,29 @@ flowchart TD
   "code": "wallet.already_exists",
   "message": "The wallet address 0x71C... is already linked to another account.",
   "occurredAt": "2023-01-01T00:00:00.000Z"
+}
+```
+
+## Emitted Events
+
+### WalletLinkedEvent
+
+**Tipo**: 📜 **Auditável** (`LINK_WALLET`)
+
+> [!IMPORTANT]
+> Este evento é **automaticamente registrado** no audit log (`tb_activity`) para rastreabilidade de vinculação de carteiras e compliance.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "userId": "018f3b5e-5678-7000-8000-000000000001",
+    "deviceId": "018f3b5e-9999-7000-8000-000000000003",
+    "walletId": "018f3b5e-abcd-7000-8000-000000000002",
+    "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "network": "ethereum"
+  }
 }
 ```

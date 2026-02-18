@@ -1,0 +1,40 @@
+---
+title: "Complete Onboard ⚙️"
+---
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+
+> **Acesso**: `⚙️ Internal` — Disparado pela saga `UserSaga` ao receber `WalletLinkedEvent`.
+
+## Purpose
+
+Marks the user's onboarding process as completed. This is the final Phase 3 of the onboarding flow, triggered when the user links their first wallet.
+
+## Input
+
+| Field  | Type | Description     |
+| :----- | :--- | :-------------- |
+| userId | uuid | User identifier |
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["WalletLinkedEvent"] --> B["UserSaga dispatches CompleteOnboardCommand"]
+    B --> C{"User exists?"}
+    C -- "No" --> D["Throw UserNotFoundError"]
+    C -- "Yes" --> E{"isOnboardCompleted?"}
+    E -- "Already true" --> F["Return (idempotent)"]
+    E -- "false" --> G["Set isOnboardCompleted = true"]
+    G --> H["Update updatedAt"]
+    H --> I["Persist changes"]
+```
+</MermaidZoom>
+
+## Side Effects
+
+- Updates `UserEntity.isOnboardCompleted` to `true`
+- Updates `UserEntity.updatedAt` timestamp
+
+> [!NOTE]
+> This command is **idempotent** — if `isOnboardCompleted` is already `true`, no changes are made.

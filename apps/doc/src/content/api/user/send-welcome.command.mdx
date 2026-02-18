@@ -1,0 +1,35 @@
+---
+title: "Send Welcome Email ⚙️"
+---
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
+
+> **Acesso**: `⚙️ Internal` — Disparado pela saga `UserSaga` ao receber `UserActivatedEvent`.
+
+## Purpose
+
+Sends a welcome email to the user after account activation, providing a direct link to the onboarding page.
+
+## Input
+
+| Field  | Type | Description     |
+| :----- | :--- | :-------------- |
+| userId | uuid | User identifier |
+
+## Diagram
+
+<MermaidZoom>
+```mermaid
+flowchart TD
+    A["UserActivatedEvent"] --> B["UserSaga dispatches SendWelcomeCommand"]
+    B --> C{"User exists?"}
+    C -- "No" --> D["Throw UserNotFoundError"]
+    C -- "Yes" --> E["Get user email"]
+    E --> F["Render welcome.html + welcome.text"]
+    F --> G["Send email via MailerPort"]
+```
+</MermaidZoom>
+
+## Side Effects
+
+- Sends email using templates `welcome.html` / `welcome.text` with subject **"Welcome to Investor!"**
+- Email contains the onboarding URL (`webBaseURL + webOnboardPath`)

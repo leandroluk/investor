@@ -2,6 +2,7 @@ import {
   GenerateUserWalletCommand,
   LinkUserWalletCommand,
   RequestWalletNonceCommand,
+  RevealWalletSeedCommand,
   UpdateUserProfileCommand,
   UploadDocumentCommand,
 } from '#/application/user/command';
@@ -11,7 +12,11 @@ import {
   DocumentNotFoundError,
   KycNotFoundError,
   ProfileNotFoundError,
+  UserInvalidCredentialsError,
+  UserInvalidOtpError,
   UserNotFoundError,
+  WalletNotFoundError,
+  WalletSeedNotAvailableError,
 } from '#/domain/account/errors';
 import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Res, UseGuards} from '@nestjs/common';
 import {CommandBus, QueryBus} from '@nestjs/cqrs';
@@ -34,6 +39,9 @@ import {
   LinkUserWalletBodyDTO,
   LinkUserWalletResultDTO,
   RequestWalletNonceResultDTO,
+  RevealWalletSeedBodyDTO,
+  RevealWalletSeedParamDTO,
+  RevealWalletSeedResultDTO,
   UpdateUserProfileBodyDTO,
   UploadDocumentBodyDTO,
   UploadDocumentResultDTO,
@@ -47,10 +55,14 @@ import {ListUserDocumentResultDTO} from './dto/list-user-document.dto';
 @UseGuards(AuthGuard, ChallengeGuard)
 @MapDomainError(
   [AuthUnauthorizedError, HttpStatus.UNAUTHORIZED],
+  [UserInvalidCredentialsError, HttpStatus.UNAUTHORIZED],
+  [UserInvalidOtpError, HttpStatus.UNAUTHORIZED],
   [UserNotFoundError, HttpStatus.NOT_FOUND],
+  [WalletNotFoundError, HttpStatus.NOT_FOUND],
   [KycNotFoundError, HttpStatus.NOT_FOUND],
   [ProfileNotFoundError, HttpStatus.NOT_FOUND],
-  [DocumentNotFoundError, HttpStatus.NOT_FOUND]
+  [DocumentNotFoundError, HttpStatus.NOT_FOUND],
+  [WalletSeedNotAvailableError, HttpStatus.BAD_REQUEST]
 )
 export class UserController {
   constructor(
@@ -92,6 +104,20 @@ export class UserController {
     @Body() body: GenerateUserWalletBodyDTO
   ): Promise<GenerateUserWalletResultDTO> {
     const result = await this.commandBus.execute(GenerateUserWalletCommand.new({...meta, ...body}));
+    return result;
+  }
+  // #endregion
+
+  // #region postRevealWalletSeed
+  @Post('wallet/:walletId/seed')
+  @ApiOperation({summary: 'Reveal wallet seed phrase'})
+  @ApiOkResponse({description: 'Seed revealed successfully'})
+  async postRevealWalletSeed(
+    @GetMeta() meta: GetMeta,
+    @Param() param: RevealWalletSeedParamDTO,
+    @Body() body: RevealWalletSeedBodyDTO
+  ): Promise<RevealWalletSeedResultDTO> {
+    const result = await this.commandBus.execute(RevealWalletSeedCommand.new({...meta, ...param, ...body}));
     return result;
   }
   // #endregion

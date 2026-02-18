@@ -1,7 +1,7 @@
 ---
 title: Update User Profile
 ---
-import {MermaidZoom} from '#/components/molecules/MermaidZoom'
+import { MermaidZoom } from '#/components/molecules/MermaidZoom'
 
 ## Rules
 
@@ -81,5 +81,28 @@ flowchart TD
   "code": "auth.unauthorized",
   "message": "Missing or invalid token",
   "occurredAt": "2023-01-01T00:00:00.000Z"
+}
+```
+
+## Emitted Events
+
+### User2FAToggledEvent _(Condicional)_
+
+**Tipo**: 📜 **Auditável** (`TOGGLE_2FA`)
+
+> [!IMPORTANT]
+> Este evento é emitido **APENAS se** o campo `twoFactorEnabled` for alterado. É **automaticamente registrado** no audit log (`tb_activity`) para rastreabilidade de mudanças de configuração de segurança.
+
+**Payload:**
+```json
+{
+  "correlationId": "018f3b5e-1234-7000-8000-000000000000",
+  "occurredAt": "2026-02-12T21:00:00.000Z",
+  "payload": {
+    "userId": "018f3b5e-5678-7000-8000-000000000001",
+    "deviceId": "018f3b5e-9999-7000-8000-000000000003",
+    "enabled": true,
+    "previousState": false
+  }
 }
 ```

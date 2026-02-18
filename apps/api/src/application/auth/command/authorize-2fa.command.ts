@@ -47,10 +47,13 @@ export class Authorize2FAHandler implements ICommandHandler<Authorize2FACommand,
       throw new UserInvalidOtpError('Invalid OTP');
     }
 
-    challenge.status = ChallengeStatusEnum.COMPLETED;
-    challenge.verifiedAt = new Date();
-    challenge.updatedAt = new Date();
-    await this.challengeRepository.update(challenge);
+    await this.challengeRepository.update(
+      Object.assign(challenge, {
+        status: ChallengeStatusEnum.COMPLETED,
+        verifiedAt: new Date(),
+        updatedAt: new Date(),
+      })
+    );
     await this.challengeStore.delete(challenge.userId);
 
     return challenge;

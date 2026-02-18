@@ -3,9 +3,9 @@ import {createClass} from '#/domain/_shared/factories';
 import {BrokerPort, StoragePort} from '#/domain/_shared/ports';
 import {DocumentEntity, KycEntity, UserEntity} from '#/domain/account/entities';
 import {DocumentStatusEnum, KycStatusEnum} from '#/domain/account/enums';
-import {KycNotFoundError, UserNotFoundError} from '#/domain/account/errors';
+import {DeviceNotFoundError, KycNotFoundError, UserNotFoundError} from '#/domain/account/errors';
 import {DocumentUploadedEvent} from '#/domain/account/events';
-import {DocumentRepository, KycRepository, UserRepository} from '#/domain/account/repositories';
+import {DeviceRepository, DocumentRepository, KycRepository, UserRepository} from '#/domain/account/repositories';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import z from 'zod';
 
@@ -13,6 +13,7 @@ export class UploadDocumentCommand extends createClass(
   Command,
   z.object({
     userId: UserEntity.schema.shape.id,
+    fingerprint: z.string().min(1),
     type: DocumentEntity.schema.shape.type,
     contentType: z.string().min(1).meta({
       description: 'File content type',
@@ -45,6 +46,7 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
     private readonly userRepository: UserRepository,
     private readonly kycRepository: KycRepository,
     private readonly documentRepository: DocumentRepository,
+    private readonly deviceRepository: DeviceRepository,
     private readonly storagePort: StoragePort,
     private readonly brokerPort: BrokerPort
   ) {}
@@ -62,6 +64,14 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
       throw new KycNotFoundError();
     }
     return {user, kyc};
+  }
+
+  private async getDevice(userId: string, fingerprint: string): Promise<string> {
+    const device = await this.deviceRepository.findByFingerprint(userId, fingerprint);
+    if (!device) {
+      throw new DeviceNotFoundError();
+    }
+    return device.id;
   }
 
   private async createDocumentWithUploadURL(
@@ -96,23 +106,26 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
   private async publishDocumentUploadedEvent(
     correlationId: string,
     occurredAt: Date,
-    document: DocumentEntity
+    document: DocumentEntity,
+    deviceId: string
   ): Promise<void> {
     await this.brokerPort.publish(
       new DocumentUploadedEvent(correlationId, occurredAt, {
         documentId: document.id,
         documentUserId: document.userId,
+        deviceId,
       })
     );
   }
 
   async execute(command: UploadDocumentCommand): Promise<UploadDocumentCommandResult> {
-    const {userId, type, correlationId, occurredAt} = command;
+    const {userId, type, correlationId, occurredAt, fingerprint} = command;
     const {user, kyc} = await this.getUserAndKyc(userId);
+    const deviceId = await this.getDevice(userId, fingerprint);
 
     const {document, uploadURL, expiresAt} = await this.createDocumentWithUploadURL(type, user, kyc);
     await this.updateKycStatus(kyc);
-    await this.publishDocumentUploadedEvent(correlationId, occurredAt, document);
+    await this.publishDocumentUploadedEvent(correlationId, occurredAt, document, deviceId);
 
     return UploadDocumentCommandResult.new({
       id: document.id,

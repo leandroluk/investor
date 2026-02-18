@@ -76,7 +76,6 @@ export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserC
       new UserRegisteredEvent(correlationId, user.createdAt, {
         userId: user.id,
         userEmail: user.email,
-        userRole: user.role,
       })
     );
   }
